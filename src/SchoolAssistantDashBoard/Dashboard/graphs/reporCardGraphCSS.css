@@ -1,0 +1,14 @@
+#chart ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+#chart{
+    margin: 40px 20px;
+    overflow: hidden;
+   padding-top: 30px;
+}
+.graph{
+    max-height: 400px;
+    overflow: hidden;
+}

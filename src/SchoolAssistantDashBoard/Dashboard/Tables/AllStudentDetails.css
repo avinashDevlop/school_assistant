@@ -1,0 +1,8 @@
+.table-container ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+  .table-container{
+    height: 480px;
+  }  
+  

@@ -1,0 +1,21 @@
+/* Add these styles to your CSS file or component */
+.noStud{
+    padding-right: 10%;
+  }
+  .detailStud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      overflow-y: hidden;
+    }
+    select {
+      padding: 3px;
+      font-size: 16px;
+      border: none;    
+      background-color: #D9D9D9;
+      height: 30px;
+    }
+  .studGraphtop{
+    margin-top: -50px;
+  }
+  

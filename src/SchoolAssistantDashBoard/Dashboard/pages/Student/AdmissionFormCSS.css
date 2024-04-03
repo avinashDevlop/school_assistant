@@ -1,0 +1,71 @@
+.admission-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(238, 239, 245, 0.938);
+  }
+  
+  form {
+    display: grid;
+    gap: 10px;
+  }
+  
+  label {
+    font-weight: bold;
+  }
+  
+  input,
+  textarea {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    margin-top: 4px;
+  }
+  .droplist{
+    border: 2px solid rgb(199, 208, 240);
+    height: 50px;
+  }
+  button {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  .admission-form h2{
+     color: rgb(29, 29, 161);
+     text-align: center;
+     border: 2px solid rgb(197, 152, 152);
+     border-radius: 10px;
+     overflow-y: hidden;
+     margin: 15px 120px;
+     padding: 2px;
+  }
+  .gender-label {
+    display: flex;
+    gap: 10px; /* Adjust the value as needed */
+  }
+  
+  .gender-radio {
+    display: flex;
+    align-items: center;
+    margin-right: 10px; /* Adjust the value as needed */
+  }
+  
+  .gender-radio:last-child {
+    margin-right: 0; /* Removes margin from the last element */
+  }
+  
+  .gender-radio input[type="radio"] {
+    margin-right: 5px; /* Adjust the value as needed */
+  }
+  .gender{
+    width: 120px;
+    padding-bottom: 5px;
+    padding-left: -25px;
+  }

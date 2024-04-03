@@ -1,0 +1,19 @@
+#sheet{
+    margin-top: -50px;
+}
+.dropdown{
+    display: flex;
+    justify-content: space-around;
+    width: 50%;
+}
+.forcss{
+    height: 40%;
+}
+.alldropdowns{
+    display: flex;
+    justify-content: space-evenly;
+    background-color: rgb(255, 249, 249);
+}
+.graph{
+    padding-bottom: 0px;
+}

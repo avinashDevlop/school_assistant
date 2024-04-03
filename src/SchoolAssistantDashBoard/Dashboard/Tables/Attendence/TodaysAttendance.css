@@ -1,0 +1,35 @@
+.Absent{
+    color: red;
+ font-size: large;
+}
+.Present{
+    color: rgb(6, 214, 6);
+    font-size: large;
+}
+
+/* styles.css */
+.markFooter {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px;
+    background-color: #FFF9F9;
+  }
+  .customInput {
+    width: 300px; /* Adjust width as needed */
+  }
+  .inputContainer {
+    display: flex;
+    align-items: center;
+  }
+  .buttonContainer{
+    display: flex;
+    align-items: center;
+  }
+  .outlinedInput {
+    margin-left: 10px; /* Adjust margin as needed */
+  }
+  
+  .buttonContainer {
+    margin-left: 10px; /* Adjust margin as needed */
+  }

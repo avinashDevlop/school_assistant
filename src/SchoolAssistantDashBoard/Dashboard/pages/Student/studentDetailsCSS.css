@@ -1,0 +1,76 @@
+.margin{
+    margin: 0px 55px;
+    padding: 0px 10px;
+    border-radius: 10px;
+}
+.img{
+    padding: 0px 30px;
+    padding-top: 20px;  
+}
+.allDetails{
+    display: flex;
+    justify-content: space-between;
+    background-color: #ffffff;
+    margin: 0px 58px;
+}
+.about{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    width: 50%;
+}
+.gradeAndAttend{
+    display: flex;
+    justify-content: space-between;
+    width: 50%;
+}
+.info{
+    font-weight: 500;
+    padding: 20px;
+}
+.info div {
+    padding: 10px;
+  }
+.profile{
+    height: 150px;
+    width: 150px;
+    border-radius: 50%;
+    background-color: rgb(180, 221, 187);
+}
+.attendence,.grades {
+    height: 80px;
+    width:80px;
+    background-color: beige;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.results{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+.name,.profile{
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+.reportCard{
+    margin: 0px 58px 0px 58px;
+    background-color: #ffffff;
+    box-shadow: rgba(99, 99, 99, 0);
+    height: 500px;
+    border-top: 1px solid rgb(201, 201, 221);
+    overflow: hidden;
+}
+.paymentHystory{
+    background-color: white;
+    margin: 0 60px;
+}
+#payment{
+    background-color: #ffffff;
+    border-top: 1px solid rgb(201, 201, 221);
+}

@@ -1,0 +1,97 @@
+/* TeacherDetailsCSS.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+.teacher-dashboard {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #f8f8f8;
+  margin: 0;
+}
+
+.teacher-dashboard {
+  margin: 20px 10px;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.teacher-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.teacher-photo {
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  margin-right: 20px;
+}
+
+.teacher-details {
+  max-width: 400px;
+}
+
+.teacher-details h2 {
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.teacher-details p {
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.teacher-body {
+  margin-top: 20px;
+}
+
+.teacher-section {
+  margin-bottom: 20px;
+}
+
+.teacher-section h3 {
+  color: #333;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.teacher-section p {
+  color: #555;
+  font-size: 16px;
+}
+
+.teacher-section ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 5px;
+}
+
+.teacher-section li {
+  color: #777;
+}
+
+h3 span {
+  color: #777;
+  font-weight: normal;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .teacher-header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .teacher-photo {
+    margin-bottom: 20px;
+  }
+
+  .teacher-details {
+    max-width: none;
+    text-align: center;
+  }
+}

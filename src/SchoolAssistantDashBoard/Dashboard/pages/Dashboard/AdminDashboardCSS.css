@@ -1,0 +1,177 @@
+.container_top{
+    margin: 0px 5%;
+    height: 90px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+}
+.container_top_data{
+    display: flex;
+    justify-content: space-evenly;
+    height: 65px;
+    width: 100%;
+    align-items: center;
+    margin-left: -25px;
+}
+.item{
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: space-evenly;
+}
+.item .icon1{
+    background-color: #9992e7;
+    color: white;
+    padding: 10px;
+    font-size: 30px;
+    border-radius: 40%;
+    margin-right: 25px;
+    margin-left: 30px;
+}
+.item .icon2{
+    background-color: #4da8a1;
+    color: white;
+    padding: 10px;
+    font-size: 30px;
+    border-radius: 40%;
+}
+.item .icon3{
+    background-color: #a2c47b;
+    color: white;
+    padding: 10px;
+    font-size: 30px;
+    border-radius: 40%;
+    margin-right: 25px;
+}
+.item .icon4{
+    background-color: #c07d6b;
+    color: white;
+    padding: 10px;
+    font-size: 30px;
+    border-radius: 40%;
+    margin-right: 25px;
+}
+
+.dataName{
+    color:#A098AE;
+    font-family: poppins;
+}
+.green{
+    color: #2F9C09;
+}
+
+.container_Bottom_data {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 50px 0px;
+  }
+  
+  .Lastcard {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    width: 150px;
+    border-radius: 40px;
+    justify-content: space-around;
+    cursor: pointer;
+    color: #A098AE;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .Lastcard:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    
+  }
+  
+  .facebook, .instragram, .WhatsApp, .Website {
+    font-size: 50px;
+  }
+  
+  .facebook {
+    color: #1877f2;
+  }
+  
+  .instragram {
+    color: #e1306c;
+  }
+  
+  .WhatsApp {
+    color: #25d366;
+  }
+  
+.Website{
+    color: rgb(24, 216, 223);
+    font-size: 50px;
+}
+.Lastcard{
+    display: flex;
+    align-items: center;
+    background-color: white;
+    width: 150px;
+    border-radius: 40px;
+    justify-content: space-around;
+    cursor:pointer;
+    color: #A098AE;
+    font-weight: 500;
+}
+
+.studGraph{
+    padding: 55px 55px 0px 55px;
+}
+.detailStud{
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    height: 60px;
+}
+.threeDots,.noStud{
+   padding: 20px;
+   overflow-y: hidden;
+   font-size: large;
+}
+.noStud{
+    color: #715a99;
+}
+.detailExam{
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+}
+.leftOne,.RightOne{
+    padding: 10px;
+   overflow-y: hidden;
+   font-size: medium;
+}
+.Onename{
+    font-size: large;
+    color:#ac8ee4;
+    font-weight: 400;
+}
+.detailExam{
+    background-color: #F3F4FF;
+    border: 15px solid white;
+}
+.tableStudentMarks{
+    padding: 20px;
+    border: 10px solid white;
+}
+/* Media Query for smaller screens */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .dashboard-content {
+        order: -1;
+        /* Move the content above the sidebar on smaller screens */
+        margin-left: 0;
+        /* Reset the margin for smaller screens */
+    }
+}   
+.icon{
+    margin-left: 65px;
+}

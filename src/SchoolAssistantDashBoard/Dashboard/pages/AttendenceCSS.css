@@ -1,0 +1,60 @@
+.sheet {
+    margin-top: -50px;
+  }
+  
+  .title {
+    font-size: larger;
+    margin-top: 10px;
+    margin-right: 30px;
+  }
+  
+  .attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .attendance-table th,
+  .attendance-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .attendance-table th {
+    background-color: #f2f2f2;
+    text-align: center;
+  }
+  
+  .attendance-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .attendance-table tbody tr:hover {
+    background-color: #c9c9c95d;
+  }
+  
+  .attendance-table td:last-child {
+    text-align: center;
+  }
+
+  .attendance-table td:nth-child(1),
+  .attendance-table th:nth-child(1) {
+    width: 20%; /* Adjust the width of the Roll Number column */
+  }
+  
+  .attendance-table td:nth-child(2),
+  .attendance-table th:nth-child(2) {
+    width: 50%; /* Adjust the width of the Name column */
+  }
+  
+  .attendance-table td:nth-child(3),
+  .attendance-table th:nth-child(3) {
+    width: 30%; /* Adjust the width of the Present/Absent column */
+  }
+  .attendance-table td.student-name {
+    padding-left: 5%;
+  }
+  .center-text {
+    text-align: center;
+  }
+ 

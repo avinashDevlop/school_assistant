@@ -1,0 +1,76 @@
+/* Existing CSS */
+.dropdowns {
+    display: flex;
+    justify-content: space-around;
+    width: 40%;
+}
+.studGraph1{
+    margin-top: -50px;
+}
+.updateTimeTable{
+   margin: 0 10px;
+}
+.detailStud2{
+    margin: 0px -45px;
+}
+.timetable {
+    width: 50%;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+.timetable td,
+.timetable th {
+    padding: 5px;
+    border: 1px solid #ddd;
+}
+
+.timetable th {
+    background-color: #f2f2f2;
+}
+
+.dropdowns {
+    display: flex;
+}
+
+.dropdowns > div {
+    margin-right: 10px;
+}
+
+.updateTimeTable {
+    overflow-x: auto;
+}
+
+.noStud {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* New CSS for input tags */
+.timetable input[type="time"],
+.timetable input[type="text"] {
+    width: 130px; /* Adjust the width as needed */
+    height: 50px; /* Adjust the height as needed */
+}
+
+/* Media query for smaller screens */
+@media screen and (max-width: 600px) {
+    .dropdowns {
+        flex-direction: column;
+    }
+
+    .dropdowns > div {
+        margin-bottom: 10px;
+    }
+}
+.teach {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: white;
+    padding: 20px 0;
+    margin: 0 10px;
+  }
+  .teach input[type="text"] {
+    width: 60%; /* Set your desired width here */
+  }  
