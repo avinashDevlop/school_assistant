@@ -19,8 +19,8 @@ const AssignedTransportList = () => {
             const students = [];
             for (const [className, sections] of Object.entries(data)) {
                 for (const [sectionName, studentEntries] of Object.entries(sections)) {
-                    for (const [, studentData] of Object.entries(studentEntries)) {
-                        students.push({
+                    for (const studentData of Object.values(studentEntries)) {
+                        students.push({ 
                             name: `${studentData.name} ${studentData.surname}`,
                             classSection: `${className} / ${sectionName}`
                         });
@@ -38,7 +38,7 @@ const AssignedTransportList = () => {
     const fetchDrivers = useCallback(async () => {
         try {
             setLoadingDrivers(true);
-            const response = await api.get('accounts/Driver.json');
+            const response = await api.get('https://studentassistant-18fdd-default-rtdb.firebaseio.com/accounts/Driver.json');
             const data = response.data || {};
             const drivers = Object.values(data);
             setDriverOptions(drivers);

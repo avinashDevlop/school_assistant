@@ -55,7 +55,9 @@ const TodaysAttendance = () => {
   const [presentStudents, setPresentStudents] = useState(0);
   const [sectionOptions, setSectionOptions] = useState([]);
   const [holidayName, setHolidayName] = useState("");
-  const [submitDisabled, setSubmitDisabled] = useState(true);
+  const [submitDisabled, setSubmitDisabled] = useState(true); // Initialize submit button as disabled
+  const [attendanceNames, setAttendanceNames] = useState({});
+  const [errorMessage, setErrorMessage] = useState("");
 
   const classOptions = [
     "10th Class",
@@ -73,6 +75,7 @@ const TodaysAttendance = () => {
     "Pre-K",
   ];
 
+  // Fetches current date and formats it
   useEffect(() => {
     const now = new Date();
     const days = [
@@ -83,56 +86,117 @@ const TodaysAttendance = () => {
       "Thursday",
       "Friday",
       "Saturday",
-    ]; 
+    ];
     const currentDay = days[now.getDay()];
     const date = now.getDate();
-    const month = now.toLocaleString("default", { month: "long" }).toLowerCase();
+    const month = now
+      .toLocaleString("default", { month: "long" })
+      .toLowerCase(); // Get full month name
     const year = now.getFullYear();
     setCurrentDate(`${currentDay}, ${month} ${date}, ${year}`);
   }, []);
-
-  useEffect(() => {
-    const fetchSections = async () => {
-      try {
-        setLoadingSections(true);
-        const response = await api.get(`admissionForms/${selectedClass}.json`);
-        const data = response.data || {};
+// Fetches sections based on selected class
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setLoadingSections(true);
+      const response = await api.get(
+        `admissionForms/${selectedClass}.json`
+      );
+      const data = response.data || {};
+      if (Object.keys(data).length > 0) {
         const sections = Object.keys(data);
+        console.log("Sections:", sections); // Log sections to verify data
         setSectionOptions(sections);
         setSelectedSection(sections[0] || "");
-        setLoadingSections(false);
-      } catch (error) {
-        setLoadingSections(false);
-        console.error("Error fetching sections:", error);
       }
-    };
-    fetchSections();
-  }, [selectedClass]);
+      setLoadingSections(false);
+    } catch (error) {
+      setLoadingSections(false);
+      console.error("Error fetching sections:", error);
+      // Handle error gracefully, e.g., display a message to the user
+    }
+  };
 
+  fetchData();
+}, [selectedClass]);
+
+  // Fetches attendance data and holiday data based on selected class and section
   useEffect(() => {
-    const fetchAttendanceData = async () => {
+    const fetchData = async () => {
       try {
         setLoadingStudents(true);
+        setErrorMessage(""); // Clear any previous error message
+  
         if (selectedClass && selectedSection) {
-          const now = new Date();
-          const month = now.toLocaleString("default", { month: "long" }).toLowerCase();
-          const date = now.getDate();
-          const attendanceResponse = await api.get(
-            `Attendance/StudAttendance/${selectedClass}/${selectedSection}/${month}/${month}_${date}.json`
-          );
-          const attendanceData = attendanceResponse.data || {};
-          const studentResponse = await api.get(
+          const response = await api.get(
             `admissionForms/${selectedClass}/${selectedSection}.json`
           );
-          const studentData = studentResponse.data || {};
-          const studentArray = Object.keys(studentData).map((key) => ({
-            id: key,
-            ...studentData[key],
-            present: attendanceData.present?.includes(key) || false,
-          }));
-          setStudents(studentArray);
-          setTotalStudents(studentArray.length);
-          setPresentStudents(studentArray.filter(student => student.present).length);
+          const studentData = response.data || {};
+          if (Object.keys(studentData).length > 0) {
+            const studentArray = Object.keys(studentData).map((key) => ({
+              id: key,
+              ...studentData[key],
+              present: false,
+            }));
+            setStudents(studentArray);
+            setTotalStudents(studentArray.length);
+            setPresentStudents(0);
+            setErrorMessage(""); // Clear any previous error message
+          } else {
+            setStudents([]);
+            setTotalStudents(0);
+            setPresentStudents(0);
+            setErrorMessage("No students found.");
+          }
+        } else {
+          setStudents([]);
+          setTotalStudents(0);
+          setPresentStudents(0);
+          setErrorMessage("");
+        }
+        setLoadingStudents(false);
+      } catch (error) {
+        setLoadingStudents(false);
+        setErrorMessage("Error fetching student data.");
+        console.error("Error fetching student data:", error);
+      }
+    };
+  
+    // Call fetchData only if selectedClass and selectedSection are truthy
+    if (selectedClass && selectedSection) {
+      fetchData();
+    }
+  }, [selectedClass, selectedSection]);
+  
+
+
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      try {
+        setLoadingStudents(true);
+        setErrorMessage(""); // Clear any previous error message
+        
+        if (selectedClass && selectedSection) {
+          const response = await api.get(
+            `admissionForms/${selectedClass}/${selectedSection}.json`
+          );
+          const studentData = response.data || {};
+          if (Object.keys(studentData).length > 0) {
+            const studentArray = Object.keys(studentData).map((key) => ({
+              id: key,
+              ...studentData[key],
+              present: false,
+            }));
+            setStudents(studentArray);
+            setTotalStudents(studentArray.length);
+            setPresentStudents(0);
+          } else {
+            setStudents([]);
+            setTotalStudents(0);
+            setPresentStudents(0);
+            setErrorMessage("No students found.");
+          }
         } else {
           setStudents([]);
           setTotalStudents(0);
@@ -141,65 +205,136 @@ const TodaysAttendance = () => {
         setLoadingStudents(false);
       } catch (error) {
         setLoadingStudents(false);
+        setErrorMessage("Error fetching student data.");
         console.error("Error fetching student data:", error);
       }
     };
-    if (selectedClass && selectedSection) {
-      fetchAttendanceData();
+  
+    // Call fetchStudentData only if selectedClass is truthy
+    if (selectedClass) {
+      fetchStudentData();
     }
   }, [selectedClass, selectedSection]);
-
   const toggleAttendance = (id) => {
     const updatedStudents = students.map((student) =>
       student.id === id ? { ...student, present: !student.present } : student
     );
     setStudents(updatedStudents);
-    setPresentStudents(updatedStudents.filter((student) => student.present).length);
+  
+    const presentCount = updatedStudents.filter((student) => student.present).length;
+    setPresentStudents(presentCount);
+  
+    // Enable submit button if at least one student's attendance is updated
     setSubmitDisabled(false);
   };
-
+  
+  useEffect(() => {
+    const fetchAttendanceData = async () => {
+      try {
+        setLoadingStudents(true);
+        setErrorMessage("");
+  
+        if (selectedClass && selectedSection) {
+          const now = new Date();
+          const month = now.toLocaleString("default", { month: "long" }).toLowerCase();
+          const date = now.getDate();
+  
+          const attendanceResponse = await api.get(
+            `Attendance/StudAttendance/${selectedClass}/${selectedSection}/${month}/${month}_${date}.json`
+          );
+          const attendanceData = attendanceResponse.data || {};
+  
+          const studentResponse = await api.get(
+            `admissionForms/${selectedClass}/${selectedSection}.json`
+          );
+          const studentData = studentResponse.data || {};
+  
+          if (Object.keys(studentData).length > 0) {
+            const studentArray = Object.keys(studentData).map((key) => ({
+              id: key,
+              ...studentData[key],
+              present: attendanceData.present?.includes(key) || false,
+            }));
+            setStudents(studentArray);
+            setTotalStudents(studentArray.length);
+            setPresentStudents(studentArray.filter(student => student.present).length);
+            setErrorMessage("");
+          } else {
+            setStudents([]);
+            setTotalStudents(0);
+            setPresentStudents(0);
+            setErrorMessage("No students found.");
+          }
+        } else {
+          setStudents([]);
+          setTotalStudents(0);
+          setPresentStudents(0);
+          setErrorMessage("");
+        }
+        setLoadingStudents(false);
+      } catch (error) {
+        setLoadingStudents(false);
+        setErrorMessage("Error fetching student data.");
+        console.error("Error fetching student data:", error);
+      }
+    };
+  
+    if (selectedClass && selectedSection) {
+      fetchAttendanceData();
+    }
+  }, [selectedClass, selectedSection]);
+  
   const handleClassChange = (event) => {
     setSelectedClass(event.target.value);
-    setSelectedSection("");
-    setStudents([]);
-    setTotalStudents(0);
-    setPresentStudents(0);
-    setHolidayName("");
+    setSelectedSection(""); // Reset selected section
+    setStudents([]); // Reset student data
+    setTotalStudents(0); // Reset total students count
+    setPresentStudents(0); // Reset present students count
+    setHolidayName(""); // Reset holiday name
+    setErrorMessage("");
   };
-
+  // Handles section change event
   const handleSectionChange = (event) => {
     setSelectedSection(event.target.value);
   };
 
+  // Handles holiday input change event
   const handleHolidayInputChange = (event) => {
     const holidayName = event.target.value;
     setHolidayName(holidayName);
+
+    // Enable submit button if holiday name field is not empty
     setSubmitDisabled(holidayName.trim() === "");
   };
 
+  // Handles attendance submission
   const handleSubmitAttendance = async () => {
     try {
       const holidayInput = document.getElementById("holiday-input");
-      const holidayName = holidayInput.value.trim();
+      const holidayName = holidayInput.value.trim(); // Remove any leading or trailing whitespace
 
       if (holidayName) {
         const confirmation = window.confirm(
           `Are you sure you want to submit the holiday?\nHoliday: ${holidayName}`
         );
         if (confirmation) {
+          // Submit holiday data to the database
           await submitHolidayToDatabase(holidayName);
           return;
         }
         return;
       }
 
+      // Submit regular attendance data to the database
       await submitRegularAttendanceToDatabase();
 
+      // Automatically select the next section in the class
       const currentSectionIndex = sectionOptions.indexOf(selectedSection);
       const nextSectionIndex =
         (currentSectionIndex + 1) % sectionOptions.length;
       setSelectedSection(sectionOptions[nextSectionIndex]);
 
+      // Disable submit button again after submission
       setSubmitDisabled(true);
     } catch (error) {
       console.error("Error submitting attendance:", error);
@@ -207,18 +342,25 @@ const TodaysAttendance = () => {
     }
   };
 
+  // Submits holiday data to the database
   const submitHolidayToDatabase = async (holidayName) => {
     try {
       const now = new Date();
-      const month = now.toLocaleString("default", { month: "long" }).toLowerCase();
+      const month = now
+        .toLocaleString("default", { month: "long" })
+        .toLowerCase();
       const date = now.getDate();
       const holidayData = {
         isHoliday: true,
         holidayName: holidayName,
       };
+
+      // Iterate over each class and section and send holiday data
       await Promise.all(
         classOptions.map(async (classOption) => {
-          const response = await api.get(`admissionForms/${classOption}.json`);
+          const response = await api.get(
+            `admissionForms/${classOption}.json`
+          );
           const sections = Object.keys(response.data || {});
           await Promise.all(
             sections.map(async (section) => {
@@ -230,31 +372,33 @@ const TodaysAttendance = () => {
           );
         })
       );
-      setHolidayName("");
+
+      setHolidayName(""); // Reset holiday name input
     } catch (error) {
       console.error("Error submitting holiday:", error);
       alert("Submit Error!!!");
     }
   };
 
+  // Submits regular attendance data to the database
   const submitRegularAttendanceToDatabase = async () => {
     const now = new Date();
-    const month = now.toLocaleString("default", { month: "long" }).toLowerCase();
+    const month = now
+      .toLocaleString("default", { month: "long" })
+      .toLowerCase();
     const date = now.getDate();
     const presentStudentsData = students.filter((student) => student.present);
     const absentStudentsData = students.filter((student) => !student.present);
     const attendanceData = {
-      present: presentStudentsData.map((student) => student.id),
-      absent: absentStudentsData.map((student) => student.id),
+      [`present`]: presentStudentsData.map(
+        (student) => `${student.id}`
+      ),
+      [`absent`]: absentStudentsData.map(
+        (student) => `${student.id}`
+      ),
     };
     const confirmation = window.confirm(
-      `Are you sure you want to submit the attendance?\
-
-n\nTotal Students: ${totalStudents}\nPresent Students: ${presentStudents}\n\nPresent Students:\n${presentStudentsData
-        .map((student) => `${student.firstName} ${student.lastName}`)
-        .join("\n")}\n\nAbsent Students:\n${absentStudentsData
-        .map((student) => `${student.firstName} ${student.lastName}`)
-        .join("\n")}`
+      `Are you sure you want to submit the attendance?\nPresent: ${presentStudentsData.length}, Absent: ${absentStudentsData.length}`
     );
     if (confirmation) {
       await api.put(
@@ -265,96 +409,129 @@ n\nTotal Students: ${totalStudents}\nPresent Students: ${presentStudents}\n\nPre
   };
 
   return (
-    <div className="attendance-page">
-      <h2 className="attendance-heading">Today's Attendance</h2>
-      <p className="current-date">{currentDate}</p>
-      <div className="attendance-form">
-        <FormControl variant="outlined" className="attendance-form-control">
-          <InputLabel id="class-select-label">Select Class</InputLabel>
-          <Select
-            labelId="class-select-label"
-            id="class-select"
-            value={selectedClass}
-            onChange={handleClassChange}
-            label="Select Class"
-            input={<OutlinedInput label="Select Class" />}
-          >
-            {classOptions.map((classOption) => (
-              <MenuItem key={classOption} value={classOption}>
-                {classOption}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl variant="outlined" className="attendance-form-control">
-          <InputLabel id="section-select-label">Select Section</InputLabel>
-          {loadingSections ? (
-            <CircularProgress size={24} />
-          ) : (
-            <Select
-              labelId="section-select-label"
-              id="section-select"
-              value={selectedSection}
-              onChange={handleSectionChange}
-              label="Select Section"
-              input={<OutlinedInput label="Select Section" />}
-            >
-              {sectionOptions.map((section) => (
-                <MenuItem key={section} value={section}>
-                  {section}
-                </MenuItem>
-              ))}
-            </Select>
-          )}
-        </FormControl>
-      </div>
-      <div className="holiday-section">
-        <label htmlFor="holiday-input">Holiday Name (if any):</label>
-        <input
-          type="text"
-          id="holiday-input"
-          value={holidayName}
-          onChange={handleHolidayInputChange}
-          className="holiday-input"
-          placeholder="Enter holiday name"
-        />
-      </div>
-      {loadingStudents ? (
-        <div className="loading-indicator">
-          <CircularProgress size={48} />
-        </div>
-      ) : (
-        <div className="attendance-container">
-          <div className="attendance-header">
-            <h3>Students List</h3>
-            <p>Total Students: {totalStudents}</p>
-            <p>Present Students: {presentStudents}</p>
+    <div>
+      <div className="studGraph">
+        <div className="detailStud alldropdowns">
+          <div className="noStud title">Today's Attendance - {currentDate}</div>
+          <div className="Class">
+            <FormControl fullWidth variant="filled">
+              <InputLabel id="class-label">Class</InputLabel>
+              <Select
+                labelId="class-label"
+                id="class-select"
+                value={selectedClass}
+                onChange={handleClassChange}
+              >
+                {classOptions.map((className, index) => (
+                  <MenuItem key={index} value={className}>
+                    {className}
+                  </MenuItem>
+                ))}
+                ;
+              </Select>
+            </FormControl>
           </div>
-          <div className="student-list">
-            {students.map((student) => (
-              <div key={student.id} className="student-item">
-                <span>
-                  {student.firstName} {student.lastName}
-                </span>
-                <Android12Switch
-                  checked={student.present}
-                  onChange={() => toggleAttendance(student.id)}
-                  inputProps={{ "aria-label": "attendance switch" }}
-                />
-              </div>
-            ))}
+          <div className="Section">
+            <FormControl fullWidth variant="filled">
+              <InputLabel id="section-label">Section</InputLabel>
+              <Select
+                labelId="section-label"
+                id="section-select"
+                value={selectedSection}
+                onChange={handleSectionChange}
+              >
+                {sectionOptions.map((section, index) => (
+                  <MenuItem key={index} value={section}>
+                    {section}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </div>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmitAttendance}
-            className="submit-button"
-            disabled={submitDisabled}
-          >
-            Submit Attendance
-          </Button>
         </div>
-      )}
+        <div className="tableTopStud">
+          <div className="tableStudentMarks forcss">
+            {loadingStudents ? (
+              <CircularProgress />
+            ) : (
+              <table className="attendance-table">
+                <thead>
+                  <tr>
+                    <th className="center">Roll Number</th>
+                    <th className="center">Name</th>
+                    <th className="center">
+                     Present:{" "}<span className="Present">{presentStudents}</span>
+                      / Absent:{" "}
+                      <span className="Absent">
+                        {totalStudents - presentStudents}
+                      </span>{" "}                  
+                     </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {students.length > 0 ? (
+                    students.map((student, index) => (
+                      <tr key={student.id}>
+                        <td style={{ textAlign: "center" }}>{index + 1}</td>
+                        <td className="student-name">
+                         {`${student.surname || ''} ${student.name || ''}` || attendanceNames[student.id] || student.id}
+                       </td>
+                        <td> 
+                          <Android12Switch
+                            checked={student.present}
+                            onChange={() => toggleAttendance(student.id)}
+                          />
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="3" style={{ textAlign: "center" }}>
+                        {loadingSections
+                          ? "Loading sections..."
+                          : "No students found"}
+                      </td>
+                    </tr>
+                  )}
+                  {/* Displaying IRR if it's a holiday */}
+                  {holidayName && (
+                    <tr>
+                      <td colSpan="3" style={{ textAlign: "center" }}>
+                        {holidayName}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
+          </div>
+          <div className="markFooter">
+            <div className="buttonContainer">
+              <InputLabel htmlFor="outlined-input">
+                If Holiday : &nbsp;
+              </InputLabel>
+              <OutlinedInput
+                id="holiday-input"
+                value={holidayName}
+                onChange={handleHolidayInputChange}
+                placeholder="Holiday name then submit"
+                className="customInput"
+                style={{ width: "300px" }} // Adjust width as needed
+              />
+            </div>
+            <div>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={handleSubmitAttendance}
+                disabled={submitDisabled} // Set disabled attribute based on submitDisabled state
+              >
+                Submit
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

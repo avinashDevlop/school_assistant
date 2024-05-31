@@ -1,0 +1,26 @@
+#abc{
+    background-color: #d9f6f8;
+}
+.login{
+    overflow: hidden;
+}
+.login-btn1{
+    background-color: #2f33ff; /* Green background */
+    border: none;             /* No border */
+    color: white;             /* White text */
+    padding: 10px 100px 10px 100px;  
+    display: flex;
+    justify-content: center;    
+    align-items: center;       /* Centered text */
+    text-decoration: none;    /* No underline */
+    display: flex;    /* Inline-block display */    
+    font-size: 19px;          /* Font size */
+    cursor: pointer;          /* Pointer cursor on hover */
+    border-radius: 8px;       /* Rounded corners */
+    transition: background-color 0.3s ease;
+    width: 80px;
+}
+.d-grid {
+    display: flex;
+    padding-left: 5%;
+  }
