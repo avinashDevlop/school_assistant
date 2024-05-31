@@ -1,0 +1,181 @@
+.notice-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+  }
+  
+  .notice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .notice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .notice-card {
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .notice-date {
+    font-size: 12px;
+    color: #999;
+  }
+  
+  .notice-type {
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  
+  .notice-type-announcement { color: #ff6347; }
+  .notice-type-assignment { color: #4682b4; }
+  .notice-type-grade { color: #32cd32; }
+  .notice-type-feedback { color: #ff4500; }
+  .notice-type-emergency { color: #ff0000; }
+  
+  .notice-title {
+    font-size: 18px;
+    margin: 10px 0;
+  }
+  
+  .notice-content {
+    color: #666;
+  }
+  
+  .btn-delete {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-delete:hover {
+  
+  
+    background-color: #c0392b;
+  }
+  
+  .refresh-btn {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .refresh-btn:hover {
+    background-color: #2980b9;
+  }
+  
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    animation: slideIn 0.5s ease-in-out;
+  }
+  
+  .btn-close {
+    position: absolute;
+    color: hsl(241, 100%, 50%);
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  
+  .btn-close:hover {
+    color: #ddd;
+    background-color: #c0392b;
+    padding-bottom: 14px;
+  }
+  
+  .modal-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .input-field {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  textarea.input-field {
+    height: 100px;
+    resize: none;
+  }
+  
+  select.input-field {
+    height: 40px;
+  }
+  
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .btn-submit {
+    background-color: #2ecc71;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-submit:hover {
+    background-color: #27ae60;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateY(-50px); }
+    to { transform: translateY(0); }
+  }

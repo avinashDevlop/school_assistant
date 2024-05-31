@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useEffect } from "react";
+import axios from "axios";
 import { MaterialReactTable } from "material-react-table";
 import "./AllStudentDetails.css";
 import Box from "@mui/material/Box";
 import Skeleton from "@mui/material/Skeleton";
-import api from '../../../api';
 
 const Example = () => {
   const [selectedClass, setSelectedClass] = useState("10th Class");
@@ -18,10 +18,10 @@ const Example = () => {
     const fetchClassOptions = async () => {
       try {
         setLoading(true);
-        const response = await api.get(
-          "admissionForms/previousYearStudents.json"
+        const response = await axios.get(
+          "https://studentassistant-18fdd-default-rtdb.firebaseio.com/admissionForms/previousYearStudents.json"
         );
-        const data = response.data;
+        const data = response.data || {}; // Default to an empty object if data is undefined
 
         const dataArray = Object.entries(data).map(([value, label]) => ({
           value,
@@ -29,29 +29,36 @@ const Example = () => {
         }));
         setDataArray(dataArray);
 
-        if (data) {
-          const fetchedOptions = Object.keys(data).map((className) => ({
+        const fetchedOptions = Object.keys(data).map((className) => ({
+          value: className,
+          label: className,
+        }));
+
+        const defaultOptions = [
+          "10th Class",
+          "9th Class",
+          "8th Class",
+          "7th Class",
+          "6th Class",
+          "5th Class",
+          "4th Class",
+          "3rd Class",
+          "2nd Class",
+          "1st Class",
+          "UKG",
+          "LKG",
+          "Pre-K",
+        ];
+
+        const options = [
+          ...defaultOptions.map((className) => ({
             value: className,
             label: className,
-          }));
-          const options = [
-            "10th Class",
-            "9th Class",
-            "8th Class",
-            "7th Class",
-            "6th Class",
-            "5th Class",
-            "4th Class",
-            "3rd Class",
-            "2nd Class",
-            "1st Class",
-            "UKG",
-            "LKG",
-            "Pre-K",
-            ...fetchedOptions,
-          ];
-          setClassOptions(options);
-        }
+          })),
+          ...fetchedOptions,
+        ];
+
+        setClassOptions(options);
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -61,27 +68,22 @@ const Example = () => {
 
     fetchClassOptions();
   }, []);
+
   useEffect(() => {
     const fetchData = async () => {
-      let data; // Declare data variable here
-
       try {
         setLoading(true);
 
-        if (dataArray.some((item) => item.value === selectedClass)) {
-          const response = await api.get(
-            `admissionForms/previousYearStudents/${selectedClass}.json`
-          );
-          data = response.data; // Assign data here
-        } else {
-          const response = await api.get(
-            `admissionForms/${selectedClass}.json`
-          );
-          data = response.data; // Assign data here
-        }
-        if (data) {
-          const sections = Object.keys(data);
-          setSections(sections);
+        const url = dataArray.some((item) => item.value === selectedClass)
+          ? `https://studentassistant-18fdd-default-rtdb.firebaseio.com/admissionForms/previousYearStudents/${selectedClass}.json`
+          : `https://studentassistant-18fdd-default-rtdb.firebaseio.com/admissionForms/${selectedClass}.json`;
+
+        const response = await axios.get(url);
+        const data = response.data || {}; // Default to an empty object if data is undefined
+
+        const sections = Object.keys(data);
+        setSections(sections);
+        if (sections.length > 0) {
           setSelectedSection(sections[0]);
         }
         setLoading(false);
@@ -92,22 +94,18 @@ const Example = () => {
     };
 
     fetchData();
-  }, [selectedClass, dataArray]); // Add dataArray to the dependency array
+  }, [selectedClass, dataArray]);
 
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
         setLoading(true);
-        let url = "";
+        const url = dataArray.some((item) => item.value === selectedClass)
+          ? `https://studentassistant-18fdd-default-rtdb.firebaseio.com/admissionForms/previousYearStudents/${selectedClass}/${selectedSection}.json`
+          : `https://studentassistant-18fdd-default-rtdb.firebaseio.com/admissionForms/${selectedClass}/${selectedSection}.json`;
 
-        if (dataArray.some((item) => item.value === selectedClass)) {
-          url = `previousYearStudents/${selectedClass}/${selectedSection}.json`;
-        } else {
-          url = `${selectedClass}/${selectedSection}.json`;
-        }
-
-        const response = await api.get(url);
-        setStudentData(response.data || []);
+        const response = await axios.get(url);
+        setStudentData(response.data || []); // Default to an empty array if data is undefined
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -115,10 +113,11 @@ const Example = () => {
       }
     };
 
-    fetchStudentData();
+    if (selectedSection) {
+      fetchStudentData();
+    }
   }, [selectedClass, selectedSection, dataArray]);
 
-  // Define columns for the table
   const columns = useMemo(
     () => [
       { accessorKey: "SI", header: "SI", size: 25 },
@@ -134,7 +133,6 @@ const Example = () => {
     []
   );
 
-  // Format student data for the table
   const formattedStudentData = useMemo(() => {
     return Object.entries(studentData).map(([name, details], index) => ({
       SI: index + 1,
@@ -183,15 +181,14 @@ const Example = () => {
       <div className="table-container">
         {loading ? (
           <Box sx={{ width: '100%', height: '500px'}}>
-          <Skeleton height={50} />
-          <Skeleton height={50} />
-          <Skeleton height={50} />
-          <Skeleton height={50} />
-          <Skeleton height={50} />
-          <Skeleton animation="wave" height={50} />
-          <Skeleton animation={true} height={50} />
-        </Box>
-        
+            <Skeleton height={50} />
+            <Skeleton height={50} />
+            <Skeleton height={50} />
+            <Skeleton height={50} />
+            <Skeleton height={50} />
+            <Skeleton animation="wave" height={50} />
+            <Skeleton animation={true} height={50} />
+          </Box>
         ) : (
           <MaterialReactTable columns={columns} data={formattedStudentData} />
         )}

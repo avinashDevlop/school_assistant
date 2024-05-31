@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./AdmissionFormCSS.css";
-import api from '../../../../api';
+import api from "../../../../api";
 
 const AdmissionForm = () => {
   const topRef = useRef(null);
@@ -8,7 +8,14 @@ const AdmissionForm = () => {
     surname: "",
     name: "",
     fathersName: "",
+    fathersOccupation: "",
+    fathersMobileNumber: "",
+    fathersAadharCardNo: "",
+    mothersSurname: "",
     mothersName: "",
+    mothersOccupation: "",
+    mothersMobileNumber: "",
+    mothersAadharCardNo: "",
     aadharCardNo: "",
     dob: "",
     caste: "",
@@ -25,11 +32,13 @@ const AdmissionForm = () => {
     dateOfIssue: "",
     bloodGroup: "",
     identificationMarks: "",
-    contactNumber: "",
     email: "",
     selectedClass: "",
     selectedSection: "",
     gender: "",
+    guardianName: "",
+    guardianMobileNumber: "",
+    admissionNumber: "", // Added admissionNumber field
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -39,28 +48,20 @@ const AdmissionForm = () => {
   }, []);
 
   const generateFormNumber = () => {
-    // Generate a 6-digit random number
     const randomFormNo = Math.floor(100000 + Math.random() * 900000);
     const formattedRandomFormNo = String(randomFormNo).padStart(6, "0");
-
-    // Combine the random number and class code to form the final form number
     const finalFormNo = `${formattedRandomFormNo}`;
 
-    // Ensure setFormData is available and a function
-    if (typeof setFormData === "function") {
-      setFormData((prevData) => ({
-        ...prevData,
-        formNo: finalFormNo,
-      }));
-    } else {
-      console.error("setFormData is not a function or not defined properly.");
-    }
+    setFormData((prevData) => ({
+      ...prevData,
+      formNo: finalFormNo,
+    }));
   };
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
 
-    if (name === "aadharCardNo") {
+    if (name.endsWith("AadharCardNo") || name === "aadharCardNo") {
       const formattedAadharNo = value
         .replace(/\D/g, "")
         .replace(/(\d{4})(?=\d)/g, "$1-");
@@ -80,10 +81,6 @@ const AdmissionForm = () => {
     e.preventDefault();
 
     try {
-      // if (formData.selectedClass === "") {
-      //   window.alert("Class is required");
-      //   return;
-      // }
       for (const key in formData) {
         if (formData.hasOwnProperty(key)) {
           if (formData[key] === "" && key !== "photo") {
@@ -93,39 +90,29 @@ const AdmissionForm = () => {
         }
       }
 
-      // Capitalize the first letter of the name
-      const capitalizedFirstName =
-        formData.name.charAt(0).toUpperCase() +
-        formData.name.slice(1).toLowerCase();
-      const lowersurName = formData.surname.toLowerCase();
-      // Concatenate surname and capitalized first name, trim spaces, and convert to lower case
+      const lowersurName = formData.surname.trim();
+      const capitalizedFirstName = formData.name.trim();
       const lowerCaseName = `${lowersurName} ${capitalizedFirstName}`.trim();
 
-      // Construct the URL dynamically based on the selected class
       const url = `admissionForms/${formData.selectedClass}/${formData.selectedSection}/${lowerCaseName}.json`;
 
-      // Post form data to Firebase Realtime Database using Axios
-      await api.put(url, formData).then((res) => {
-        console.log("Form submitted successfully!",res);
-      // Show a window alert
-      window.alert("Form submitted successfully!");
-      // Reset the form after successful submission
-      setFormData(initialFormData);
-      generateFormNumber();
-      // Scroll to the top of the page
-      topRef.current.scrollIntoView({ behavior: "smooth" });
-        
-      })
-       .catch((err) => {
-         console.error("Error submitting form: ", err);
-       })
-      // Handle successful submission
-      
+      await api
+        .put(url, formData)
+        .then((res) => {
+          console.log("Form submitted successfully!", res);
+          window.alert("Form submitted successfully!");
+          setFormData(initialFormData);
+          generateFormNumber();
+          topRef.current.scrollIntoView({ behavior: "smooth" });
+        })
+        .catch((err) => {
+          console.error("Error submitting form: ", err);
+        });
     } catch (error) {
-      // Handle errors
       console.error("Error submitting form:", error);
     }
   };
+
   const sectionOptions = ["Section A", "Section B", "Section C"];
   const classOptions = [
     "10th Class",
@@ -143,6 +130,15 @@ const AdmissionForm = () => {
     "Pre-K",
   ];
 
+  const religionOptions = [
+    "Hinduism",
+    "Islam",
+    "Christianity",
+    "Buddhism",
+    "Jainism",
+    "Sikhism",
+  ];
+
   return (
     <>
       <h3 ref={topRef}>
@@ -151,263 +147,451 @@ const AdmissionForm = () => {
       <div className="admission-form">
         <h2>ADMISSION FORM</h2>
         <form onSubmit={handleSubmit}>
-          <label>Form Number:</label>
-          <input
-            type="text"
-            name="formNo"
-            value={formData.formNo}
-            onChange={handleChange}
-            readOnly
-            required
-          />
-          <label>Date of Issue:</label>
-          <input
-            type="date"
-            name="dateOfIssue"
-            value={formData.dateOfIssue}
-            onChange={handleChange}
-            required
-          />
-          <label>Class:</label>
-          <select
-            name="selectedClass"
-            value={formData.selectedClass}
-            onChange={handleChange}
-            className="droplist"
-            required
-          >
-            <option value="">Select Class...</option>
-            {classOptions.map((className, index) => (
-              <option key={index} value={className}>
-                {className}
-              </option>
-            ))}
-          </select>
-          <label>Section:</label>
-          <select
-            name="selectedSection"
-            value={formData.selectedSection}
-            onChange={handleChange}
-            className="droplist"
-            required
-          >
-            <option value="">Select Section...</option>
-            {sectionOptions.map((section, index) => (
-              <option key={index} value={section}>
-                {section}
-              </option>
-            ))}
-          </select>
-
-          <label>Surname:</label>
-          <input
-            type="text"
-            name="surname"
-            value={formData.surname}
-            onChange={handleChange}
-            required
-          />
-          <label>Name:</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-            {/* Add Gender Field */}
-            <label className="gender-label">
-            Gender:
-            <label className="gender-radio">
+          <div className="form-group">
+            <label>Form Number</label>
+            <input
+              type="text"
+              className="form-control"
+              name="formNo"
+              value={formData.formNo}
+              readOnly
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Date of Issue</label>
+            <input
+              type="date"
+              className="form-control"
+              name="dateOfIssue"
+              value={formData.dateOfIssue}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Class</label>
+            <select
+              className="form-control"
+              name="selectedClass"
+              value={formData.selectedClass}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Class...</option>
+              {classOptions.map((className, index) => (
+                <option key={index} value={className}>
+                  {className}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Section</label>
+            <select
+              className="form-control"
+              name="selectedSection"
+              value={formData.selectedSection}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Section...</option>
+              {sectionOptions.map((section, index) => (
+                <option key={index} value={section}>
+                  {section}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Admission Number</label>
+            <input
+              type="text"
+              className="form-control"
+              name="admissionNumber"
+              value={formData.admissionNumber}
+              onChange={handleChange}
+              placeholder="Enter admission number"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Surname</label>
+            <input
+              type="text"
+              className="form-control"
+              name="surname"
+              value={formData.surname}
+              onChange={handleChange}
+              placeholder="Enter surname"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Name</label>
+            <input
+              type="text"
+              className="form-control"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Enter name"
+              required
+            />
+          </div>
+          <div className="form-group flex">
+            <label>Gender</label>
+            <div className="form-check-inline flex">
               <input
+                className="form-check-input"
                 type="radio"
                 name="gender"
                 value="Male"
                 checked={formData.gender === "Male"}
                 onChange={handleChange}
               />
-              <span class='gender'>Male</span>
-            </label>
-            <label className="gender-radio female-radio">
+              <label className="form-check-label">Male</label>
+            </div>
+            <div className="form-check-inline flex">
               <input
+                className="form-check-input"
                 type="radio"
                 name="gender"
                 value="Female"
                 checked={formData.gender === "Female"}
                 onChange={handleChange}
               />
-              <span class='gender'>Female</span>
-            </label>
-          </label>
-          <label>Father's Name:</label>
-          <input
-            type="text"
-            name="fathersName"
-            value={formData.fathersName}
-            onChange={handleChange}
-            required
-          />
-
-          <label>Mother's Name:</label>
-          <input
-            type="text"
-            name="mothersName"
-            value={formData.mothersName}
-            onChange={handleChange}
-            required
-          />
-
-          <label>Contact Number:</label>
-          <input
-            type="text"
-            name="contactNumber"
-            value={formData.contactNumber}
-            onChange={handleChange}
-            required
-          />
-
-          <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-
-          <label>Aadhar Card Number:</label>
-          <input
-            type="text"
-            name="aadharCardNo"
-            value={formData.aadharCardNo}
-            onChange={handleChange}
-            data-type="adhaar-number"
-            maxLength="19"
-            required
-          />
-
-          <label>Date of Birth:</label>
-          <input
-            type="date"
-            name="dob"
-            value={formData.dob}
-            onChange={handleChange}
-            required
-          />
-
-          <label>Caste:</label>
-          <input
-            type="text"
-            name="caste"
-            value={formData.caste}
-            onChange={handleChange}
-            required
-          />
-
-          <label>Mother Tongue:</label>
-          <select
-            name="motherTongue"
-            value={formData.motherTongue}
-            onChange={handleChange}
-            className="droplist"
-            required
+              <label className="form-check-label">Female</label>
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Date of Birth</label>
+            <input
+              type="date"
+              className="form-control"
+              name="dob"
+              value={formData.dob}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Aadhar Card Number</label>
+            <input
+              type="text"
+              className="form-control"
+              name="aadharCardNo"
+              value={formData.aadharCardNo}
+              onChange={handleChange}
+              maxLength={14}
+              placeholder="xxxx-xxxx-xxxx"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Father's Name</label>
+            <input
+              type="text"
+              className="form-control"
+              name="fathersName"
+              value={formData.fathersName}
+              onChange={handleChange}
+              placeholder="Enter father's name"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Father's Occupation</label>
+            <input
+              type="text"
+              className="form-control"
+              name="fathersOccupation"
+              value={formData.fathersOccupation}
+              onChange={handleChange}
+              placeholder="Enter father's occupation"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Father's Mobile Number</label>
+            <input
+              type="text"
+              className="form-control"
+              name="fathersMobileNumber"
+              value={formData.fathersMobileNumber}
+              onChange={handleChange}
+              placeholder="Enter father's mobile number"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Father's Aadhar Card Number</label>
+            <input
+              type="text"
+              className="form-control"
+              name="fathersAadharCardNo"
+              value={formData.fathersAadharCardNo}
+              onChange={handleChange}
+              maxLength={14}
+              placeholder="xxxx-xxxx-xxxx"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Mother's Surname</label>
+            <input
+              type="text"
+              className="form-control"
+              name="mothersSurname"
+              value={formData.mothersSurname}
+              onChange={handleChange}
+              placeholder="Enter mother's surname"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Mother's Name</label>
+            <input
+              type="text"
+              className="form-control"
+              name="mothersName"
+              value={formData.mothersName}
+              onChange={handleChange}
+              placeholder="Enter mother's name"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Mother's Occupation</label>
+            <input
+              type="text"
+              className="form-control"
+              name="mothersOccupation"
+              value={formData.mothersOccupation}
+              onChange={handleChange}
+              placeholder="Enter mother's occupation"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Mother's Mobile Number</label>
+            <input
+              type="text"
+              className="form-control"
+              name="mothersMobileNumber"
+              value={formData.mothersMobileNumber}
+              onChange={handleChange}
+              placeholder="Enter mother's mobile number"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Mother's Aadhar Card Number</label>
+            <input
+              type="text"
+              className="form-control"
+              name="mothersAadharCardNo"
+              value={formData.mothersAadharCardNo}
+              onChange={handleChange}
+              maxLength={14}
+              placeholder="xxxx-xxxx-xxxx"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Caste</label>
+            <input
+              type="text"
+              className="form-control"
+              name="caste"
+              value={formData.caste}
+              onChange={handleChange}
+              placeholder="Enter caste"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Mother Tongue</label>
+            <input
+              type="text"
+              className="form-control"
+              name="motherTongue"
+              value={formData.motherTongue}
+              onChange={handleChange}
+              placeholder="Enter mother tongue"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Category</label>
+            <input
+              type="text"
+              className="form-control"
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              placeholder="Enter category"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Religion</label>
+            <select
+              className="form-control"
+              name="religion"
+              value={formData.religion}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Religion...</option>
+              {religionOptions.map((religion, index) => (
+                <option key={index} value={religion}>
+                  {religion}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Last School Name</label>
+            <input
+              type="text"
+              className="form-control"
+              name="lastSchoolName"
+              value={formData.lastSchoolName}
+              onChange={handleChange}
+              placeholder="Enter last school name"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Residential Address</label>
+            <input
+              type="text"
+              className="form-control"
+              name="residentialAddress"
+              value={formData.residentialAddress}
+              onChange={handleChange}
+              placeholder="Enter residential address"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>City</label>
+            <input
+              type="text"
+              className="form-control"
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+              placeholder="Enter city"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>State</label>
+            <input
+              type="text"
+              className="form-control"
+              name="state"
+              value={formData.state}
+              onChange={handleChange}
+              placeholder="Enter state"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Pincode</label>
+            <input
+              type="text"
+              className="form-control"
+              name="pincode"
+              value={formData.pincode}
+              onChange={handleChange}
+              placeholder="Enter pincode"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Blood Group</label>
+            <input
+              type="text"
+              className="form-control"
+              name="bloodGroup"
+              value={formData.bloodGroup}
+              onChange={handleChange}
+              placeholder="Enter blood group"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Identification Marks</label>
+            <input
+              type="text"
+              className="form-control"
+              name="identificationMarks"
+              value={formData.identificationMarks}
+              onChange={handleChange}
+              placeholder="Enter identification marks"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              className="form-control"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter email"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Photo</label>
+            <input
+              type="file"
+              className="form-control"
+              name="photo"
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Guardian Name</label>
+            <input
+              type="text"
+              className="form-control"
+              name="guardianName"
+              value={formData.guardianName}
+              onChange={handleChange}
+              placeholder="Enter guardian name"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Guardian Mobile Number</label>
+            <input
+              type="text"
+              className="form-control"
+              name="guardianMobileNumber"
+              value={formData.guardianMobileNumber}
+              onChange={handleChange}
+              placeholder="Enter guardian mobile number"
+              required
+            />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              width: "550px",
+            }}
           >
-            <option value="">Select Mother Tongue</option>
-            <option value="Telugu">Telugu</option>
-            <option value="Hindi">Hindi</option>
-            <option value="Urdu">Urdu</option>
-            <option value="English">English</option>
-            <option value="Tamil">Tamil</option>
-          </select>
-
-          <label>Category:</label>
-          <input
-            type="text"
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            required
-          />
-
-          <label>Religion:</label>
-          <input
-            type="text"
-            name="religion"
-            value={formData.religion}
-            onChange={handleChange}
-            required
-          />
-
-          <label>Name of the School Last Attended:</label>
-          <input
-            type="text"
-            name="lastSchoolName"
-            value={formData.lastSchoolName}
-            onChange={handleChange}
-          />
-
-          <label>Residential Address:</label>
-          <textarea
-            name="residentialAddress"
-            value={formData.residentialAddress}
-            onChange={handleChange}
-            required
-          ></textarea>
-
-          <label>City:</label>
-          <input
-            type="text"
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-            required
-          />
-
-          <label>State:</label>
-          <input
-            type="text"
-            name="state"
-            value={formData.state}
-            onChange={handleChange}
-            required
-          />
-
-          <label>Pincode:</label>
-          <input
-            type="number"
-            name="pincode"
-            value={formData.pincode}
-            onChange={handleChange}
-            required
-          />
-
-          <label>Photo:</label>
-          <input
-            type="file"
-            name="photo"
-            accept="image/*"
-            onChange={handleChange}
-          />
-
-          <label>Blood Group:</label>
-          <input
-            type="text"
-            name="bloodGroup"
-            value={formData.bloodGroup}
-            onChange={handleChange}
-            required
-          />
-
-          <label>Identification Marks:</label>
-          <textarea
-            name="identificationMarks"
-            value={formData.identificationMarks}
-            onChange={handleChange}
-            required
-          ></textarea>
-          <button type="submit" onClick={handleSubmit}>
-            Submit
-          </button>
+            <button type="submit" style={{ width: "100px" }}>
+              Submit
+            </button>
+          </div>
         </form>
       </div>
     </>

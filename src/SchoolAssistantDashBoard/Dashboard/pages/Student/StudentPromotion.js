@@ -20,6 +20,7 @@ const StudentPromotionForm = () => {
   const [Email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const classOptions = [
     "10th Class",
     "9th Class",
@@ -46,6 +47,7 @@ const StudentPromotionForm = () => {
 
     if (name === "currentClass" && value !== "") {
       try {
+        setLoading(true);
         const response = await api.get(
           `admissionForms/${value}.json`
         );
@@ -53,11 +55,14 @@ const StudentPromotionForm = () => {
         setSectionOptions(sections);
       } catch (error) {
         console.error("Error fetching sections:", error);
+      } finally {
+        setLoading(false); // Set loading to false after fetching sections
       }
     }
 
     if (name === "studentName" && value !== "") {
       try {
+        setLoading(true);
         const response = await api.get(
           `${formData.currentClass}/${formData.currentSection}/${value}.json`
         );
@@ -73,12 +78,15 @@ const StudentPromotionForm = () => {
         }
       } catch (error) {
         console.error("Error fetching student information:", error);
+      }finally{
+        setLoading(false); // Set loading to false after fetching student names
       }
     }
   };
 
   useEffect(() => {
     if (formData.currentClass && formData.currentSection) {
+      setLoading(true);
       api
         .get(
           `admissionForms/${formData.currentClass}/${formData.currentSection}.json`
@@ -89,6 +97,9 @@ const StudentPromotionForm = () => {
         })
         .catch((error) => {
           console.error("Error fetching student names:", error);
+        })
+        .finally(() => {
+          setLoading(false); // Set loading to false after fetching student names
         });
     }
   }, [formData.currentClass, formData.currentSection]);
@@ -105,12 +116,14 @@ const StudentPromotionForm = () => {
     }
 
     try {
+      setLoading(true);
       const response = await api.get(
         `admissionForms/${formData.currentClass}/${formData.currentSection}/${selectedStudent}.json`
       );
       const studentInfo = response.data;
 
       if (!studentInfo) {
+        setLoading(false);
         alert("Student information not found.");
         return;
       }
@@ -134,6 +147,8 @@ const StudentPromotionForm = () => {
     } catch (error) {
       console.error("Error promoting student:", error);
       alert("student data is not present in some class. Please try again later.");
+    }finally {
+      setLoading(false); // Set loading to false after fetching sections
     }
   };
 
@@ -148,14 +163,15 @@ const StudentPromotionForm = () => {
     }
 
     try {
-        const auth = getAuth(app);
+      setLoading(true);
+       const auth = getAuth(app);
         await signInWithEmailAndPassword(auth, Email, password);
         const user = auth.currentUser;
-
+        setShowModal(false);
         if (user) {
             console.log("Login successfully", user);
             alert("Login successful!");
-
+            
             try {
                 const currentYear = new Date().getFullYear();
                 const classUpdate = [
@@ -344,11 +360,9 @@ const StudentPromotionForm = () => {
                         }
                     }
                 } 
-                 
-                setShowModal(false);
-
                 alert("All students promoted successfully.");
             } catch (error) {
+                setLoading(false);
                 console.error("Error promoting all students:", error);
                 alert("Error promoting all students. Please try again later.");
             }
@@ -357,8 +371,11 @@ const StudentPromotionForm = () => {
             alert("User not authenticated");
         }
     } catch (error) {
+        setLoading(false);
         console.error("Login failed:", error.message);
         alert("Login failed. Please try again.");
+    } finally{
+      setLoading(false);
     }
 };
 
@@ -458,7 +475,9 @@ const StudentPromotionForm = () => {
               </option>
             ))}
           </select>
-          <button type="submit">Submit</button>
+          <button type="submit">
+      {loading ? "Submitting..." : "Submit"}
+    </button>
         </form>
         <span className="or">or</span>
         <input

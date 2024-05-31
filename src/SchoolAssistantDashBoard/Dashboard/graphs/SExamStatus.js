@@ -4,9 +4,14 @@ import Chart from 'react-apexcharts';
 const DonutChart = () => {
   const [chartData, setChartData] = useState([20, 8, 30, 10]);
 
+  const updateChartData = () => {
+    // Example function to update chart data
+    setChartData([25, 15, 35, 25]);
+  }; 
+
   const options = {
     labels: ['Grade-A', 'Grade-B', 'Grade-C', 'Grade-D'],
-    chart: {
+    chart: { 
       type: 'donut',
     },
     responsive: [
@@ -41,6 +46,7 @@ const DonutChart = () => {
   return (
     <div style={chartStyle}>
       <Chart options={options} series={chartData} type="donut" height="100%" />
+      <button onClick={updateChartData}>Update Data</button>
     </div>
   );
 };

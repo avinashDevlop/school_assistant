@@ -16,7 +16,6 @@ const AllStudent = () => {
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedSection, setSelectedSection] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedTest, setSelectedTest] = useState("");
   const classOptions = [
     "10th Class",
     "9th Class",
@@ -31,7 +30,6 @@ const AllStudent = () => {
     "UKG",
     "LKG",
     "Pre-K",
-    "previousBatchs"
   ];
 
   const sectionOptions = ["Section A", "Section B", "Section C"];
@@ -49,12 +47,7 @@ const AllStudent = () => {
       "November",
       "December",
     ];
-  const testNames = [
-    "Geography weekly test-2",
-    "Mathematics mid-term exam",
-    "History quiz",
-    // Add more test names as needed
-  ];
+
   const handleClassChange = (e) => {
     setSelectedClass(e.target.value);
   };
@@ -66,9 +59,7 @@ const AllStudent = () => {
   const handleMonthChange = (e) => {
     setSelectedMonth(e.target.value);
   };
-  const handleTestChange = (e) => {
-    setSelectedTest(e.target.value);
-  };
+  
   return (
     <div className="dashboard-content">
       <h3>
@@ -120,46 +111,9 @@ const AllStudent = () => {
         </div>
       </div>
       {/* all exam results */}
-      <div className="studGraph">
-        <div className="detailStud">
-          <div className="noStud">All Exam Results</div>
-          <div className="threeDots">
-            <select value={selectedClass} onChange={handleClassChange}>
-              {classOptions.map((className, index) => (
-                <option key={index} value={className}>
-                  {className}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="detailExam">
-          <div className="leftOne">
-            <span className="Onename">Test Name :</span>
-            <select value={selectedTest} onChange={handleTestChange}>
-              {testNames.map((test, index) => (
-                <option key={index} value={test}>
-                  {test}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="RightOne">
-            <span className="Onename">Conducted on :</span> 10 May, 10:00AM -
-            11:30AM
-          </div>
-        </div>
-        <div className="graph">
+      <div className="Tableresults"> 
+        <div className="resultsTable">
           <SAllExamReaslts />
-        </div>
-        <div className="detailExam">
-          <div className="leftOne">
-            Students attended the test <span className="Onename">: 300</span>
-          </div>
-          <div className="RightOne">
-            Students didn’t attend the test{" "}
-            <span className="Onename">: 20</span>
-          </div>
         </div>
       </div>
       {/* social media */}

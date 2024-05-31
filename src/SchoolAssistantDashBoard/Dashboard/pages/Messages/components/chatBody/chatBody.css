@@ -1,0 +1,20 @@
+.main__chatbody {
+  flex-grow: 1;
+  background-color: #f4f3f8;
+  border-radius: 10px;
+  padding: 10px;
+  margin-left: -30px;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  height: 80vh; 
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .main__chatbody {
+    flex-direction: column;
+    height: 80vh;
+  }
+}

@@ -20,13 +20,14 @@ const AllStudent = () => {
 
   useEffect(() => {
     const fetchMonthWiseStuAttendance = async () => {
+      if (!selectedClass || !selectedSection || !selectedMonth) return;
       try {
         setLoading(true);
         const response = await api.get(
           `Attendance/StudAttendance/${selectedClass}/${selectedSection}/${selectedMonth}.json`
         );
 
-        setAttendanceDataResponse(response.data);
+        setAttendanceDataResponse(response.data || {});
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -43,32 +44,34 @@ const AllStudent = () => {
         const response = await api.get(
           "admissionForms/previousYearStudents.json"
         );
-        const data = response.data;
+        const data = response.data || {};
 
-        if (data) {
-          const fetchedOptions = Object.keys(data).map((className) => ({
-            value: className,
-            label: className,
-          }));
-          setDataArray(fetchedOptions);
-          const options = [
-            "10th Class",
-            "9th Class",
-            "8th Class",
-            "7th Class",
-            "6th Class",
-            "5th Class",
-            "4th Class",
-            "3rd Class",
-            "2nd Class",
-            "1st Class",
-            "UKG",
-            "LKG",
-            "Pre-K",
-            ...fetchedOptions,
-          ];
-          setClassOptions(options);
-        }
+        const fetchedOptions = Object.keys(data).map((className) => ({
+          value: className,
+          label: className,
+        }));
+        setDataArray(fetchedOptions);
+
+        const defaultOptions = [
+          "10th Class",
+          "9th Class",
+          "8th Class",
+          "7th Class",
+          "6th Class",
+          "5th Class",
+          "4th Class",
+          "3rd Class",
+          "2nd Class",
+          "1st Class",
+          "UKG",
+          "LKG",
+          "Pre-K",
+        ].map((className) => ({
+          value: className,
+          label: className,
+        }));
+
+        setClassOptions([...defaultOptions, ...fetchedOptions]);
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -81,6 +84,7 @@ const AllStudent = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!selectedClass) return;
       try {
         setLoading(true);
 
@@ -89,11 +93,11 @@ const AllStudent = () => {
           : `admissionForms/${selectedClass}.json`;
 
         const response = await api.get(url);
-        const data = response.data;
+        const data = response.data || {};
 
-        if (data) {
-          const sections = Object.keys(data);
-          setSectionOptions(sections);
+        const sections = Object.keys(data);
+        setSectionOptions(sections);
+        if (sections.length > 0) {
           setSelectedSection(sections[0]);
         }
         setLoading(false);
@@ -108,16 +112,17 @@ const AllStudent = () => {
 
   useEffect(() => {
     const fetchMonthOptions = async () => {
+      if (!selectedClass || !selectedSection) return;
       try {
         setLoading(true);
         const response = await api.get(
           `Attendance/StudAttendance/${selectedClass}/${selectedSection}.json`
         );
-        const data = response.data;
+        const data = response.data || {};
 
-        if (data) {
-          const months = Object.keys(data);
-          setMonthOptions(months);
+        const months = Object.keys(data);
+        setMonthOptions(months);
+        if (months.length > 0) {
           setSelectedMonth(months[0]);
         }
         setLoading(false);
@@ -127,22 +132,17 @@ const AllStudent = () => {
       }
     };
 
-    if (selectedClass && selectedSection) {
-      fetchMonthOptions();
-    }
+    fetchMonthOptions();
   }, [selectedClass, selectedSection]);
 
   useEffect(() => {
     const fetchStudentData = async () => {
+      if (!selectedClass || !selectedSection) return;
       try {
         setLoading(true);
-        let url = "";
-
-        if (dataArray.some((item) => item.value === selectedClass)) {
-          url = `admissionForms/previousYearStudents/${selectedClass}/${selectedSection}.json`;
-        } else {
-          url = `admissionForms/${selectedClass}/${selectedSection}.json`;
-        }
+        const url = dataArray.some((item) => item.value === selectedClass)
+          ? `admissionForms/previousYearStudents/${selectedClass}/${selectedSection}.json`
+          : `admissionForms/${selectedClass}/${selectedSection}.json`;
 
         const response = await api.get(url);
         setStudentData(response.data || []);
@@ -168,15 +168,13 @@ const AllStudent = () => {
     setSelectedMonth(e.target.value);
   };
 
-  // Define getDaysInMonth function outside useMemo
   const getDaysInMonth = (year, month) => {
     return new Date(year, month + 1, 0).getDate();
   };
+
   const columns = useMemo(() => {
     const year = new Date().getFullYear();
-    const monthIndex = new Date(
-      Date.parse(selectedMonth + " 1, " + year)
-    ).getMonth();
+    const monthIndex = new Date(Date.parse(`${selectedMonth} 1, ${year}`)).getMonth();
     const daysInMonth = getDaysInMonth(year, monthIndex);
 
     const dayColumns = Array.from({ length: daysInMonth }, (_, index) => {
@@ -211,40 +209,33 @@ const AllStudent = () => {
 
   const formattedStudentData = useMemo(() => {
     const year = new Date().getFullYear();
-    const monthIndex = new Date(
-      Date.parse(selectedMonth + " 1, " + year)
-    ).getMonth();
+    const monthIndex = new Date(Date.parse(`${selectedMonth} 1, ${year}`)).getMonth();
     const daysInMonth = getDaysInMonth(year, monthIndex);
-  
+
     return Object.entries(studentData).map(([name, _], index) => {
-      const rowData = { 'SI': index + 1, 'Name': name };
-      let rowDataObj = {};
-  
+      const rowData = { SI: index + 1, Name: name };
       let presentStudents = [];
       let absentStudents = [];
+
       for (let i = 1; i <= daysInMonth; i++) {
-        presentStudents[i] = attendanceDataResponse[`march_${i}`]?.present || [];
-        absentStudents[i] = attendanceDataResponse[`march_${i}`]?.absent || [];
+        presentStudents[i] = attendanceDataResponse[`${selectedMonth}_${i}`]?.present || [];
+        absentStudents[i] = attendanceDataResponse[`${selectedMonth}_${i}`]?.absent || [];
       }
-  
+
       const attendanceRow = [name];
       for (let i = 1; i <= daysInMonth; i++) {
         attendanceRow.push(presentStudents[i].includes(name));
       }
-  
+
       const tempObject = {};
       for (let i = 1; i < attendanceRow.length; i++) {
         tempObject[i] = attendanceRow[i];
       }
-  
-      rowDataObj = { ...rowData, ...tempObject };
-  
-      // console.log("rowDataObj", rowDataObj);
-  
-      return rowDataObj;
+
+      return { ...rowData, ...tempObject };
     });
   }, [attendanceDataResponse, selectedMonth, studentData]);
-  
+
   return (
     <div className="tablecontainer year">
       <div className="studGraph">
@@ -271,7 +262,9 @@ const AllStudent = () => {
             </select>
           </div>
           <div className="Month">
-            <select value={selectedMonth} onChange={handleMonthChange}>
+            <select value={selectedMonth
+
+} onChange={handleMonthChange}>
               {monthOptions.map((month, index) => (
                 <option key={index} value={month}>
                   {month}

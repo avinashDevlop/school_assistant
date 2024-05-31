@@ -2,3 +2,47 @@
     width: 0;
     height: 0;
   }
+  .container {
+    margin: 20px;
+    display: flex;
+    flex-direction: column;
+    height: auto; /* Ensure container height adjusts based on content */
+    background-color: rgb(255, 245, 245);
+  }
+  
+  .table-container {
+    flex: 1; /* Fill remaining vertical space */
+    overflow-y: auto; /* Add vertical scroll if content exceeds container height */
+  }
+  
+  .detailStud,
+  .detailExam {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .noStud {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  .threeDots select {
+    padding: 5px;
+  }
+  
+  .Onename {
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  
+  .leftOne {
+    flex: 1;
+  }
+  
+  .RightOne {
+    flex: 1;
+    text-align: right;
+  }
+  

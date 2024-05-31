@@ -1,0 +1,128 @@
+.stud-account-container {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+  }
+  
+  .stud-account-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .stud-account-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+  }
+  
+  .stud-account-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  .stud-account-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .stud-account-input {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    font-size: 16px;
+  }
+  .stud-account-input.select {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    font-size: 16px;
+    background-color: #fff;
+  }
+  
+  .stud-account-button {
+    margin: 10px 5px; /* Added horizontal margin */
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .stud-account-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .stud-account-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .stud-account-search {
+    margin-bottom: 20px;
+    width: 80%;
+  }
+  
+  .stud-account-table {
+    margin-top: 20px;
+    border-collapse: collapse;
+    width: 80%;
+    max-width: 800px;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stud-account-table th, .stud-account-table
+  
+   td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+    font-size: 16px;
+  }
+  
+  .stud-account-table th {
+    background-color: #343a40;
+    color: white;
+  }
+  
+  .stud-account-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .stud-account-table tr:hover {
+    background-color: #e9ecef;
+  }
+  
+  .stud-account-edit-input {
+    width: calc(100% - 20px);
+    padding: 5px;
+    margin: 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .stud-account-input:focus, .stud-account-edit-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  .submit button{
+    height: 60px;
+  }

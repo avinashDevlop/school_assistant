@@ -1,69 +1,110 @@
 @import url("https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900");
-/* Header.css */
-.nav-link-hover:hover {
+.nav-container{
+    width: 100%;
+}
+.custom-nav-link-hover:hover {
     color: rgba(44, 113, 122, 0.877) !important; /* Add !important to override Bootstrap styles if necessary */
-  }
-  .nav-link-hover {
+}
+
+.custom-nav-link-hover {
     color: rgb(16, 16, 31) !important; /* Add !important to override Bootstrap styles if necessary */
-  }
-  /* Center text in buttons */
-  .btn {
+    font-size: 15px;
+}
+
+/* Center text in buttons */
+.custom-btn {
     display: inline-block;
-  }
-  @media (max-width: 991px) {
-    .btn-width {
-      width: 40%; /* Set the button width to 150px on laptops and larger screens */
+}
+
+@media (max-width: 991px) {
+    .custom-btn-width {
+        width: 40%; /* Set the button width to 40% on smaller screens */
     }
 }
-.content {
-  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-  margin-bottom: 25px;
-}
-.content h4 {
-	color: #fff;
-	font-size: 25px;
-	position: absolute;
-} 
-.content h4:nth-child(1) {
-	color: transparent;
-	-webkit-text-stroke: 1.5px #936ece;
+
+.custom-content {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    margin-bottom: 25px;
 }
 
-.content h4:nth-child(2) {
-	color: #000000;
-	animation: animate 2s ease-in-out infinite;
+.custom-h4 {
+    color: #fff;
+    font-size: 25px;
+    position: absolute;
 }
 
-@keyframes animate {
-	0%,
-	100% {
-		clip-path: polygon(
-			0% 45%,
-			16% 44%,
-			33% 50%,
-			54% 60%,
-			70% 61%,
-			84% 59%,
-			100% 52%,
-			100% 100%,
-			0% 100%
-		);
-	}
+.custom-outline-text {
+    color: transparent;
+    -webkit-text-stroke: 1.5px #936ece;
+}
 
-	50% {
-		clip-path: polygon(
-			0% 60%,
-			15% 65%,
-			34% 66%,
-			51% 62%,
-			67% 50%,
-			84% 45%,
-			100% 46%,
-			100% 100%,
-			0% 100%
-		); 
+.custom-animated-text {
+    color: #000000;
+    animation: custom-animate 2s ease-in-out infinite;
+}
+
+@keyframes custom-animate {
+    0%, 100% {
+        clip-path: polygon(
+            0% 45%, 16% 44%, 33% 50%, 54% 60%, 70% 61%, 84% 59%, 100% 52%, 100% 100%, 0% 100%
+        );
+    }
+
+    50% {
+        clip-path: polygon(
+            0% 60%, 15% 65%, 34% 66%, 51% 62%, 67% 50%, 84% 45%, 100% 46%, 100% 100%, 0% 100%
+        );
+    }
+}
+
+.custom-bg-body-tertiary {
+    background-color: #f8f9fa !important;
+}
+
+.custom-nav-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 15px; /* Adjust the gap between the nav links */
+}
+
+.custom-btn-width {
+    width: 100px; /* Set the button width to 100px on larger screens */
+    text-align: center;
+}
+
+.navContainer {
+    display: flex;
+    width: 100%; /* Make the container take the full width */
+    justify-content: space-between; /* Add space between brand and toggler */
+    align-items: center; /* Align items vertically center */
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-around; /* Adjust as needed (e.g., space-between, center, etc.) */
+    align-items: center;
+    gap: 10px; /* Adjust the gap between buttons as needed */
+}
+
+.form-btn1 {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px;
+    background-color: #60adff; /* Adjust as needed */
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
   }
-}
-.nav-link-hover{
-	font-size: 15px;
+  
+  .form-btn1:hover {
+    background-color: #0056b3; /* Adjust as needed */
+  }
+  
+.navBar{
+    padding: 5px 20px;
 }

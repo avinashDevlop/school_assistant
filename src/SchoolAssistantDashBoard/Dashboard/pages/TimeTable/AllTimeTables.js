@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import './AllTimeTable.css';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFacebook,
-  faInstagramSquare,
-  faWhatsapp,
-} from "@fortawesome/free-brands-svg-icons";
-import { faGlobe } from "@fortawesome/free-solid-svg-icons";
+import React, { useState, useEffect, useMemo } from "react";
+import "./AllTimeTable.css";
+import axios from "axios";
 
 const StudentTimeTable = () => {
+  const [selectedClass, setSelectedClass] = useState("10th Class");
+  const [selectedSection, setSelectedSection] = useState("");
+  const [sections, setSections] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [timetableData, setTimetableData] = useState({});
+
   const classOptions = [
     "10th Class",
     "9th Class",
@@ -20,21 +20,130 @@ const StudentTimeTable = () => {
     "3rd Class",
     "2nd Class",
     "1st Class",
+    "UKG",
+    "LKG",
     "Pre-K",
   ];
 
-  const sectionOptions = ["Section A", "Section B", "Section C"];
-  
-  const [selectedClass, setSelectedClass] = useState("");
-  const [selectedSection, setSelectedSection] = useState("");
+  const days = useMemo(() => [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ], []);
 
-  const handleClassChange = (event) => {
-    setSelectedClass(event.target.value);
+  const periods = useMemo(() => [
+    "Period-1",
+    "Period-2",
+    "Period-3",
+    "Period-4",
+    "Period-5",
+    "Period-6",
+    "Period-7",
+    "Period-8",
+    "Period-9",
+  ], []);
+
+  const [timeRanges, setTimeRanges] = useState([
+    "8:30 - 9:30",
+    "9:30 - 10:30",
+    "10:30 - 11:30",
+    "11:30 - 12:30",
+    "12:30 - 1:30",
+    "1:30 - 2:00",
+    "3:00 - 3:30",
+    "3:30 - 4:00",
+    "4:00 - 4:30",
+  ]);
+
+  const handleClassChange = async (event) => {
+    const selectedClass = event.target.value;
+    setSelectedClass(selectedClass);
   };
 
   const handleSectionChange = (e) => {
     setSelectedSection(e.target.value);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `https://studentassistant-18fdd-default-rtdb.firebaseio.com/admissionForms/${selectedClass}.json`
+        );
+        const data = response.data;
+        if (data) {
+          const fetchedSections = Object.keys(data);
+          setSections(fetchedSections);
+          setSelectedSection(fetchedSections[0]); // Set the first section as default
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [selectedClass]);
+
+  useEffect(() => {
+    const fetchTimesDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          `https://studentassistant-18fdd-default-rtdb.firebaseio.com/SchoolTimeTable/${selectedClass}/${selectedSection}/${days[0]}.json`
+        );
+        const data = response.data;
+        if (data) {
+          const newTimeRanges = periods.map((period) => {
+            const startTime = data[period]?.startTime || "";
+            const endTime = data[period]?.endTime || "";
+            return `${startTime} - ${endTime}`;
+          });
+          setTimeRanges(newTimeRanges);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching time details:", error);
+        setLoading(false);
+      }
+    };
+
+    if (selectedClass && selectedSection) {
+      fetchTimesDetails();
+    }
+  }, [selectedClass, selectedSection, days, periods]);
+
+  useEffect(() => {
+    const fetchSubjectsDetails = async () => {
+      try {
+        setLoading(true);
+        const fetchedSubjectTables = {};
+        for (const day of days) {
+          const response = await axios.get(
+            `https://studentassistant-18fdd-default-rtdb.firebaseio.com/SchoolTimeTable/${selectedClass}/${selectedSection}/${day}.json`
+          );
+          const data = response.data;
+          fetchedSubjectTables[day] = data;
+        }
+        setTimetableData((prevState) => ({
+          ...prevState,
+          [selectedSection]: fetchedSubjectTables,
+        }));
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching subject details:", error);
+        setLoading(false);
+      }
+    };
+
+    if (selectedClass && selectedSection) {
+      fetchSubjectsDetails();
+    }
+  }, [selectedClass, selectedSection, days]);
 
   return (
     <>
@@ -44,9 +153,13 @@ const StudentTimeTable = () => {
       <div className="container py-5">
         <div className="card text-bg-light mb-3">
           <div className="card-header text-center head">
-            <div className='dropdown'>
+            <div className="dropdown">
               Student TimeTable
-              <select value={selectedClass} onChange={handleClassChange} className="form-select mb-2">
+              <select
+                value={selectedClass}
+                onChange={handleClassChange}
+                className="form-select mb-2"
+              >
                 {classOptions.map((className, index) => (
                   <option key={index} value={className}>
                     {className}
@@ -54,14 +167,23 @@ const StudentTimeTable = () => {
                 ))}
               </select>
             </div>
-            <div className='dropdown'>
-              Section
-              <select value={selectedSection} onChange={handleSectionChange} className="form-select mb-2">
-                {sectionOptions.map((section, index) => (
-                  <option key={index} value={section}>
-                    {section}
-                  </option>
-                ))}
+            <div>
+              Student Section
+              <select
+                className="Section"
+                value={selectedSection}
+                onChange={handleSectionChange}
+                disabled={loading || !selectedClass}
+              >
+                {loading ? (
+                  <option>Loading...</option>
+                ) : (
+                  sections.map((section, index) => (
+                    <option key={index} value={section}>
+                      {section}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
           </div>
@@ -70,132 +192,32 @@ const StudentTimeTable = () => {
               <thead className="table-dark" style={{ backgroundColor: "blue" }}>
                 <tr>
                   <th scope="col">Time</th>
-                  <th scope="col">8:30-9:30</th>
-                  <th scope="col">9:30-10:30</th>
-                  <th scope="col">10:30-11:30</th>
-                  <th scope="col">11:30-12:30</th>
-                  <th scope="col">12:30-1:30</th>
-                  <th scope="col">1:30-2:00</th>
-                  <th scope="col">3:00-3:30</th>
-                  <th scope="col">3:00-4:00</th>
-                  <th scope="col">4:00-4:30</th>
+                  {timeRanges.map((timeRange, index) => (
+                    <th key={index} scope="col">
+                      {timeRange}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <th scope="row">Monday</th>
-                  <td>Telugu</td>
-                  <td>English</td>
-                  <td>Maths</td>
-                  <td>Science</td>
-                  <td>Lunch</td>
-                  <td>Hindi</td>
-                  <td>Social</td>
-                  <td>Maths</td>
-                  <td>Science</td>
-                </tr>
-                <tr>
-                  <th scope="row">Tuesday</th>
-                  <td>Telugu</td>
-                  <td>English</td>
-                  <td>Maths</td>
-                  <td>Science</td>
-                  <td>Lunch</td>
-                  <td>Computer</td>
-                  <td>Hindi</td>
-                  <td>Social</td>
-                  <td>Maths</td>
-                </tr>
-                <tr>
-                  <th scope="row">Wednesday</th>
-                  <td>Telugu</td>
-                  <td>English</td>
-                  <td>Maths</td>
-                  <td>Science</td>
-                  <td>Lunch</td>
-                  <td>Maths</td>
-                  <td>Maths</td>
-                  <td>Maths</td>
-                  <td>Maths</td>
-                </tr>
-                <tr>
-                  <th scope="row">Thursday</th>
-                  <td>Telugu</td>
-                  <td>English</td>
-                  <td>Maths</td>
-                  <td>Science</td>
-                  <td>Lunch</td>
-                  <td>Computer</td>
-                  <td>Hindi</td>
-                  <td>Social</td>
-                  <td>Maths</td>
-                </tr>
-                <tr>
-                  <th scope="row">Friday</th>
-                  <td>Science Lab</td>
-                  <td>English</td>
-                  <td>Computer</td>
-                  <td>Chemistry</td>
-                  <td>Lunch</td>
-                  <td>Science</td>
-                  <td>English</td>
-                  <td>Maths</td>
-                  <td>Maths</td>
-                </tr>
-                <tr>
-                  <th scope="row">Saturday</th>
-                  <td>Maths</td>
-                  <td>Maths</td>
-                  <td>Maths</td>
-                  <td>Maths</td>
-                  <td>Lunch</td>
-                  <td>Computer</td>
-                  <td>Chemistry</td>
-                  <td>Social</td>
-                  <td>Maths</td>
-                </tr>
+                {days.map((day, index) => (
+                  <tr key={index}>
+                    <th scope="row">{day}</th>
+                    {periods.map((periods, idx) => {
+                      const subjectName =
+                        timetableData[selectedSection]?.[day]?.[periods]
+                          ?.subjectName || "-";
+                      return <td key={idx}>{subjectName}</td>;
+                    })}
+                  </tr>
+                ))}
               </tbody>
             </table>
-            <caption className='teaching'>
-              <div>Telugu : swami sir</div>
-              <div>Hindi : siri mam</div>
-              <div>English : manhor sir</div>
-              <div>Maths : raju sir</div>
-              <div>Science : raghu sir</div>
-              <div>Social : swami sir</div>
-            </caption>
           </div>
-        </div>
-      </div>
-      {/* social media */}
-      <div className="container_Bottom_data">
-        <div className="Lastcard">
-          <div className="facebook">
-            <FontAwesomeIcon icon={faFacebook} />
-          </div>
-          <div className="details">Visit</div>
-        </div>
-        <div className="Lastcard">
-          <div className="instragram">
-            <FontAwesomeIcon icon={faInstagramSquare} />
-          </div>
-          <div className="details">Visit</div>
-        </div>
-        <div className="Lastcard">
-          <div className="WhatsApp">
-            <FontAwesomeIcon icon={faWhatsapp} />
-          </div>
-          <div className="details">Chart</div>
-        </div>
-        <div className="Lastcard">
-          <div className="Website">
-            <FontAwesomeIcon icon={faGlobe} />
-          </div>
-          <div className="details">Visit</div>
         </div>
       </div>
     </>
   );
-}
+};
 
 export default StudentTimeTable;

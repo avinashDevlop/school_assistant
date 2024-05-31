@@ -1,55 +1,13 @@
-import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGlobe } from "@fortawesome/free-solid-svg-icons";
-import {
-  faFacebook,
-  faInstagramSquare,
-  faWhatsapp,
-} from "@fortawesome/free-brands-svg-icons";
+import React, { useState, useEffect } from "react";
 import "./ExamSchedule.css";
 
 const ExamSchedule = () => {
-    const [exams, setExams] = useState([
-        {
-          date: "2024-02-18",
-          time: "10:00 AM - 12:00 PM",
-          subject: "Science",
-          maxMarks: 100,
-        },
-        {
-          date: "2024-02-20",
-          time: "1:00 PM - 3:00 PM",
-          subject: "Mathematics",
-          maxMarks: 100,
-        },
-        {
-          date: "2024-02-22",
-          time: "10:00 AM - 12:00 PM",
-          subject: "English",
-          maxMarks: 100,
-        },
-        {
-          date: "2024-02-23",
-          time: "9:30 AM - 11:30 AM",
-          subject: "Telugu",
-          maxMarks: 100,
-        },
-        {
-          date: "2024-02-24",
-          time: "1:00 PM - 3:00 PM",
-          subject: "Hindi",
-          maxMarks: 100,
-        },
-        {
-            date: "2024-02-24",
-            time: "1:00 PM - 3:00 PM",
-            subject: "Social",
-            maxMarks: 100,
-          },
-        // Add more exams as needed
-      ]);
+  const [exams, setExams] = useState([]);
   const [selectedTest, setSelectedTest] = useState("");
-  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedClass, setSelectedClass] = useState("10th Class");
+  const [testNames, setTestNames] = useState([]);
+  const [testDates, setTestDates] = useState([]);
+
   const classOptions = [
     "10th Class",
     "9th Class",
@@ -63,20 +21,111 @@ const ExamSchedule = () => {
     "1st Class",
     "Pre-K",
   ];
-  const testNames = [
-    "Unit Test - 1",
-    "Quarterly Exam",
-    "Unit Test - 2",
-    "Half Yearly Exam",
-    "Unit Test - 3",
-    "Annual Exam",
-  ];
+
+  useEffect(() => {
+    const fetchExamDataOnLoad = async () => {
+      try {
+        const response = await fetch(
+          `https://studentassistant-18fdd-default-rtdb.firebaseio.com/ExamSchedule/${selectedClass}.json`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data = await response.json();
+        if (data) {
+          const names = Object.keys(data);
+          setTestNames(names);
+          // Select the first test by default if test names are available
+          if (names.length > 0) {
+            setSelectedTest(names[0]);
+          }
+        } else {
+          setTestNames([]);
+          setSelectedTest("");
+        }
+      } catch (error) {
+        console.error("Error fetching test names:", error);
+        setTestNames([]);
+        setSelectedTest("");
+      }
+    };
+
+    fetchExamDataOnLoad();
+  }, [selectedClass]);
+
+  useEffect(() => {
+    const fetchExamDatesOnLoad = async () => {
+      if (selectedTest) {
+        try {
+          const response = await fetch(
+            `https://studentassistant-18fdd-default-rtdb.firebaseio.com/ExamSchedule/${selectedClass}/${selectedTest}.json`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch data");
+          }
+          const data = await response.json();
+          if (data) {
+            setTestDates(Object.keys(data));
+          } else {
+            setTestDates([]);
+          }
+        } catch (error) {
+          console.error("Error fetching test dates:", error);
+          setTestDates([]);
+        }
+      } else {
+        setTestDates([]);
+      }
+    };
+
+    fetchExamDatesOnLoad();
+  }, [selectedClass, selectedTest]);
+
+  useEffect(() => {
+    const fetchExamData = async () => {
+      if (testDates.length > 0) {
+        const examDataArray = [];
+
+        // Loop through each test date
+        for (const date of testDates) {
+          try {
+            const response = await fetch(
+              `https://studentassistant-18fdd-default-rtdb.firebaseio.com/ExamSchedule/${selectedClass}/${selectedTest}/${date}.json`
+            );
+
+            if (!response.ok) {
+              throw new Error("Failed to fetch exam schedule");
+            }
+
+            const examData = await response.json();
+            if (examData) {
+              examDataArray.push(examData);
+            }
+          } catch (error) {
+            console.error(`Error fetching exam schedule for ${date}:`, error);
+          }
+        }
+
+        setExams(examDataArray);
+      } else {
+        setExams([]);
+      }
+    };
+
+    fetchExamData();
+  }, [selectedClass, selectedTest, testDates]);
+
   const handleClassChange = (e) => {
-    setSelectedClass(e.target.value);
+    const selectedClass = e.target.value;
+    setSelectedClass(selectedClass);
+    setSelectedTest(""); // Reset selected test when class changes
   };
+
   const handleTestChange = (e) => {
-    setSelectedTest(e.target.value);
+    const selectedTest = e.target.value;
+    setSelectedTest(selectedTest);
   };
+
   return (
     <>
       <h3>
@@ -112,8 +161,9 @@ const ExamSchedule = () => {
           <thead>
             <tr>
               <th>Date</th>
-              <th>Timings</th>
-              <th>Subject Name</th>
+              <th>From Time</th>
+              <th>To Time</th>
+              <th>Subject</th>
               <th>Max Marks</th>
             </tr>
           </thead>
@@ -121,7 +171,8 @@ const ExamSchedule = () => {
             {exams.map((exam, index) => (
               <tr key={index}>
                 <td>{exam.date}</td>
-                <td>{exam.time}</td>
+                <td>{exam.fromTime}</td>
+                <td>{exam.toTime}</td>
                 <td>{exam.subject}</td>
                 <td>{exam.maxMarks}</td>
               </tr>
@@ -129,33 +180,6 @@ const ExamSchedule = () => {
           </tbody>
         </table>
       </div>
-      {/* social media */}
-      <div className="container_Bottom_data">
-          <div className="Lastcard">
-            <div className="facebook">
-              <FontAwesomeIcon icon={faFacebook} />
-            </div>
-            <div className="details">Visit</div>
-          </div>
-          <div className="Lastcard">
-            <div className="instragram">
-              <FontAwesomeIcon icon={faInstagramSquare} />
-            </div>
-            <div className="details">Visit</div>
-          </div>
-          <div className="Lastcard">
-            <div className="WhatsApp">
-              <FontAwesomeIcon icon={faWhatsapp} />
-            </div>
-            <div className="details">Chart</div>
-          </div>
-          <div className="Lastcard">
-            <div className="Website">
-              <FontAwesomeIcon icon={faGlobe} />
-            </div>
-            <div className="details">Visit</div>
-          </div>
-        </div>
     </>
   );
 };

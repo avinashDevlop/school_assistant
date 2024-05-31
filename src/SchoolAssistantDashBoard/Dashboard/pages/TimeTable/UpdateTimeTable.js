@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import axios from "axios";
 import "./UpdateTimeTables.css";
+import { Link } from 'react-router-dom';
 
 const UpdateTimeTable = () => {
-  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedClass, setSelectedClass] = useState("10th Class");
   const [selectedSection, setSelectedSection] = useState("");
-  const [timetable, setTimetable] = useState([]);
+  const [sections, setSections] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [timetable, setTimetable] = useState({});
 
   const classOptions = [
     "10th Class",
@@ -17,19 +21,31 @@ const UpdateTimeTable = () => {
     "3rd Class",
     "2nd Class",
     "1st Class",
+    "UKG",
+    "LKG",
     "Pre-K",
   ];
 
-  const sectionOptions = ["Section A", "Section B", "Section C"];
-
-  const days = [
+  const days = useMemo(() => [
     "Monday",
     "Tuesday",
     "Wednesday",
     "Thursday",
     "Friday",
     "Saturday",
-  ];
+  ], []);
+
+  const periods = useMemo(() => [
+    'Period-1',
+    'Period-2',
+    'Period-3',
+    'Period-4',
+    'Period-5',
+    'Period-6',
+    'Period-7',
+    'Period-8',
+    'Period-9'
+  ], []);
 
   const handleClassChange = (e) => {
     setSelectedClass(e.target.value);
@@ -39,74 +55,121 @@ const UpdateTimeTable = () => {
     setSelectedSection(e.target.value);
   };
 
-  const handleSubjectChange = (dayIndex, rowIndex, event) => {
-    const value = event.target.value;
-    const updatedTimetable = [...timetable];
-    updatedTimetable[dayIndex].subjects[rowIndex] = value;
-    setTimetable(updatedTimetable);
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `https://studentassistant-18fdd-default-rtdb.firebaseio.com/admissionForms/${selectedClass}.json`
+      );
+      const data = response.data;
 
-    // Send data to the server
-    sendDataToServer(dayIndex, rowIndex, value);
+      if (data) {
+        const fetchedSections = Object.keys(data);
+        setSections(fetchedSections);
+        setSelectedSection(fetchedSections[0]);
+      }
+
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error("Error fetching data:", error);
+    }
+  }, [selectedClass]);
+
+  useEffect(() => {
+    if (selectedClass) {
+      fetchData();
+    }
+  }, [selectedClass, fetchData]);
+
+  const handleTimeChange = (day, period, field, value) => {
+    const updatedTimetable = { ...timetable };
+    if (!updatedTimetable[day]) {
+      updatedTimetable[day] = {};
+    }
+    updatedTimetable[day][period] = {
+      ...updatedTimetable[day][period],
+      [field]: value
+    };
+    setTimetable(updatedTimetable);
   };
 
-  const handleTimeChange = (dayIndex, timeType, event) => {
-    const value = event.target.value;
-    const updatedTimetable = [...timetable];
-    updatedTimetable[dayIndex][timeType] = value;
+  const handleSubjectChange = (day, period, event) => {
+    const updatedTimetable = { ...timetable };
+    updatedTimetable[day][period] = {
+      ...updatedTimetable[day][period],
+      subjectName: event.target.value
+    };
     setTimetable(updatedTimetable);
-
-    // Send data to the server
-    sendDataToServer(dayIndex, null, value);
   };
 
-  const handleExtraChange = (dayIndex, event) => {
-    const value = event.target.value;
-    const updatedTimetable = [...timetable];
-    updatedTimetable[dayIndex].extra = value;
-    setTimetable(updatedTimetable);
-
-    // Send data to the server
-    sendDataToServer(dayIndex, null, value);
-  };
-
-  const sendDataToServer = (dayIndex, rowIndex, value) => {
-    // Example code to send data to the server using fetch API
-    fetch("http://your-server-url.com/save-data", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ dayIndex, rowIndex, value }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
+  const validateTimetable = () => {
+    for (let day of days) {
+      for (let period of periods) {
+        const entry = timetable[day]?.[period];
+        if (!entry || !entry.subjectName) {
+          return false;
         }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Data successfully sent to the server:", data);
-      })
-      .catch((error) => {
-        console.error("There was a problem sending data to the server:", error);
-      });
+        if (day === "Monday" && (!entry.startTime || !entry.endTime)) {
+          return false;
+        }
+      }
+    }
+    return true;
   };
 
-  const initializeTimetable = () => {
-    const periods = new Array(13).fill(""); // Adjusted to 13 periods
-    const initialTimetable = days.map((day) => ({
-      day,
-      startTime: "",
-      endTime: "",
-      subjects: [...periods],
-      extra: "",
-    }));
-    setTimetable(initialTimetable);
+  const sendDataToServer = async () => {
+    if (!validateTimetable()) {
+      alert("Please fill in all fields before submitting.");
+      return;
+    }
+
+    try {
+      const timetableData = timetable;
+
+      await axios.put(
+        `https://studentassistant-18fdd-default-rtdb.firebaseio.com/SchoolTimeTable/${selectedClass}/${selectedSection}.json`,
+        timetableData
+      );
+
+      alert(`Timetable data saved successfully: ${selectedClass}/${selectedSection}`);
+      
+      // Reset the timetable after saving
+      initializeTimetable();
+    } catch (error) {
+      console.error("Error saving data:", error);
+    }
   };
+
+  const initializeTimetable = useCallback(() => {
+    const initialTimetable = {};
+
+    // Initialize timetable for Monday with starting and ending times
+    initialTimetable["Monday"] = {};
+    periods.forEach((period) => {
+      initialTimetable["Monday"][period] = {
+        startTime: "",
+        endTime: "",
+        subjectName: "",
+      };
+    });
+
+    // Leave other days empty without starting and ending times
+    days.slice(1).forEach((day) => {
+      initialTimetable[day] = {};
+      periods.forEach((period) => {
+        initialTimetable[day][period] = {
+          subjectName: "",
+        };
+      });
+    });
+
+    setTimetable(initialTimetable);
+  }, [days, periods]);
 
   useEffect(() => {
     initializeTimetable();
-  }, [selectedClass, selectedSection]);
+  }, [selectedClass, selectedSection, initializeTimetable]);
 
   return (
     <div>
@@ -130,12 +193,20 @@ const UpdateTimeTable = () => {
                 </select>
               </div>
               <div className="Section">
-                <select value={selectedSection} onChange={handleSectionChange}>
-                  {sectionOptions.map((section, index) => (
-                    <option key={index} value={section}>
-                      {section}
-                    </option>
-                  ))}
+                <select
+                  value={selectedSection}
+                  onChange={handleSectionChange}
+                  disabled={loading || !selectedClass}
+                >
+                  {loading ? (
+                    <option>Loading...</option>
+                  ) : (
+                    sections.map((section, index) => (
+                      <option key={index} value={section}>
+                        {section}
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
             </div>
@@ -145,135 +216,58 @@ const UpdateTimeTable = () => {
           <table className="timetable">
             <thead>
               <tr>
+                <th>Period</th>
+                {periods.map((period) => (
+                  <th key={period}>{period}</th>
+                ))}
+              </tr>
+              <tr>
                 <td>Time</td>
-                {days.map((day, dayIndex) => (
-                  <td key={dayIndex}>
+                {periods.map((period) => (
+                  <td key={period}>
                     From{" "}
                     <input
                       type="time"
-                      value={timetable[dayIndex]?.startTime || ""} // Add optional chaining to prevent errors
-                      onChange={(event) =>
-                        handleTimeChange(dayIndex, "startTime", event)
+                      value={timetable[days[0]]?.[period]?.startTime || ""}
+                      onChange={(e) =>
+                        handleTimeChange(days[0], period, 'startTime', e.target.value)
                       }
                     />
                     - To
                     <input
                       type="time"
-                      value={timetable[dayIndex]?.endTime || ""} // Add optional chaining to prevent errors
-                      onChange={(event) =>
-                        handleTimeChange(dayIndex, "endTime", event)
+                      value={timetable[days[0]]?.[period]?.endTime || ""}
+                      onChange={(e) =>
+                        handleTimeChange(days[0], period, 'endTime', e.target.value)
                       }
                     />
                   </td>
                 ))}
-                <td>
-                  From{" "}
-                  <input
-                    type="time"
-                    value={timetable[0]?.extraStartTime || ""} // Add optional chaining to prevent errors
-                    onChange={(event) => handleTimeChange("startTime", event)}
-                  />
-                  - To{" "}
-                  <input
-                    type="time"
-                    value={timetable[0]?.extraEndTime || ""} // Add optional chaining to prevent errors
-                    onChange={(event) => handleTimeChange("endTime", event)}
-                  />
-                </td>
-                <td>
-                  From{" "}
-                  <input
-                    type="time"
-                    value={timetable[0]?.extraStartTime || ""} // Add optional chaining to prevent errors
-                    onChange={(event) => handleTimeChange("startTime", event)}
-                  />
-                  - To{" "}
-                  <input
-                    type="time"
-                    value={timetable[0]?.extraEndTime || ""} // Add optional chaining to prevent errors
-                    onChange={(event) => handleTimeChange("endTime", event)}
-                  />
-                </td>
-                <td>
-                  From{" "}
-                  <input
-                    type="time"
-                    value={timetable[0]?.extraStartTime || ""} // Add optional chaining to prevent errors
-                    onChange={(event) => handleTimeChange("startTime", event)}
-                  />
-                  - To{" "}
-                  <input
-                    type="time"
-                    value={timetable[0]?.extraEndTime || ""} // Add optional chaining to prevent errors
-                    onChange={(event) => handleTimeChange("endTime", event)}
-                  />
-                </td>
               </tr>
             </thead>
             <tbody>
-              {days.map((day, rowIndex) => (
-                <tr key={rowIndex}>
+              {days.map((day) => (
+                <tr key={day}>
                   <td>{day}</td>
-                  {timetable.map((dayData, dayIndex) => (
-                    <React.Fragment key={dayIndex}>
-                      <td>
-                        <input
-                          type="text"
-                          value={dayData.subjects[rowIndex]}
-                          onChange={(event) =>
-                            handleSubjectChange(dayIndex, rowIndex, event)
-                          }
-                        />
-                      </td>
-                    </React.Fragment>
+                  {periods.map((period) => (
+                    <td key={period}>
+                      <input
+                        type="text"
+                        value={timetable[day]?.[period]?.subjectName || ""}
+                        onChange={(e) => handleSubjectChange(day, period, e)}
+                      />
+                    </td>
                   ))}
-                  <td>
-                    <input
-                      type="text"
-                      value={timetable[rowIndex]?.extra || ""} // Add optional chaining to prevent errors
-                      onChange={(event) => handleExtraChange(rowIndex, event)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      value={timetable[rowIndex]?.extra || ""} // Add optional chaining to prevent errors
-                      onChange={(event) => handleExtraChange(rowIndex, event)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      value={timetable[rowIndex]?.extra || ""} // Add optional chaining to prevent errors
-                      onChange={(event) => handleExtraChange(rowIndex, event)}
-                    />
-                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <div className="teach">
-          <div>
-            Telugu : <input type="text" value="" />
-          </div>
-          <div>
-            Hindi : <input type="text" value="" />
-          </div>
-          <div>
-            English : <input type="text" value="" />
-          </div>
-          <div>
-            Maths : <input type="text" value="" />
-          </div>
-          <div>
-            Science : <input type="text" value="" />
-          </div>
-          <div>
-            Social : <input type="text" value="" />
-          </div>
+        <div className="d-flex justify-content-end">
+          <Link className="form-btn1" onClick={sendDataToServer}>
+            Save Timetable
+          </Link>
         </div>
-        <button onClick={sendDataToServer}>Save Timetable</button>
       </div>
     </div>
   );

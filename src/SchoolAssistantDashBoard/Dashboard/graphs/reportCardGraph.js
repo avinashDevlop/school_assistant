@@ -6,10 +6,10 @@ const ApexChart = () => {
   const [state, setState] = useState({
     series: [{
       name: "Progress",
-      data: [0, 94, 85, 90, 95, 80, 90, 80, 90, 85,80]
+      data: [0, 94, 85, 90, 95, 80, 90, 80, 90, 85, 80]
     }],
     options: {
-      chart: {
+      chart: { 
         type: 'area',
         zoom: {
           enabled: false
@@ -48,12 +48,27 @@ const ApexChart = () => {
     },
   });
 
+  // Dummy function to use setState
+  const updateState = () => {
+    setState(prevState => ({
+      ...prevState,
+      options: {
+        ...prevState.options,
+        title: {
+          ...prevState.options.title,
+          text: 'Updated Report'
+        }
+      }
+    }));
+  };
+
   return (
     <div>
       <div id="chart">
         <ReactApexChart options={state.options} series={state.series} type="area" height={350} className='graph' />
       </div>
       <div id="html-dist"></div>
+      <button onClick={updateState}>Update Chart Title</button>
     </div>
   );
 };

@@ -1,0 +1,124 @@
+.detailStud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.noStud {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.dropdown {
+  display: flex;
+}
+
+.Class, .Section {
+  margin: 0 10px;
+}
+
+.table-container {
+  margin-top: 20px;
+}
+
+/* Styles for the Update Password Button */
+.MuiButton-outlined {
+  color: #007bff;
+  border-color: #007bff;
+  transition: all 0.3s ease;
+  font-size: 20px;
+}
+
+.MuiButton-outlined:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Styles for the Popup */
+.MuiDialog-paper {
+  border-radius: 15px;
+  animation: popupAnimation 0.3s ease-out;
+}
+
+@keyframes popupAnimation {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.MuiDialogTitle-root {
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.MuiDialogContent-root {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.MuiDialogActions-root {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.MuiIconButton-root {
+  transition: color 0.3s ease;
+}
+
+.MuiIconButton-root:hover {
+  color: red;
+}
+
+input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: border-color 0.3s ease;
+}
+
+input[type="password"]:focus {
+  border-color: #007bff;
+}
+
+.MuiButton-containedPrimary {
+  background-color: #007bff;
+  color: white;
+}
+.updatePassword {
+  border: 2px solid #3f51b5; /* Replace with your primary color */
+  color: #3f51b5; /* Replace with your primary color */
+  text-transform: none;
+  padding: 8px 24px;
+  background: transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.updatePassword:hover {
+  background-color: #757de8;
+  border-color: #303f9f;
+  color: #fff; 
+}
+
+.updatePassword:active {
+  background-color: #303f9f; 
+  border-color: #3f51b5;
+  color: #fff; 
+}
+
+.updatePassword:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.5); 
+}

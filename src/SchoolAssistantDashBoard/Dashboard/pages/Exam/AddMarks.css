@@ -21,4 +21,11 @@ input[type="number"] {
   .table-container th {
     background-color: #f2f2f2; /* Background color for table header */
   }
-  
+ .table-container{
+  height: 150%;
+ }
+ .form-btn1.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}

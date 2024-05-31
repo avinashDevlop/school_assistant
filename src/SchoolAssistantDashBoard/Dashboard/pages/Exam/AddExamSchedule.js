@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import "./AddExamSchedule.css";
+import api from "../../../../api";
+import { Link } from 'react-router-dom';
 
 const AddExamSchedule = () => {
-  const [selectedTest, setSelectedTest] = useState("");
-  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedTest, setSelectedTest] = useState("Class Test");
+  const [selectedClass, setSelectedClass] = useState("10th Class");
   const classOptions = [
     "10th Class",
     "9th Class",
@@ -18,6 +20,7 @@ const AddExamSchedule = () => {
     "Pre-K",
   ];
   const testNames = [
+    "Class Test",
     "Unit Test - 1",
     "Quarterly Exam",
     "Unit Test - 2",
@@ -25,9 +28,11 @@ const AddExamSchedule = () => {
     "Unit Test - 3",
     "Annual Exam",
   ];
+
   const handleClassChange = (e) => {
     setSelectedClass(e.target.value);
   };
+
   const handleTestChange = (e) => {
     setSelectedTest(e.target.value);
   };
@@ -66,6 +71,10 @@ const AddExamSchedule = () => {
     }
   };
 
+  const handleClear = () => {
+    setExams([]); // Clear the exams array
+  };
+
   // Function to validate form fields
   const validateForm = () => {
     return (
@@ -77,6 +86,34 @@ const AddExamSchedule = () => {
     );
   };
 
+  const handlePost = async () => {
+    try {
+      for (const exam of exams) {
+        const { date, fromTime, toTime, subject, maxMarks } = exam;
+  
+        const rowExamData = {
+          date:date,
+          fromTime: fromTime,
+          toTime: toTime,
+          subject: subject,
+          maxMarks: maxMarks
+        };
+  
+        await api.put(
+          `ExamSchedule/${selectedClass}/${selectedTest}/${date}.json`,
+          rowExamData
+        );
+      }
+  
+      alert("Exam Schedule posted successfully!");
+      setExams([]); // Clear the exams array after posting
+    } catch (error) {
+      console.error("Error posting exams:", error);
+      // Handle error here (e.g., show error message)
+    }
+  };
+  
+
   return (
     <>
       <h3>
@@ -85,7 +122,7 @@ const AddExamSchedule = () => {
 
       <div className="exam-schedule-container">
         <form onSubmit={handleSubmit} className="exam-form">
-          <div className="detailStud">
+          <div className="detailStud headerAddNewExam">
             <div className="noStud">Add New Exam Schedule</div>
             <div className="dropdown1">
               <div className="Class">
@@ -98,7 +135,7 @@ const AddExamSchedule = () => {
                   ))}
                 </select>
               </div>
-              <div className="leftOne">
+              <div className="leftOne exam-name">
                 <span className="Onename">Exam Name : </span>
                 <select value={selectedTest} onChange={handleTestChange}>
                   {testNames.map((test, index) => (
@@ -166,7 +203,7 @@ const AddExamSchedule = () => {
                 placeholder="Enter max marks"
                 value={formData.maxMarks}
                 onChange={handleChange}
-                className="input-field"
+                className="input-field w-100"
                 required
               />
             </div>
@@ -177,6 +214,14 @@ const AddExamSchedule = () => {
         </form>
         <table className="exam-table">
           <thead>
+            <tr>
+              <th colSpan={2} className="headerTableClassTest">
+                Class : {selectedClass}
+              </th>
+              <th colSpan={3} className="headerTableClassTest">
+                Exam Name : {selectedTest}
+              </th>
+            </tr>
             <tr>
               <th>Date</th>
               <th>From Time</th>
@@ -197,6 +242,14 @@ const AddExamSchedule = () => {
             ))}
           </tbody>
         </table>
+        <div className="tableFooter">
+          <Link className="form-btn1" onClick={handleClear}>
+              Clear
+          </Link>
+          <Link className="form-btn1" onClick={handlePost}>
+              Submit
+          </Link>
+        </div>
       </div>
     </>
   );

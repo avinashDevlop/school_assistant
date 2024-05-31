@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./LibraryBooksCSS.css"; // Import CSS file for styling
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFacebook,
-  faInstagramSquare,
-  faWhatsapp,
-} from "@fortawesome/free-brands-svg-icons";
-import { faGlobe } from "@fortawesome/free-solid-svg-icons";
- 
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import {
+//   faFacebook,
+//   faInstagramSquare,
+//   faWhatsapp,
+// } from "@fortawesome/free-brands-svg-icons";
+// import { faGlobe } from "@fortawesome/free-solid-svg-icons";
+
 const BookDisplayPage = () => {
   const [books, setBooks] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const dummyBooks = [
+  const dummyBooksRef = useRef([
     {
       title: "The Great Gatsby",
       author: "F. Scott Fitzgerald",
@@ -93,10 +93,10 @@ const BookDisplayPage = () => {
       image: "narnia.jpg",
       selectedClass: "6th Class",
     },
-  ];
+  ]);
 
   useEffect(() => {
-    setBooks(dummyBooks);
+    setBooks(dummyBooksRef.current);
   }, []);
 
   const handleSearch = (e) => {
@@ -149,36 +149,9 @@ const BookDisplayPage = () => {
             </div>
           ))}
         </div>
-        {/* social media */}
-        <div className="container_Bottom_data">
-          <div className="Lastcard">
-            <div className="facebook">
-              <FontAwesomeIcon icon={faFacebook} />
-            </div>
-            <div className="details">Visit</div>
-          </div>
-          <div className="Lastcard">
-            <div className="instragram">
-              <FontAwesomeIcon icon={faInstagramSquare} />
-            </div>
-            <div className="details">Visit</div>
-          </div>
-          <div className="Lastcard">
-            <div className="WhatsApp">
-              <FontAwesomeIcon icon={faWhatsapp} />
-            </div>
-            <div className="details">Chart</div>
-          </div>
-          <div className="Lastcard">
-            <div className="Website">
-              <FontAwesomeIcon icon={faGlobe} />
-            </div>
-            <div className="details">Visit</div>
-          </div>
-        </div>
       </div>
     </>
   );
 };
 
-export default BookDisplayPage;
+export default BookDisplayPage; 

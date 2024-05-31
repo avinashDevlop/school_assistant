@@ -8,7 +8,6 @@ import Layout from './SchoolAssistantDashBoard/Dashboard/Layout';
 import AdminDashboard from './SchoolAssistantDashBoard/Dashboard/pages/Dashboard/AdminDashboard';
 import TeacherDashboard from './SchoolAssistantDashBoard/Dashboard/pages/Dashboard/TeacherDashboard';
 import StudentDashboard from './SchoolAssistantDashBoard/Dashboard/pages/Dashboard/StudentDashboard';
-import SubRoute from './SubRoute';
 import AllStudent from "./SchoolAssistantDashBoard/Dashboard/pages/Student/AllStudent.js";
 import StudentDetails from "./SchoolAssistantDashBoard/Dashboard/pages/Student/studentDetails.js";
 import AdmissionForm from "./SchoolAssistantDashBoard/Dashboard/pages/Student/AdmissionForm.js";
@@ -24,95 +23,48 @@ import UpdateTimeTables from './SchoolAssistantDashBoard/Dashboard/pages/TimeTab
 import ExamSchedule from './SchoolAssistantDashBoard/Dashboard/pages/Exam/ExamSchedule.js';
 import AddExamSchedule from './SchoolAssistantDashBoard/Dashboard/pages/Exam/AddExamSchedule.js';
 import AddMarks from './SchoolAssistantDashBoard/Dashboard/pages/Exam/AddMarks.js'
+import StudAccount from "./SchoolAssistantDashBoard/Dashboard/pages/Accounts/StudAccount.jsx";
+import TeachAccounts from "./SchoolAssistantDashBoard/Dashboard/pages/Accounts/TeachAccounts.jsx";
+import DriverAccounts from "./SchoolAssistantDashBoard/Dashboard/pages/Accounts/DriverAccounts.jsx";
+import Notice from "./SchoolAssistantDashBoard/Dashboard/pages/Notice/Notice.jsx";
+import ChatStudent from "./SchoolAssistantDashBoard/Dashboard/pages/Messages/chatStudent.jsx"
+import Transport from './SchoolAssistantDashBoard/Dashboard/pages/Transport/Transport.jsx'
 const App = () => (
   <Router>
-    
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/SignUpForm" element={<Signin />} />
       <Route path="/LoginForm" element={<Login />} />
-      <Route path="/SchoolAssistantDashBoard/welcomeInfo/ProfileDeatails" element={<Profile />} />
+      <Route path="/ProfileDetails" element={<Profile />} />
 
       <Route path="/Dashboard" element={<Layout />}>
-      <Route
-          index
-          path=""
-          element={<SubRoute path="/Dashboard/AdminDashboard" name="Admin" component={AdminDashboard} />}
-        />
-        <Route
-          path="AdminDashboard"
-          element={<SubRoute path="/Dashboard/AdminDashboard" name="Admin" component={AdminDashboard} />}
-        />
-        <Route
-          path="TeacherDashboard"
-          element={<SubRoute path="/Dashboard/TeacherDashboard" name="Teachers" component={TeacherDashboard} />}
-        />
-        <Route
-          path="StudentDashboard"
-          element={<SubRoute path="/Dashboard/StudentDashboard" name="Student" component={StudentDashboard} />}
-        />
-        <Route
-          path="AllStudent"
-          element={<SubRoute path="/Student/AllStudent" name="AllStudent" component={AllStudent} />}
-        />
-        <Route
-          path="StudentDetails"
-          element={<SubRoute path="/Student/StudentDetails" name="StudentDetails" component={StudentDetails} />}
-        />
-        <Route
-          path="AdmissionForm"
-          element={<SubRoute path="/Student/AdmissionForm" name="AdmissionForm" component={AdmissionForm} />}
-        />
-        <Route
-          path="StudentPromotion"
-          element={<SubRoute path="/Student/StudentPromotion" name="StudentPromotion" component={StudentPromotion} />}
-        />
-        <Route
-          path="AllTeachers"
-          element={<SubRoute path="/Student/AllTeachers" name="AllTeachers" component={AllTeachers} />}
-        />
-        <Route
-          path="TeacherDetails"
-          element={<SubRoute path="/Student/TeacherDetails" name="TeacherDetails" component={TeacherDetails} />}
-        />
-        <Route
-          path="AddTeacher"
-          element={<SubRoute path="/Student/AddTeacher" name="AddTeacher" component={AddTeacher} />}
-        />
-        <Route
-          path="Attendence"
-          element={<SubRoute path="Attendence" name="Attendence" component={Attendence} />}
-        />
-        <Route
-          path="AddLibaryBooks"
-          element={<SubRoute path="AddLibaryBooks" name="AddLibaryBooks" component={AddLibaryBooks} />}
-        />
-        <Route
-          path="LibraryBooks"
-          element={<SubRoute path="LibraryBooks" name="LibraryBooks" component={LibaryBooks} />}
-        />
-        <Route
-          path="AllTimeTables"
-          element={<SubRoute path="AllTimeTables" name="AllTimeTables" component={AllTimeTables} />}
-        />
-         <Route
-          path="UpdateTimeTables"
-          element={<SubRoute path="UpdateTimeTables" name="UpdateTimeTables" component={UpdateTimeTables} />}
-        />
-        <Route
-          path="ExamSchedule"
-          element={<SubRoute path="ExamSchedule" name="ExamSchedule" component={ExamSchedule} />}
-        />
-        <Route
-          path="AddExamSchedule"
-          element={<SubRoute path="AddExamSchedule" name="AddExamSchedule" component={AddExamSchedule} />}
-        />
-        <Route
-          path="AddMarks"
-          element={<SubRoute path="AddMarks" name="AddMarks" component={AddMarks} />}
-        />
+        <Route index element={<AdminDashboard />} />
+        <Route path="AdminDashboard" element={<AdminDashboard />} />
+        <Route path="TeacherDashboard" element={<TeacherDashboard />} />
+        <Route path="StudentDashboard" element={<StudentDashboard />} />
+        <Route path="AllStudent" element={<AllStudent />} />
+        <Route path="StudentDetails" element={<StudentDetails />} />
+        <Route path="AdmissionForm" element={<AdmissionForm />} />
+        <Route path="StudentPromotion" element={<StudentPromotion />} />
+        <Route path="AllTeachers" element={<AllTeachers />} />
+        <Route path="TeacherDetails" element={<TeacherDetails />} />
+        <Route path="AddTeacher" element={<AddTeacher />} />
+        <Route path="Attendence" element={<Attendence />} />
+        <Route path="AddLibraryBooks" element={<AddLibaryBooks />} />
+        <Route path="LibraryBooks" element={<LibaryBooks />} />
+        <Route path="AllTimeTables" element={<AllTimeTables />} />
+        <Route path="UpdateTimeTables" element={<UpdateTimeTables />} />
+        <Route path="ExamSchedule" element={<ExamSchedule />} />
+        <Route path="AddExamSchedule" element={<AddExamSchedule />} />
+        <Route path="AddMarks" element={<AddMarks />} />
+        <Route path="StudAccount" element={<StudAccount />} />
+        <Route path="TeachAccounts" element={<TeachAccounts />} />
+        <Route path="DriverAccounts" element={<DriverAccounts />} />
+        <Route path="Notice" element={<Notice />} />
+        <Route path="chatStudent" element={<ChatStudent />} />
+        <Route path="Transport" element={<Transport />} /> 
       </Route>
-       
+
       {/* Handle unknown routes */}
       <Route path="*" element={<div>Not Found</div>} />
     </Routes>

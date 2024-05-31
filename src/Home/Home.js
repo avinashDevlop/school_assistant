@@ -5,7 +5,7 @@ import Footer from '../Footer/Footer.js'
 const Home = () => {
   return (
     <div>
-      <Header/>           
+      <Header style={{width:'100%'}}/>           
       <HomeBody/>
       <Footer/>
     </div>
