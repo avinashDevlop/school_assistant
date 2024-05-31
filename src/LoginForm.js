@@ -1,6 +1,6 @@
 import React from 'react';
 import Header from './Header/Header.js';
-import './LoginFormCSS.css';
+import './LoginForm.css';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { app } from "./firebaseConfig.js";
 import { useNavigate, Link } from "react-router-dom";
@@ -59,6 +59,8 @@ const LoginForm = () => {
                 placeholder='Enter your Email'
                 id="exampleInputEmail1"
                 aria-describedby="emailHelp"
+                style={{width:'325px'}}
+                required
               />
             </div>
             <div className="mb-3">
@@ -71,6 +73,8 @@ const LoginForm = () => {
                 className="form-control border border-primary"
                 id="exampleInputPassword1"
                 name="password"
+                style={{width:'325px'}}
+                required
               />
             </div>
             <p className="small">
@@ -85,7 +89,7 @@ const LoginForm = () => {
             </div>
           </form>
           <div className="mt-3">
-            <p className="mb-0 text-center">
+            <p className="mb-0 text-center" >
               Don't have an account?{' '}
               <a href="/SignUpForm" className="text-primary fw-bold">
                 Sign Up

@@ -101,24 +101,24 @@ const SignUpForm = () => {
   return (
     <>
       <Header />
-      <div className="signup-container">
-        <h2 className="signup-title">Sign Up</h2>
+      <div className="signup-wrapper">
+        <h2 className="signup-heading">Sign Up</h2>
         <form onSubmit={handleSubmit} className="signup-form">
-          <label htmlFor="email" className="signup-label" id="email1">
-            Email or UserName
+          <label htmlFor="email" className="signup-label" id="email-label">
+            Email or Username
           </label>
           <input
             type="email"
             id="email"
             name="email"
-            placeholder="Enter Email or userName"
+            placeholder="Enter Email or Username"
             value={formData.email}
             onChange={handleChange}
             required
             className="signup-input"
           />
 
-          <label htmlFor="password" className="signup-label" id="password1">
+          <label htmlFor="password" className="signup-label" id="password-label">
             Create Password
           </label>
           <input
@@ -130,6 +130,7 @@ const SignUpForm = () => {
             onChange={handleChange}
             required
             className="signup-input"
+            style={{width:'330px'}}
           />
 
           <label htmlFor="confirmPassword" className="signup-label">
@@ -144,16 +145,17 @@ const SignUpForm = () => {
             onChange={handleChange}
             required
             className="signup-input"
+            style={{width:'330px'}}
           />
 
           {!passwordMatch &&
             formData.password !== "" &&
             formData.confirmPassword !== "" && (
-              <p className="signup-error-text">Passwords do not match</p>
+              <p className="signup-error">Passwords do not match</p>
             )}
 
           {passwordLengthError && (
-            <p className="signup-error-text">
+            <p className="signup-error">
               Password must be at least 8 characters
             </p>
           )}
@@ -162,7 +164,7 @@ const SignUpForm = () => {
             Sign Up
           </button>
         </form>
-        <p className="signup-login-link">
+        <p className="signup-login">
           Already have an account?{" "}
           <a href="/LoginForm" className="signup-link">
             Log in
