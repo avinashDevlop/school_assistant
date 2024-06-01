@@ -1,0 +1,45 @@
+.summary-container {
+    padding: 20px;
+}
+
+.table-container {
+    max-width: 100%;
+    max-height: 400px;
+    overflow-x: auto;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px; /* Added rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Added shadow for better look */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px; /* Increased padding for better spacing */
+    text-align: center;
+    font-family: 'Arial', sans-serif; /* Changed font */
+    vertical-align: middle; /* Ensure content is vertically centered */
+}
+
+th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+td {
+    background-color: #fff; /* Ensure white background for data cells */
+}
+
+th svg {
+    margin-right: 8px; /* Space between icon and text */
+}
+
+@media (max-width: 600px) {
+    th, td {
+        font-size: 14px; /* Smaller font size for mobile view */
+    }
+}

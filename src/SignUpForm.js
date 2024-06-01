@@ -101,9 +101,9 @@ const SignUpForm = () => {
   return (
     <>
       <Header />
-      <div className="signup-wrapper">
+      <div className="signup-wrapper" style={{overflow:'hidden'}}>
         <h2 className="signup-heading">Sign Up</h2>
-        <form onSubmit={handleSubmit} className="signup-form">
+        <form onSubmit={handleSubmit} className="signup-form" style={{overflow:'hidden'}}>
           <label htmlFor="email" className="signup-label" id="email-label">
             Email or Username
           </label>

@@ -56,8 +56,7 @@ const TodaysAttendance = () => {
   const [sectionOptions, setSectionOptions] = useState([]);
   const [holidayName, setHolidayName] = useState("");
   const [submitDisabled, setSubmitDisabled] = useState(true); // Initialize submit button as disabled
-  const [attendanceNames, setAttendanceNames] = useState({});
-  const [errorMessage, setErrorMessage] = useState("");
+  const [attendanceNames] = useState({});
 
   const classOptions = [
     "10th Class",
@@ -126,7 +125,6 @@ useEffect(() => {
     const fetchData = async () => {
       try {
         setLoadingStudents(true);
-        setErrorMessage(""); // Clear any previous error message
   
         if (selectedClass && selectedSection) {
           const response = await api.get(
@@ -142,23 +140,22 @@ useEffect(() => {
             setStudents(studentArray);
             setTotalStudents(studentArray.length);
             setPresentStudents(0);
-            setErrorMessage(""); // Clear any previous error message
+          
           } else {
             setStudents([]);
             setTotalStudents(0);
             setPresentStudents(0);
-            setErrorMessage("No students found.");
+            
           }
         } else {
           setStudents([]);
           setTotalStudents(0);
           setPresentStudents(0);
-          setErrorMessage("");
+  
         }
         setLoadingStudents(false);
       } catch (error) {
         setLoadingStudents(false);
-        setErrorMessage("Error fetching student data.");
         console.error("Error fetching student data:", error);
       }
     };
@@ -175,7 +172,7 @@ useEffect(() => {
     const fetchStudentData = async () => {
       try {
         setLoadingStudents(true);
-        setErrorMessage(""); // Clear any previous error message
+
         
         if (selectedClass && selectedSection) {
           const response = await api.get(
@@ -195,7 +192,7 @@ useEffect(() => {
             setStudents([]);
             setTotalStudents(0);
             setPresentStudents(0);
-            setErrorMessage("No students found.");
+    
           }
         } else {
           setStudents([]);
@@ -205,7 +202,7 @@ useEffect(() => {
         setLoadingStudents(false);
       } catch (error) {
         setLoadingStudents(false);
-        setErrorMessage("Error fetching student data.");
+        
         console.error("Error fetching student data:", error);
       }
     };
@@ -232,7 +229,7 @@ useEffect(() => {
     const fetchAttendanceData = async () => {
       try {
         setLoadingStudents(true);
-        setErrorMessage("");
+        
   
         if (selectedClass && selectedSection) {
           const now = new Date();
@@ -258,23 +255,23 @@ useEffect(() => {
             setStudents(studentArray);
             setTotalStudents(studentArray.length);
             setPresentStudents(studentArray.filter(student => student.present).length);
-            setErrorMessage("");
+            
           } else {
             setStudents([]);
             setTotalStudents(0);
             setPresentStudents(0);
-            setErrorMessage("No students found.");
+            
           }
         } else {
           setStudents([]);
           setTotalStudents(0);
           setPresentStudents(0);
-          setErrorMessage("");
+          
         }
         setLoadingStudents(false);
       } catch (error) {
         setLoadingStudents(false);
-        setErrorMessage("Error fetching student data.");
+        
         console.error("Error fetching student data:", error);
       }
     };
@@ -291,7 +288,6 @@ useEffect(() => {
     setTotalStudents(0); // Reset total students count
     setPresentStudents(0); // Reset present students count
     setHolidayName(""); // Reset holiday name
-    setErrorMessage("");
   };
   // Handles section change event
   const handleSectionChange = (event) => {

@@ -5,7 +5,7 @@ import { MdDashboard } from "react-icons/md";
 import { PiStudentFill } from "react-icons/pi";
 import { GiTeacher } from "react-icons/gi";
 import { IoIosPaper } from "react-icons/io";
-import { FaShuttleVan } from "react-icons/fa";
+import { FaRupeeSign, FaShuttleVan } from "react-icons/fa";
 import { RiMailSendLine } from "react-icons/ri";
 import { MdManageAccounts } from "react-icons/md";
 import { AiOutlineMessage } from "react-icons/ai";
@@ -160,6 +160,11 @@ const routes = [
         ,
       },
     ],
+  },
+  {
+    path: "Finance",
+    name: "Finance",
+    icon: <FaRupeeSign />,
   },
   {
     path: "Transport",

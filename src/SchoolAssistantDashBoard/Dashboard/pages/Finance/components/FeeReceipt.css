@@ -1,0 +1,78 @@
+.receipt-container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #000;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+header p {
+    margin: 2px 0;
+    font-size: small;
+}
+
+
+.receipt-details {
+    margin-bottom: 10px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.column {
+    width: 45%;
+}
+
+.column p {
+    margin: 5px 0;
+}
+
+.fees-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.fees-table th, .fees-table td {
+    border: 1px solid #000;
+    padding: 8px;
+    text-align: center;
+}
+
+footer {
+    text-align: center;
+}
+
+.receipt-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border: 1px solid #000;
+    padding: 20px;
+    z-index: 1000;
+}
+
+.popup-buttons {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.popup-buttons button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
