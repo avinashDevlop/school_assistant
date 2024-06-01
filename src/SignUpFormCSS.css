@@ -8,6 +8,7 @@
 	text-align: center;
 	margin: 50px auto;
 	border: 2px solid #4c5ac5;
+    overflow-y: hidden;
   }
   
   .signup-heading {
@@ -22,6 +23,7 @@
 	flex-direction: column;
 	align-items: flex-start;
 	margin: 0 20px;
+	overflow: hidden;
   }
   
   .signup-label {
@@ -65,7 +67,7 @@
   
   .signup-error {
 	color: #ff0000;
-	margin: 8px 0;
+	margin: 8px 0; 
 	font-size: 12px;
   }
   

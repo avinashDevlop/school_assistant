@@ -1,6 +1,11 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from './Home/Home.js';
+import Gallery from "./Home/components/Gallery.jsx";
+import WebsiteAdmission from './Home/components/Admission.jsx'
+import Results from './Home/components/Results.jsx' 
+import AboutUs from './Home/components/AboutUs.jsx'
+import ContactUs from './Home/components/ContactUs.jsx'
 import Signin from './SignUpForm';
 import Login from './LoginForm';
 import Profile from './SchoolAssistantDashBoard/welcomeInfo/ProfileDeatails';
@@ -29,10 +34,16 @@ import DriverAccounts from "./SchoolAssistantDashBoard/Dashboard/pages/Accounts/
 import Notice from "./SchoolAssistantDashBoard/Dashboard/pages/Notice/Notice.jsx";
 import ChatStudent from "./SchoolAssistantDashBoard/Dashboard/pages/Messages/chatStudent.jsx"
 import Transport from './SchoolAssistantDashBoard/Dashboard/pages/Transport/Transport.jsx'
+import Finance from "./SchoolAssistantDashBoard/Dashboard/pages/Finance/Finance.jsx";
 const App = () => (
   <Router>
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/Gallery" element={<Gallery />} />
+      <Route path="/WebsiteAdmission" element={<WebsiteAdmission />} />
+      <Route path="/Results" element={<Results />} />
+      <Route path="/AboutUs" element={<AboutUs />} />
+      <Route path="/ContactUs" element={<ContactUs />} />
       <Route path="/SignUpForm" element={<Signin />} />
       <Route path="/LoginForm" element={<Login />} />
       <Route path="/ProfileDetails" element={<Profile />} />
@@ -63,8 +74,8 @@ const App = () => (
         <Route path="Notice" element={<Notice />} />
         <Route path="chatStudent" element={<ChatStudent />} />
         <Route path="Transport" element={<Transport />} /> 
+        <Route path="Finance" element={<Finance />} /> 
       </Route>
-
       {/* Handle unknown routes */}
       <Route path="*" element={<div>Not Found</div>} />
     </Routes>

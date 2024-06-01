@@ -1,7 +1,11 @@
 @import url("https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900");
-.nav-container{
+
+.nav-container {
     width: 100%;
+    height: 85px;
+    overflow: hidden;
 }
+
 .custom-nav-link-hover:hover {
     color: rgba(44, 113, 122, 0.877) !important; /* Add !important to override Bootstrap styles if necessary */
 }
@@ -25,6 +29,8 @@
 .custom-content {
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     margin-bottom: 25px;
+    display: flex;
+    align-items: center; /* Center logo and text vertically */
 }
 
 .custom-h4 {
@@ -85,7 +91,7 @@
     display: flex;
     justify-content: space-around; /* Adjust as needed (e.g., space-between, center, etc.) */
     align-items: center;
-    gap: 10px; /* Adjust the gap between buttons as needed */
+    gap: 15px; /* Adjust the gap between buttons as needed */
 }
 
 .form-btn1 {
@@ -99,12 +105,91 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-  }
-  
-  .form-btn1:hover {
+}
+
+.form-btn1:hover {
     background-color: #0056b3; /* Adjust as needed */
-  }
-  
-.navBar{
-    padding: 5px 20px;
+}
+
+.navBar {
+    padding: 5px 0px;
+}
+
+/* Style for the logo */
+.school-logo {
+    height: 60px; /* Adjust as needed */
+    width: 60px;
+    margin-right: 10px; /* Space between logo and text */
+    border-radius: 50%;
+}
+
+/* Responsive font sizes for the school name */
+@media (max-width: 1200px) {
+    .custom-h4 {
+        font-size: 22px;
+    }
+}
+
+@media (max-width: 992px) {
+    .custom-h4 {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .custom-h4 {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 576px) {
+    .custom-h4 {
+        font-size: 16px;
+    }
+}
+/* HeaderCSS.css */
+.nav-container {
+  width: 100%;
+}
+
+.navBar {
+  background-color: #f8f9fa; /* Adjust according to your custom background color */
+}
+
+.custom-content {
+  display: flex;
+  align-items: center;
+}
+
+.brand-container {
+  display: flex;
+  align-items: center;
+}
+
+.custom-h4 {
+  margin: 0;
+  padding-left: 10px;
+}
+
+.custom-nav-container .nav-link {
+  color: #000; /* Adjust the color as needed */
+  padding: 0.5rem 1rem;
+}
+
+.custom-nav-link-hover:hover {
+  text-decoration: underline; /* Or any hover effect you want */
+}
+
+.button-container .form-btn1 {
+  margin-left: 10px;
+  color: white;
+  background-color: #007bff; /* Adjust as needed */
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.button-container .form-btn1:hover {
+  background-color: #0056b3; /* Adjust hover color */
 }
