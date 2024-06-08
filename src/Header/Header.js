@@ -26,17 +26,17 @@ function Header() {
           <div>
             <Navbar.Collapse id="navbarScroll">
               <Nav className="mx-auto custom-nav-container">
-              <Nav.Link href="#AboutUs" className="custom-nav-link-hover">
-                  About Us
-                </Nav.Link>
                 <Nav.Link href="#Gallery" className="custom-nav-link-hover">
                   Gallery
+                </Nav.Link>
+                <Nav.Link href="#Results" className="custom-nav-link-hover">
+                  Results
                 </Nav.Link>
                 <Nav.Link href="#WebsiteAdmission" className="custom-nav-link-hover">
                   Adimissions
                 </Nav.Link>
-                <Nav.Link href="#Results" className="custom-nav-link-hover">
-                  Results
+                <Nav.Link href="#AboutUs" className="custom-nav-link-hover">
+                  About Us
                 </Nav.Link>
                 <Nav.Link href="#ContactUs" className="custom-nav-link-hover">
                   Contact Us

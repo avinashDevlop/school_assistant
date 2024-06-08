@@ -42,7 +42,7 @@ const TopHeader = ({ onToggleSidebar }) => {
         </div>
 
         <div className="center">
-          Vignan Joel School, Koduru
+        St. JOHN'S ENGLISH MEDIUM SCHOOL , Mydukur
         </div>
         <div className="right">
           <span className="icon2">

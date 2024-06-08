@@ -8,7 +8,6 @@ import AboutUs from './Home/components/AboutUs.jsx'
 import ContactUs from './Home/components/ContactUs.jsx'
 import Signin from './SignUpForm';
 import Login from './LoginForm';
-import Profile from './SchoolAssistantDashBoard/welcomeInfo/ProfileDeatails';
 import Layout from './SchoolAssistantDashBoard/Dashboard/Layout';
 import AdminDashboard from './SchoolAssistantDashBoard/Dashboard/pages/Dashboard/AdminDashboard';
 import TeacherDashboard from './SchoolAssistantDashBoard/Dashboard/pages/Dashboard/TeacherDashboard';
@@ -46,7 +45,6 @@ const App = () => (
       <Route path="/ContactUs" element={<ContactUs />} />
       <Route path="/SignUpForm" element={<Signin />} />
       <Route path="/LoginForm" element={<Login />} />
-      <Route path="/ProfileDetails" element={<Profile />} />
 
       <Route path="/Dashboard" element={<Layout />}>
         <Route index element={<AdminDashboard />} />

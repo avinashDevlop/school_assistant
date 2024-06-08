@@ -63,7 +63,7 @@ const Layout = () => {
           <SideBar isOpen={isSidebarOpen} />
         </div>
         <div className="dashboard-content">
-          <Outlet />
+          <Outlet /> 
         </div>
       </div>
     </div>

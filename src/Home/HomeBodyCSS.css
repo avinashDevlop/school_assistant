@@ -1,9 +1,6 @@
-/* HomeBodyCSS.css */
-
 .carousel-item img {
   max-height: 90vh; /* Adjust the height according to your needs */
-  object-fit: cover; /* Ensures the image covers the entire container */
-  
+  object-fit: cover;
 }
 
 .carousel-caption {

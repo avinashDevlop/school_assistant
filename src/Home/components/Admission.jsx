@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  MDBBtn,
   MDBContainer,
   MDBRow,
   MDBCol,
@@ -9,7 +8,8 @@ import {
   MDBInput,
   MDBRadio,
 } from "mdb-react-ui-kit";
-
+import { Button } from "react-bootstrap";
+ 
 function App() {
   return (
     <>
@@ -103,9 +103,24 @@ function App() {
                 </MDBCol>
               </MDBRow>
 
-              <div className="d-flex justify-content-end pt-3" >
-                    <MDBBtn className='md-4 align-items-center' color='warning' size='lg'>Submit form</MDBBtn>
-                  </div>
+              <div
+                            className="form-group"
+                            style={{ marginBottom: "15px" }}
+                          >
+                            <Button
+                              type="submit"
+                              value="Send Message"
+                              className="btn btn-primary"
+                              style={{
+                                backgroundColor: "#007bff",
+                                borderColor: "#007bff",
+                                padding: "0px 20px",
+                                width:"90px"
+                              }}
+                            >
+                              Submit
+                            </Button>
+                          </div>
             </MDBCardBody>
           </MDBCard>
         </MDBRow>

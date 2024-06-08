@@ -1,7 +1,8 @@
 .main-container {
   display: flex;
+   height: 105%; 
 }
-main {
+main { 
   padding: 10px;
 }
 
