@@ -88,7 +88,7 @@ const SidebarMenu = ({ route, showAnimation, isOpen }) => {
             initial="hidden"
             animate="show"
             exit="hidden"
-            className="menu_container"
+            className="menu-container"
           >
             {route.subRoutes.map((subRoute, i) => (
               <motion.div variants={menuItemAnimation} key={i} custom={i} >

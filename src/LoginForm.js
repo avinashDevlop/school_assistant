@@ -22,7 +22,7 @@ const LoginForm = () => {
       if (user) {
         console.log('Login successfully', user);
         window.alert('Login successful!');
-        navigate("/ProfileDetails");
+        navigate("/Dashboard");
       } else {
         console.log('User not authenticated');
         window.alert('User not authenticated');
