@@ -124,7 +124,7 @@ const DevelopedBy = styled.small`
 `;
 
 const HexaFire = styled.span`
-  color: #ff5733; /* Use your preferred color */
+  color: #C1C0C0; /* Use your preferred color */
 `;
 
 const Footer = () => {
@@ -146,7 +146,7 @@ const Footer = () => {
         <DeveloperInfo>
           <FooterLink href="">
             <DevelopedBy>
-              Developed by: <HexaFire>Hexa fire 4</HexaFire>
+              Developed by: <HexaFire>Hexa <span style={{color:'#f27d0c'}}>fire</span> 4</HexaFire>
             </DevelopedBy>
           </FooterLink>
         </DeveloperInfo>
