@@ -24,13 +24,6 @@
     font-weight: bold;
   }
   
-  input {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-    margin-top: 4px;
-  }
-  
   button {
     background-color: #4caf50;
     color: white;

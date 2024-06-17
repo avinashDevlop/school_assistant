@@ -60,8 +60,8 @@ const Layout = () => {
       <NavBar onToggleSidebar={toggleSidebar} />
       <div className="dashboard-container">
         <div>
-          <SideBar isOpen={isSidebarOpen} />
-        </div>
+          <SideBar isOpen={isSidebarOpen}/>
+        </div> 
         <div className="dashboard-content">
           <Outlet /> 
         </div>

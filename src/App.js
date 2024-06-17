@@ -5,7 +5,7 @@ import Gallery from "./Home/components/Gallery.jsx";
 import WebsiteAdmission from './Home/components/Admission.jsx'
 import Results from './Home/components/Results.jsx' 
 import AboutUs from './Home/components/AboutUs.jsx'
-import ContactUs from './Home/components/ContactUs.jsx'
+
 import Signin from './SignUpForm';
 import Login from './LoginForm';
 import Layout from './SchoolAssistantDashBoard/Dashboard/Layout';
@@ -42,7 +42,7 @@ const App = () => (
       <Route path="/WebsiteAdmission" element={<WebsiteAdmission />} />
       <Route path="/Results" element={<Results />} />
       <Route path="/AboutUs" element={<AboutUs />} />
-      <Route path="/ContactUs" element={<ContactUs />} />
+      
       <Route path="/SignUpForm" element={<Signin />} />
       <Route path="/LoginForm" element={<Login />} />
 

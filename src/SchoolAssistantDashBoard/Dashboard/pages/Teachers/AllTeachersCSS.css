@@ -167,6 +167,7 @@
   opacity: 0;
   transition: 0.5s;
   transition-delay: calc(0.1s * var(--i));
+  list-style-type: none;
 }
 
 .AllCards .card .sci li a {

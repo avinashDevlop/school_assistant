@@ -1,25 +1,140 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 import { Nav, Navbar } from "react-bootstrap";
-import "./HeaderCSS.css"; // Import the CSS file for styling
 import logo from './logo.jpg'; 
 
 function Header() {
   return (
     <div className="nav-container">
+      <style>
+        {`
+          .nav-container {
+            width: 100%;
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+          }
+
+          .navBar {
+            padding: 0;
+          }
+
+          .navContainer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 10px 20px;
+          }
+
+          .brand-container {
+            display: flex;
+            align-items: center;
+          }
+
+          .school-logo {
+            width: 60px;
+            height: 70px;
+            margin-right: 10px;
+            display:'flex';
+            align-items:'center'
+            justify-content: center;
+          }
+
+          .school-info h1,
+          .school-info h2,
+          .school-info h5 {
+            margin: 0;
+            padding: 0;
+          }
+
+          .school-info h1 {
+            font-size: 1.3rem;
+            color: #3C3E90;
+          }
+
+          .school-info h2 {
+            font-size: 0.8rem;
+            color: #BA110E;
+          }
+
+          .school-info h5 {
+            font-size: 1rem;
+            color: #8C2B88;
+          }
+
+          .custom-bg-body-tertiary {
+            background-color: #ffffff;
+          }
+
+          .custom-content {
+            display: flex;
+            align-items: center;
+          }
+
+          .custom-nav-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+
+          .custom-nav-link-hover {
+            color: #007bff;
+            margin: 0 15px;
+            transition: color 0.3s ease;
+          }
+
+          .custom-nav-link-hover:hover {
+            color: #0056b3;
+            text-decoration: none;
+          }
+
+          .button-container {
+            display: flex;
+            align-items: center;
+          }
+
+          .form-btn1 {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin: 0 5px;
+            transition: background-color 0.3s ease;
+          }
+
+          .form-btn1:hover {
+            background-color: #0056b3;
+          }
+
+          @media (max-width: 992px) {
+            .navContainer {
+              flex-direction: column;
+            }
+
+            .brand-container {
+              margin-bottom: 10px;
+            }
+
+            .button-container {
+              margin-top: 10px;
+            }
+          }
+        `}
+      </style>
       <Navbar expand="lg" className="custom-bg-body-tertiary navBar">
         <div className="navContainer">
           <div className="brand-container">
             <Navbar.Brand href="/" className="custom-content"> 
-              <div className="" style={{display:'flex',alignItems:'center'}}>
-              <img src={logo} alt="School Logo" className="school-logo" /></div>
-              <div>
-              <h4 className="custom-h4 custom-outline-text">
-                St. JOHN'S ENGLISH MEDIUM SCHOOL
-              </h4>
-              <h4 className="custom-h4 custom-animated-text">
-                St. JOHN'S ENGLISH MEDIUM SCHOOL
-              </h4>
+              <div style={{display:'flex', alignItems:'center'}}>
+                <img src={logo} alt="School Logo" className="school-logo" />
+              </div>
+              <div> 
+                <div className="school-info" style={{ display: 'flex', flexDirection: 'column',alignItems:'center' }}>
+                  <h1>St. JOHN'S ENGLISH MEDIUM HIGH SCHOOL</h1>
+                  <h2>Recognised by the Govt. of Andhra Pradesh</h2>
+                  <h5>Badvel Road, Mydukur - 516172, YSR Dist. A.P. INDIA</h5>
+                </div>
               </div>
             </Navbar.Brand>
           </div>
@@ -36,10 +151,7 @@ function Header() {
                   Adimissions
                 </Nav.Link>
                 <Nav.Link href="#AboutUs" className="custom-nav-link-hover">
-                  About Us
-                </Nav.Link>
-                <Nav.Link href="#ContactUs" className="custom-nav-link-hover">
-                  Contact Us
+                  AboutUs
                 </Nav.Link>
               </Nav>
               <div className="button-container">

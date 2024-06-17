@@ -386,7 +386,7 @@ const StudentPromotionForm = () => {
       </h3>
       <div className="promotion-form">
         <h2>Student Promotion Form</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={{width:'100%'}}>  
           <label>Current Class:</label>
           <select
             name="currentClass"

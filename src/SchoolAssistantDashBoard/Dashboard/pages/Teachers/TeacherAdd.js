@@ -36,13 +36,13 @@ const AddTeacherAndEducationForm = () => {
   };
 
   return (
-    <>
+    <div style={{overflow:'hidden'}}>>
       <h3>
         Teachers/<span>Add Teachers</span>
       </h3>
       <div className="forms-container">
         <h1 className="section-title" title='Fill Form'>Personal Information</h1>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>  
           <div className="add-teacher-form">
             {/* Teacher Form */}
             <label>
@@ -168,7 +168,7 @@ const AddTeacherAndEducationForm = () => {
         </form>
       </div>
       
-    </>
+    </div>
   );
 };
 

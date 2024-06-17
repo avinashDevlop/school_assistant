@@ -244,8 +244,8 @@ const SideBar = ({ isOpen, children }) =>  {
   
   return (
     <>
-      <div className={`main-container ${isOpen ? '' : 'sidebar-close'}`} style={{overflow:'scroll'}}>
-        <motion.div
+      <div className={`main-container ${isOpen ? '' : 'sidebar-close'}`}  style={{overflow:'scroll',minHeight:'92vh',maxHeight:'100%'}} >
+        <motion.div 
           animate={{ 
             width: isOpen ? '195px' : '50px',
             transition: {

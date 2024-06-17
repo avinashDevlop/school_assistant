@@ -19,7 +19,7 @@ const menuAnimation = {
 
 const menuItemAnimation = {
   hidden: (i) => ({
-    padding: 0,
+    paddingLeft: 25,
     x: "-100%",
     transition: {
       duration: (i + 1) * 0.1,
@@ -50,7 +50,7 @@ const SidebarMenu = ({ route, showAnimation, isOpen }) => {
   
   return (
     <>
-      <div className="menu" onClick={toggleMenu}>
+      <div className="menu" onClick={toggleMenu} > 
         <div className="menu_item">
           <div className="icon">{route.icon}</div>
           <AnimatePresence>
@@ -88,7 +88,6 @@ const SidebarMenu = ({ route, showAnimation, isOpen }) => {
             initial="hidden"
             animate="show"
             exit="hidden"
-            className="menu-container"
           >
             {route.subRoutes.map((subRoute, i) => (
               <motion.div variants={menuItemAnimation} key={i} custom={i} >
