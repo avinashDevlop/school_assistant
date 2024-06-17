@@ -63,11 +63,11 @@ const AllStudent = () => {
   return (
     <div className="dashboard-content">
       <h3>
-      Student/<span>All Student</span>
+      Student/<span>All Student</span> 
       </h3>
       <div className="studGraph" id="sheet">
-        <div className="tableStud">
-          <div className="tableStudentMarks">
+        <div className="tableStud" >
+          <div className="tableStudentMarks" style={{overflow:'hidden'}}>
             <AllStudentDetails />
           </div>
         </div>

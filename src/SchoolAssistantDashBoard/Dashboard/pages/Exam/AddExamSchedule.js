@@ -121,8 +121,8 @@ const AddExamSchedule = () => {
       </h3>
 
       <div className="exam-schedule-container">
-        <form onSubmit={handleSubmit} className="exam-form">
-          <div className="detailStud headerAddNewExam">
+        <form onSubmit={handleSubmit} className="exam-form" style={{width:'100%'}}>
+          <div className="detailStud headerAddNewExam"> 
             <div className="noStud">Add New Exam Schedule</div>
             <div className="dropdown1">
               <div className="Class">
@@ -147,7 +147,7 @@ const AddExamSchedule = () => {
               </div>
             </div>
           </div>
-          <div className="form-row">
+          <div className="form-row" style={{width:'100%'}}>
             <div className="form-group">
               <label className="label">Date :</label>
               <input
@@ -156,6 +156,7 @@ const AddExamSchedule = () => {
                 value={formData.date}
                 onChange={handleChange}
                 className="input-field"
+                style={{width:'150px'}}
                 required
               />
             </div>
@@ -168,6 +169,7 @@ const AddExamSchedule = () => {
                 value={formData.fromTime}
                 onChange={handleChange}
                 className="input-field"
+                style={{width:'150px'}}
                 required
               />
             </div>
@@ -180,6 +182,7 @@ const AddExamSchedule = () => {
                 value={formData.toTime}
                 onChange={handleChange}
                 className="input-field"
+                style={{width:'150px'}}
                 required
               />
             </div>
@@ -192,6 +195,7 @@ const AddExamSchedule = () => {
                 value={formData.subject}
                 onChange={handleChange}
                 className="input-field"
+                style={{width:'150px'}}
                 required
               />
             </div>
@@ -203,7 +207,8 @@ const AddExamSchedule = () => {
                 placeholder="Enter max marks"
                 value={formData.maxMarks}
                 onChange={handleChange}
-                className="input-field w-100"
+                className="input-field"
+                style={{width:'150px'}}
                 required
               />
             </div>

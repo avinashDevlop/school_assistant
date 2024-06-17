@@ -138,7 +138,9 @@ const AdmissionForm = () => {
     "Jainism",
     "Sikhism",
   ];
-
+  const widthundred = {
+    width: "100%",
+  };
   return (
     <>
       <h3 ref={topRef}>
@@ -146,36 +148,34 @@ const AdmissionForm = () => {
       </h3>
       <div className="admission-form">
         <h2>ADMISSION FORM</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
+        <form onSubmit={handleSubmit} style={widthundred}>
+          <div className="form-group1">
             <label>Form Number</label>
             <input
               type="text"
-              className="form-control"
               name="formNo"
               value={formData.formNo}
               readOnly
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Date of Issue</label>
             <input
               type="date"
-              className="form-control"
               name="dateOfIssue"
               value={formData.dateOfIssue}
               onChange={handleChange}
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Class</label>
             <select
-              className="form-control"
               name="selectedClass"
               value={formData.selectedClass}
               onChange={handleChange}
+              className="form-dropdown"
               required
             >
               <option value="">Select Class...</option>
@@ -186,13 +186,13 @@ const AdmissionForm = () => {
               ))}
             </select>
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Section</label>
             <select
-              className="form-control"
               name="selectedSection"
               value={formData.selectedSection}
               onChange={handleChange}
+              className="form-dropdown"
               required
             >
               <option value="">Select Section...</option>
@@ -203,11 +203,10 @@ const AdmissionForm = () => {
               ))}
             </select>
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Admission Number</label>
             <input
               type="text"
-              className="form-control"
               name="admissionNumber"
               value={formData.admissionNumber}
               onChange={handleChange}
@@ -215,11 +214,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Surname</label>
             <input
               type="text"
-              className="form-control"
               name="surname"
               value={formData.surname}
               onChange={handleChange}
@@ -227,11 +225,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Name</label>
             <input
               type="text"
-              className="form-control"
               name="name"
               value={formData.name}
               onChange={handleChange}
@@ -239,7 +236,7 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group flex">
+          <div className="form-group1 flex">
             <label>Gender</label>
             <div className="form-check-inline flex">
               <input
@@ -264,22 +261,20 @@ const AdmissionForm = () => {
               <label className="form-check-label">Female</label>
             </div>
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Date of Birth</label>
             <input
               type="date"
-              className="form-control"
               name="dob"
               value={formData.dob}
               onChange={handleChange}
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Aadhar Card Number</label>
             <input
               type="text"
-              className="form-control"
               name="aadharCardNo"
               value={formData.aadharCardNo}
               onChange={handleChange}
@@ -288,11 +283,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Father's Name</label>
             <input
               type="text"
-              className="form-control"
               name="fathersName"
               value={formData.fathersName}
               onChange={handleChange}
@@ -300,11 +294,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Father's Occupation</label>
             <input
               type="text"
-              className="form-control"
               name="fathersOccupation"
               value={formData.fathersOccupation}
               onChange={handleChange}
@@ -312,11 +305,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Father's Mobile Number</label>
             <input
               type="text"
-              className="form-control"
               name="fathersMobileNumber"
               value={formData.fathersMobileNumber}
               onChange={handleChange}
@@ -324,11 +316,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Father's Aadhar Card Number</label>
             <input
               type="text"
-              className="form-control"
               name="fathersAadharCardNo"
               value={formData.fathersAadharCardNo}
               onChange={handleChange}
@@ -337,11 +328,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Mother's Surname</label>
             <input
               type="text"
-              className="form-control"
               name="mothersSurname"
               value={formData.mothersSurname}
               onChange={handleChange}
@@ -349,11 +339,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Mother's Name</label>
             <input
               type="text"
-              className="form-control"
               name="mothersName"
               value={formData.mothersName}
               onChange={handleChange}
@@ -361,11 +350,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Mother's Occupation</label>
             <input
               type="text"
-              className="form-control"
               name="mothersOccupation"
               value={formData.mothersOccupation}
               onChange={handleChange}
@@ -373,11 +361,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Mother's Mobile Number</label>
             <input
               type="text"
-              className="form-control"
               name="mothersMobileNumber"
               value={formData.mothersMobileNumber}
               onChange={handleChange}
@@ -385,11 +372,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Mother's Aadhar Card Number</label>
             <input
               type="text"
-              className="form-control"
               name="mothersAadharCardNo"
               value={formData.mothersAadharCardNo}
               onChange={handleChange}
@@ -398,11 +384,32 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
+            <label>Guardian Name</label>
+            <input
+              type="text"
+              name="guardianName"
+              value={formData.guardianName}
+              onChange={handleChange}
+              placeholder="Enter guardian name"
+              required
+            />
+          </div>
+          <div className="form-group1">
+            <label>Guardian Mobile Number</label>
+            <input
+              type="text"
+              name="guardianMobileNumber"
+              value={formData.guardianMobileNumber}
+              onChange={handleChange}
+              placeholder="Enter guardian mobile number"
+              required
+            />
+          </div>
+          <div className="form-group1">
             <label>Caste</label>
             <input
               type="text"
-              className="form-control"
               name="caste"
               value={formData.caste}
               onChange={handleChange}
@@ -410,11 +417,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Mother Tongue</label>
             <input
               type="text"
-              className="form-control"
               name="motherTongue"
               value={formData.motherTongue}
               onChange={handleChange}
@@ -422,11 +428,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Category</label>
             <input
               type="text"
-              className="form-control"
               name="category"
               value={formData.category}
               onChange={handleChange}
@@ -434,11 +439,11 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Religion</label>
             <select
-              className="form-control"
               name="religion"
+              className="form-dropdown"
               value={formData.religion}
               onChange={handleChange}
               required
@@ -451,11 +456,10 @@ const AdmissionForm = () => {
               ))}
             </select>
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Last School Name</label>
             <input
               type="text"
-              className="form-control"
               name="lastSchoolName"
               value={formData.lastSchoolName}
               onChange={handleChange}
@@ -463,11 +467,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Residential Address</label>
             <input
               type="text"
-              className="form-control"
               name="residentialAddress"
               value={formData.residentialAddress}
               onChange={handleChange}
@@ -475,11 +478,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>City</label>
             <input
               type="text"
-              className="form-control"
               name="city"
               value={formData.city}
               onChange={handleChange}
@@ -487,11 +489,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>State</label>
             <input
               type="text"
-              className="form-control"
               name="state"
               value={formData.state}
               onChange={handleChange}
@@ -499,11 +500,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Pincode</label>
             <input
               type="text"
-              className="form-control"
               name="pincode"
               value={formData.pincode}
               onChange={handleChange}
@@ -511,11 +511,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Blood Group</label>
             <input
               type="text"
-              className="form-control"
               name="bloodGroup"
               value={formData.bloodGroup}
               onChange={handleChange}
@@ -523,11 +522,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Identification Marks</label>
             <input
               type="text"
-              className="form-control"
               name="identificationMarks"
               value={formData.identificationMarks}
               onChange={handleChange}
@@ -535,11 +533,10 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Email</label>
             <input
               type="email"
-              className="form-control"
               name="email"
               value={formData.email}
               onChange={handleChange}
@@ -547,39 +544,9 @@ const AdmissionForm = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group1">
             <label>Photo</label>
-            <input
-              type="file"
-              className="form-control"
-              name="photo"
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Guardian Name</label>
-            <input
-              type="text"
-              className="form-control"
-              name="guardianName"
-              value={formData.guardianName}
-              onChange={handleChange}
-              placeholder="Enter guardian name"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Guardian Mobile Number</label>
-            <input
-              type="text"
-              className="form-control"
-              name="guardianMobileNumber"
-              value={formData.guardianMobileNumber}
-              onChange={handleChange}
-              placeholder="Enter guardian mobile number"
-              required
-            />
+            <input type="file" name="photo" onChange={handleChange} required />
           </div>
           <div
             style={{

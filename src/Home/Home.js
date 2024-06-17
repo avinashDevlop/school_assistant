@@ -5,7 +5,6 @@ import Footer from '../Footer/Footer.js'
 import Gallery from './components/Gallery.jsx'
 import Results from './components/Results.jsx'
 import AboutUs from './components/AboutUs.jsx'
-import ContactUs from './components/ContactUs.jsx'
 import Admission from './components/Admission.jsx'
 import BackToTopButton from './components/backToTop.jsx'
 const Home = () => {
@@ -15,11 +14,10 @@ const Home = () => {
       <HomeBody/>
       <Gallery/>
       <Results/>
-      <AboutUs/>
-      <ContactUs/>
+      <AboutUs/>  
       <Admission/>
       <BackToTopButton/>
-      <Footer/>
+      <Footer style={{margin:0,padding:0}}/>  
     </div>
   )
 }

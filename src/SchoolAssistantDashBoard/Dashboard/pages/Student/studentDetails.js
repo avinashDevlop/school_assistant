@@ -132,8 +132,8 @@ const StudentDetails = () => {
       <h3>
         Student/<span>Student Details</span>
       </h3>
-      <div className="dashboard-content">
-        <div className="container">
+      <div className="dashboard-content" style={{overflow:'hidden'}}>
+        <div className="container"> 
           <div className="detailStud margin">
             <label htmlFor="classDropdown">Class:</label>
             <select

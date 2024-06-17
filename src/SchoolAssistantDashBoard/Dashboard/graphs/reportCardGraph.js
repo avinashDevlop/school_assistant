@@ -67,8 +67,6 @@ const ApexChart = () => {
       <div id="chart">
         <ReactApexChart options={state.options} series={state.series} type="area" height={350} className='graph' />
       </div>
-      <div id="html-dist"></div>
-      <button onClick={updateState}>Update Chart Title</button>
     </div>
   );
 };

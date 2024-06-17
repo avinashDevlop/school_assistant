@@ -1,97 +1,80 @@
+/* AddLibraryBooksCSS.css */
+
+.add-book-container {
+  width: 100%;
+  overflow: hidden;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  border-radius: 10px;
+}
+
 .add-book-form-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #f9f9f9;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  }
+  margin-top: 20px;
+}
+
+.add-book-form-container h2 {
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.add-book-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 45%; /* Make each form group take about half the container width, with some spacing */
+  min-width: 200px; /* Ensure a minimum width to keep layout from breaking on very small screens */
+}
+
+.form-group label {
+  margin-bottom: 5px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
   
-  .add-book-form-container h2 {
-    text-align: center;
-    color: #333;
-    overflow: hidden; /* Apply overflow hidden to the header */
-  }
-  
-  .add-book-form {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
-  
-  .form-group {
-    width: 48%;
-  }
-  
-  label {
-    font-weight: bold;
-    color: #555;
-  }
-  
-  input[type='text'],
-  input[type='number'],
-  input[type='file']
-   {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    transition: border-color 0.3s;
-  }
-  .form-control{
-    width: 100%;
-    height: 57px;
-    margin: 10px 0;
-  }
-  .school-class{
-    padding: 20px;
-  }
-  input[type='text']:focus,
-  input[type='number']:focus,
-  input[type='file']:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-  .form-control:focus{
-    outline: none;
-    border-color: #007bff;
-  }
-  input[type='file'] {
-    cursor: pointer;
-  }
-  
-  button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 12px 20px;
-    font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
-  /* Add some colors */
-  .add-book-form-container {
-    background-color: #f2f2f2;
-    border-color: #999;
-  }
-  
-  .add-book-form-container h2 {
-    color: #007bff;
-  }
-  
-  button {
-    background-color: #007bff;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
+}
+
+.form-group input[type="file"] {
+  padding: 3px;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.button-right {
+  text-align: right;
+  width: 100%; /* Ensure the button spans full width */
+  margin-top: 15px; /* Add some space above the button */
+}
+
+.button-right button {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.button-right button:hover {
+  background-color: #0056b3;
+}

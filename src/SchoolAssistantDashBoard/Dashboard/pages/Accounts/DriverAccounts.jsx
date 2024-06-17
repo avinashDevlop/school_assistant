@@ -4,9 +4,9 @@ import './TeachAccount.css';
 
 const DriverAccount = () => {
   const [accounts, setAccounts] = useState([]);
-  const [newAccount, setNewAccount] = useState({ name: '', userName: '', password: '' });
+  const [newAccount, setNewAccount] = useState({ name: '', userName: '', password: '', vehicleNo: '' });
   const [editIndex, setEditIndex] = useState(null);
-  const [editedAccount, setEditedAccount] = useState({ name: '', userName: '', password: '' });
+  const [editedAccount, setEditedAccount] = useState({ name: '', userName: '', password: '', vehicleNo: '' });
   const [searchQuery, setSearchQuery] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
@@ -15,7 +15,7 @@ const DriverAccount = () => {
   useEffect(() => {
     fetchData();
   }, []);
- 
+
   const fetchData = async () => {
     try {
       const response = await axios.get(`${baseURL}.json`);
@@ -24,6 +24,7 @@ const DriverAccount = () => {
         const accountsArray = Object.keys(data).map(key => ({
           id: key,
           ...data[key],
+          vehicleNo: data[key].Vehicle?.vehicleNo || '',
         }));
         setAccounts(accountsArray);
       }
@@ -47,11 +48,12 @@ const DriverAccount = () => {
   };
 
   const addAccount = async () => {
-    if (newAccount.name && newAccount.userName && newAccount.password) {
+    if (newAccount.name && newAccount.userName && newAccount.password && newAccount.vehicleNo) {
       try {
-        await axios.put(`${baseURL}/${newAccount.name}.json`, newAccount);
+        await axios.put(`${baseURL}/${newAccount.name}.json`, {name:newAccount.name,userName:newAccount.userName,password:newAccount.password});
+        await axios.patch(`${baseURL}/${newAccount.name}/Vehicle.json`, { vehicleNo: newAccount.vehicleNo });
         fetchData();
-        setNewAccount({ name: '', userName: '', password: '' });
+        setNewAccount({ name: '', userName: '', password: '', vehicleNo: '' });
       } catch (error) {
         console.error('Error adding account:', error);
       }
@@ -69,21 +71,22 @@ const DriverAccount = () => {
       console.error('Error deleting account:', error);
     }
   };
-   
-const editAccount = (index, accountId) => {
-  setEditIndex(index);
-  const accountToEdit = accounts.find(account => account.id === accountId);
-  const { id, ...editedAccountWithoutId } = accountToEdit; 
-  setEditedAccount({ ...editedAccountWithoutId });
-};
+
+  const editAccount = (index, accountId) => {
+    setEditIndex(index);
+    const accountToEdit = accounts.find(account => account.id === accountId);
+    const { id, Vehicle, ...editedAccountWithoutId } = accountToEdit;
+    setEditedAccount({ ...editedAccountWithoutId, vehicleNo: Vehicle?.vehicleNo || '' });
+  };
 
   const saveEditedAccount = async (accountId) => {
-    if (editedAccount.name && editedAccount.userName && editedAccount.password) {
+    if (editedAccount.name && editedAccount.userName && editedAccount.password && editedAccount.vehicleNo) {
       try {
-        await axios.patch(`${baseURL}/${accountId}.json`, editedAccount); 
+        await axios.patch(`${baseURL}/${accountId}.json`, {name:editedAccount.name,userName:editedAccount.userName,password:editedAccount.password});
+        await axios.patch(`${baseURL}/${accountId}/Vehicle.json`, { vehicleNo: editedAccount.vehicleNo });
         fetchData();
         setEditIndex(null);
-        setEditedAccount({ name: '', userName: '', password: '' });
+        setEditedAccount({ name: '', userName: '', password: '', vehicleNo: '' });
       } catch (error) {
         console.error('Error saving edited account:', error);
       }
@@ -91,7 +94,6 @@ const editAccount = (index, accountId) => {
       alert('Please fill in all fields.');
     }
   };
-  
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
@@ -100,9 +102,9 @@ const editAccount = (index, accountId) => {
   const filteredAccounts = accounts.filter(account =>
     account.name && account.userName &&
     (account.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    account.userName.toLowerCase().includes(searchQuery.toLowerCase()))
+    account.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    account.vehicleNo.toLowerCase().includes(searchQuery.toLowerCase()))
   );
-  
 
   return (
     <>
@@ -135,6 +137,14 @@ const editAccount = (index, accountId) => {
               onChange={handleInputChange}
               className="stud-account-input"
             />
+            <input
+              type="text"
+              placeholder="Vehicle No."
+              name="vehicleNo"
+              value={newAccount.vehicleNo}
+              onChange={handleInputChange}
+              className="stud-account-input"
+            />
             <div className='submit'>
               <button onClick={togglePasswordVisibility}>{showPassword ? "Hide" : "Show"} Password</button>
               <button onClick={addAccount} className="stud-account-button">Add Account</button>
@@ -144,7 +154,7 @@ const editAccount = (index, accountId) => {
         <div className="stud-account-search">
           <input
             type="text"
-            placeholder="Search"
+            placeholder="Search Driver Name"
             value={searchQuery}
             onChange={handleSearchChange}
             className="stud-account-input"
@@ -156,6 +166,7 @@ const editAccount = (index, accountId) => {
               <th>Name</th>
               <th>Username</th>
               <th>Password</th>
+              <th>Vehicle No.</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -164,9 +175,10 @@ const editAccount = (index, accountId) => {
               <tr key={index}>
                 {editIndex === index ? (
                   <>
-                    <td>{account.name}</td> 
+                    <td>{account.name}</td>
                     <td><input type="text" name="userName" value={editedAccount.userName} onChange={handleEditInputChange} className="stud-account-edit-input" /></td>
                     <td><input type={showPassword ? "text" : "password"} name="password" value={editedAccount.password} onChange={handleEditInputChange} className="stud-account-edit-input" /></td>
+                    <td><input type="text" name="vehicleNo" value={editedAccount.vehicleNo} onChange={handleEditInputChange} className="stud-account-edit-input" /></td>
                     <td>
                       <button onClick={() => saveEditedAccount(account.id)} className="stud-account-button">Save</button>
                     </td>
@@ -176,6 +188,7 @@ const editAccount = (index, accountId) => {
                     <td>{account.name}</td>
                     <td>{account.userName}</td>
                     <td>{account.password}</td>
+                    <td>{account.vehicleNo}</td>
                     <td>
                       <button onClick={() => editAccount(index, account.id)} className="stud-account-button">Edit</button>
                       <button onClick={() => deleteAccount(account.id)} className="stud-account-button">Delete</button>
@@ -183,7 +196,7 @@ const editAccount = (index, accountId) => {
                   </>
                 )}
               </tr>
-            ))} 
+            ))}
           </tbody>
         </table>
       </div>

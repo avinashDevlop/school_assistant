@@ -1,19 +1,13 @@
 .main-container {
   display: flex;
-   height: 105%; 
-}
-main { 
-  padding: 10px;
+  background-color: #4D44B5;
 }
 
 .sidebar {
-  background-color: #4D44B5;
   color: white;
-  min-height: 100vh; /* Use min-height instead of height */
   box-sizing: border-box;
   transition: width 0.5s ease;
-  cursor: pointer;
-  margin-right: -20px;
+  cursor: pointer;  
 }
 .top_section {
   display: flex;

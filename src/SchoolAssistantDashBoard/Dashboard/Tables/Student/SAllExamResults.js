@@ -244,7 +244,7 @@ const Example = () => {
             {firstDate && lastDate ? `${firstDate} to ${lastDate}` : "-"}
         </div>
       </div>
-      <div className="table-container">
+      <div className="table-container w-100">
         <MaterialReactTable table={table} />
       </div>
       <div className="detailExam">
