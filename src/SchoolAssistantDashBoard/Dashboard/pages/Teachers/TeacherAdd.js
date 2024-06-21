@@ -36,7 +36,7 @@ const AddTeacherAndEducationForm = () => {
   };
 
   return (
-    <div style={{overflow:'hidden'}}>>
+    <div style={{overflow:'hidden'}}>
       <h3>
         Teachers/<span>Add Teachers</span>
       </h3>

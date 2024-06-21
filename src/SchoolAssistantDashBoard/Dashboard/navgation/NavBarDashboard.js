@@ -45,9 +45,12 @@ const TopHeader = ({ onToggleSidebar }) => {
         St. JOHN'S ENGLISH MEDIUM SCHOOL , Mydukur
         </div>
         <div className="right">
+        <span className="icon2">
+          <div class="loader2"></div>
+          </span>
           <span className="icon2">
             <FaUserCircle />
-          </span>
+          </span> 
           <div className="dateTime">
             <div className="live">
               <span>

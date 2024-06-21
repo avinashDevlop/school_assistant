@@ -50,3 +50,31 @@
   50% { opacity: 1; }
   100% { opacity: 0; }
 }
+
+.loader2 {
+  width: 17px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ffca38;
+  display: grid;
+  animation: l22-0 25s infinite linear;
+}
+.loader2:before,
+.loader2:after {
+  content: "";
+  grid-area: 1/1;
+  margin: 15%;
+  border-radius: 50%;
+  background: inherit;
+  transform: rotate(0deg) translate(150%);
+  animation: l22 2s infinite;
+}
+.loader2:after {
+  animation-delay: -.5s
+}
+@keyframes l22-0 {
+  100% {transform: rotate(1turn)}
+}
+@keyframes l22 {
+  100% {transform: rotate(1turn) translate(150%)}
+}
