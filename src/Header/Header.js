@@ -13,11 +13,9 @@ function Header() {
             background-color: #f8f9fa;
             border-bottom: 2px solid #e9ecef;
           }
-
           .navBar {
             padding: 0;
           }
-
           .navContainer {
             display: flex;
             justify-content: space-between;
@@ -25,12 +23,10 @@ function Header() {
             width: 100%;
             padding: 10px 20px;
           }
-
           .brand-container {
             display: flex;
             align-items: center;
           }
-
           .school-logo {
             width: 60px;
             height: 70px;
@@ -120,6 +116,35 @@ function Header() {
               margin-top: 10px;
             }
           }
+            @media (max-width: 740px) {
+          .school-info h1 {
+            font-size: 0.9rem;
+      
+          }
+
+          .school-info h2 {
+            font-size: 0.7rem;
+  
+          }
+
+          .school-info h5 {
+            font-size: 0.8rem;
+        
+          }
+          }
+          @media (max-width: 480px) {
+      .school-info h1 {
+        font-size: 0.8rem;
+      }
+
+      .school-info h2 {
+        font-size: 0.65rem;
+      }
+
+      .school-info h5 {
+        font-size: 0.7rem;
+      }
+    }
         `}
       </style>
       <Navbar expand="lg" className="custom-bg-body-tertiary navBar">

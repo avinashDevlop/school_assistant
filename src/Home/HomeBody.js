@@ -36,8 +36,7 @@ const HomeBody = () => {
             alt="First slide"
           />
           <Carousel.Caption>
-            <h3>St. JOHN'S ENGLISH MEDIUM HIGH SCHOOL</h3>
-            <p>Renowned for excellence in education and holistic development.</p>
+            <h4>St. JOHN'S ENGLISH MEDIUM HIGH SCHOOL</h4>
           </Carousel.Caption>
         </Carousel.Item>
         <Carousel.Item>
@@ -48,8 +47,7 @@ const HomeBody = () => {
             alt="Second slide"
           />
           <Carousel.Caption>
-            <h3>Leading by Example: NIIT Award-Winning School</h3>
-            <p>NIIT award recipient, excellence in education, innovative learning practices, student success.</p>
+            <h4>Leading by Example: NIIT Award-Winning School</h4>
           </Carousel.Caption>
         </Carousel.Item>
         <Carousel.Item>
@@ -60,8 +58,7 @@ const HomeBody = () => {
             alt="Third slide"
           />
           <Carousel.Caption>
-            <h3>Nurturing Growth: The Active Planting Approach</h3>
-            <p>Encouraging engagement, fostering roots, cultivating learning, blooming minds, thriving environment.</p>
+            <h4>Nurturing Growth: The Active Planting Approach</h4>
           </Carousel.Caption>
         </Carousel.Item>
       </Carousel>
