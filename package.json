@@ -1,7 +1,7 @@
 {
   "homepage": "https://avinashDevlop.github.io/school_assistant",
   "name": "school_web",
-  "@^4.1.1": "version",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@canvasjs/react-charts": "^1.0.0",
@@ -14,7 +14,7 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@mui/icons-material": "^5.14.19",
     "@mui/material": "^5.15.3",
-    "@mui/x-charts": "^6.18.7", 
+    "@mui/x-charts": "^6.18.7",
     "@tanstack/react-query": "^5.17.19",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -70,6 +70,7 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^6.1.1"
+    "gh-pages": "^6.1.1",
+    "@babel/plugin-proposal-private-property-in-object": "^7.20.0" 
   }
 }
