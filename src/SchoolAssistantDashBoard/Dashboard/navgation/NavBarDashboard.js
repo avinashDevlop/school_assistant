@@ -46,7 +46,7 @@ const TopHeader = ({ onToggleSidebar }) => {
         </div>
         <div className="right">
         <span className="icon2">
-          <div class="loader2"></div>
+          {/* <div className="loader2"></div> */}
           </span>
           <span className="icon2">
             <FaUserCircle />

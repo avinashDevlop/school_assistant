@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { IoIosArrowForward } from "react-icons/io";
 import { NavLink } from "react-router-dom";
 import { MdDashboard } from "react-icons/md";
@@ -15,8 +15,8 @@ import { SiGoogleclassroom } from "react-icons/si";
 import { AnimatePresence, motion } from "framer-motion";
 import SidebarMenu from "./SidebarMenu";
 import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import './SideNavCSS.css';
+import { useNavigate } from "react-router-dom";
+import "./SideNavCSS.css";
 const routes = [
   {
     path: "/Dashboard",
@@ -26,19 +26,17 @@ const routes = [
       {
         path: "AdminDashboard",
         name: "Admin",
-        icon: <IoIosArrowForward />
-        ,
+        icon: <IoIosArrowForward />,
       },
       {
         path: "StudentDashboard",
         name: "Student",
-        icon: <IoIosArrowForward />
-        ,
+        icon: <IoIosArrowForward />,
       },
       {
         path: "TeacherDashboard",
         name: "Teachers",
-        icon:<IoIosArrowForward />
+        icon: <IoIosArrowForward />,
       },
     ],
   },
@@ -50,7 +48,7 @@ const routes = [
       {
         path: "AllStudent",
         name: "All Students",
-        icon: <IoIosArrowForward /> ,
+        icon: <IoIosArrowForward />,
       },
       {
         path: "StudentDetails",
@@ -60,8 +58,7 @@ const routes = [
       {
         path: "AdmissionForm",
         name: "Admission Form",
-        icon: <IoIosArrowForward />
-        ,
+        icon: <IoIosArrowForward />,
       },
       {
         path: "StudentPromotion",
@@ -81,7 +78,7 @@ const routes = [
         icon: <IoIosArrowForward />,
       },
       {
-        path: "TeacherDetails", 
+        path: "TeacherDetails",
         name: "Teachers Details",
         icon: <IoIosArrowForward />,
       },
@@ -100,7 +97,7 @@ const routes = [
       {
         path: "LibraryBooks",
         name: "All Books",
-        icon:<IoIosArrowForward />,
+        icon: <IoIosArrowForward />,
       },
       {
         path: "AddLibraryBooks",
@@ -118,46 +115,44 @@ const routes = [
       {
         path: "AllTimeTables",
         name: "All timeTables",
-        icon: <IoIosArrowForward />
-        ,
+        icon: <IoIosArrowForward />,
       },
       {
         path: "UpdateTimeTables",
         name: "Update timeTable",
-        icon: <IoIosArrowForward />
-        ,
+        icon: <IoIosArrowForward />,
       },
     ],
   },
   {
     path: "Attendence",
     name: "Attendence",
-    icon:<TbReport />
-    ,
+    icon: <TbReport />,
   },
   {
     path: "",
     name: "Exam",
-    icon: <IoIosPaper />
-    ,
+    icon: <IoIosPaper />,
     subRoutes: [
       {
         path: "ExamSchedule",
         name: "Exam Schedule",
-        icon: <IoIosArrowForward />
-        ,
+        icon: <IoIosArrowForward />,
+      },
+      {
+        path: "StudResults",
+        name: "Student Results",
+        icon: <IoIosArrowForward />,
       },
       {
         path: "AddExamSchedule",
         name: "Add ExamSchedule",
-        icon: <IoIosArrowForward />
-        ,
+        icon: <IoIosArrowForward />,
       },
       {
         path: "AddMarks",
         name: "Add Marks",
-        icon: <IoIosArrowForward />
-        ,
+        icon: <IoIosArrowForward />,
       },
     ],
   },
@@ -174,8 +169,7 @@ const routes = [
   {
     path: "Notice",
     name: "Notice",
-    icon: <RiMailSendLine />
-    ,
+    icon: <RiMailSendLine />,
   },
   {
     path: "chatStudent",
@@ -185,32 +179,28 @@ const routes = [
   {
     path: "Account",
     name: "Account",
-    icon: <MdManageAccounts />
-    ,subRoutes: [
+    icon: <MdManageAccounts />,
+    subRoutes: [
       {
         path: "StudAccount",
         name: "Student",
-        icon: <IoIosArrowForward />
-        ,
+        icon: <IoIosArrowForward />,
       },
       {
         path: "TeachAccounts",
         name: "Teacher",
-        icon: <IoIosArrowForward />
-        ,
+        icon: <IoIosArrowForward />,
       },
       {
         path: "DriverAccounts",
         name: "Driver",
-        icon: <IoIosArrowForward />
-        ,
+        icon: <IoIosArrowForward />,
       },
     ],
   },
-
 ];
 
-const SideBar = ({ isOpen, children }) =>  {
+const SideBar = ({ isOpen, children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -236,21 +226,23 @@ const SideBar = ({ isOpen, children }) =>  {
       },
     },
   };
- 
 
   const closeMenu = () => {
     setIsMenuOpen(false);
   };
-  
+
   return (
     <>
-      <div className={`main-container ${isOpen ? '' : 'sidebar-close'}`}  style={{overflow:'scroll',minHeight:'92vh',maxHeight:'100%'}} >
-        <motion.div 
-          animate={{ 
-            width: isOpen ? '195px' : '50px',
+      <div
+        className={`main-container ${isOpen ? "" : "sidebar-close"}`}
+        style={{ overflow: "scroll", minHeight: "92vh", maxHeight: "100%" }}
+      >
+        <motion.div
+          animate={{
+            width: isOpen ? "195px" : "50px",
             transition: {
               duration: 0.1,
-              type: 'spring',
+              type: "spring",
               damping: 15,
             },
           }}
@@ -289,7 +281,7 @@ const SideBar = ({ isOpen, children }) =>  {
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </NavLink> 
+                  </NavLink>
                 )}
               </React.Fragment>
             ))}

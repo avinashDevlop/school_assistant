@@ -170,11 +170,11 @@ const StudAccounts = () => {
       SI: index + 1,
       Name: name,
       Gender: details.gender,
-      ContactNo: details.contactNumber,
+      ContactNo: details.fathersMobileNumber,
       FatherName: details.fathersName,
       UserName: details.email,
       FormNo: details.formNo,
-      id: name, // Assuming 'name' is a unique identifier for students
+      id: name,
     }));
   }, [studentData]);
 
@@ -293,7 +293,7 @@ const StudAccounts = () => {
             Update
           </Button>
           <Button onClick={handleDialogClose}>
-            Cancel
+            Close
           </Button>
         </DialogActions>
       </BootstrapDialog>

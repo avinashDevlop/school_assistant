@@ -152,33 +152,33 @@ const Footer = () => {
         </DeveloperInfo>
         <ContactInfo>
           <ContactItem>
-            <FaMapMarkerAlt style={{ color: "#ff0000", marginRight: "0.5rem" }} />
             <ContactLink
-              href="https://www.google.com/maps/dir/13.9695418,79.346555/St.JOHN'S+ENGLISH+MEDIUM+HIGH+SCHOOL,+11%2F20+,BADVEL+ROAD,MYDUKUR,+KADAPA,+Andhra+Pradesh+516172/@14.3463254,78.3799408,9z/data=!3m1!4b1!4m9!4m8!1m1!4e1!1m5!1m1!1s0x3bb35fb65792d71b:0x7276348fadeaa587!2m2!1d78.7389612!2d14.7248024?entry=ttu"
+              href="https://maps.app.goo.gl/N6kad11ypavsX2ANA"
               target="_blank"
             >
+            <FaMapMarkerAlt style={{ color: "#ff0000", marginRight: "0.5rem" }} />
               <span style={{ color: "#ff0000" }}>Badvel Road, Mydukur, Kadapa, AP-516172</span>
             </ContactLink>
           </ContactItem>
           <ContactItem>
-            <FaPhoneAlt style={{ color: "#00ff00", marginRight: "0.5rem" }} />
             <ContactLink href="tel:+917386550733">
+            <FaPhoneAlt style={{ color: "#00ff00", marginRight: "0.5rem" }} />
               <span style={{ color: "#00ff00" }}>+91 73865 50733</span>
             </ContactLink>
           </ContactItem>
           <ContactItem>
-            <FaEnvelope style={{ color: "#0000ff", marginRight: "0.5rem" }} />
             <ContactLink
               href="https://mail.google.com/mail/?view=cm&fs=1&to=stjohnsmyd@gmail.com&su=Subject&body=Body"
               target="_blank"
               rel="noopener noreferrer"
             >
+              <FaEnvelope style={{ color: "#0000ff", marginRight: "0.5rem" }} />
               <span style={{ color: "#0000ff" }}>stjohnsmyd@gmail.com</span>
             </ContactLink>
           </ContactItem>
           <ContactItem>
-            <FaWhatsapp style={{ color: "#25D366", marginRight: "0.5rem" }} />
-            <ContactLink href="https://wa.me/917386550733" target="_blank">
+            <ContactLink href="https://wa.me/919393140561" target="_blank">
+              <FaWhatsapp style={{ color: "#25D366", marginRight: "0.5rem" }} />
               <span style={{ color: "#25D366" }}>Chat</span>
             </ContactLink>
           </ContactItem>

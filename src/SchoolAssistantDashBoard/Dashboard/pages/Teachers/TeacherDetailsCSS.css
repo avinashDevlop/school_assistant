@@ -1,11 +1,23 @@
-/* TeacherDetailsCSS.css */
+.topOption {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
 
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+.dropdown2 {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  background-color: rgba(216, 216, 255, 0.507);
+  padding: 10px 0;
+  margin: 0 10px;
+}
 
-.teacher-dashboard {
-  font-family: 'Montserrat', sans-serif;
-  background-color: #f8f8f8;
-  margin: 0;
+.dropdown2 select {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
 }
 
 .teacher-dashboard {
@@ -79,6 +91,26 @@ h3 span {
   font-weight: normal;
 }
 
+.container_Bottom_data {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.Lastcard {
+  text-align: center;
+}
+
+.Lastcard .details {
+  margin-top: 5px;
+  color: #007bff;
+  cursor: pointer;
+}
+
+.Lastcard .details:hover {
+  text-decoration: underline;
+}
+
 /* Responsive Styles */
 @media (max-width: 768px) {
   .teacher-header {
@@ -94,4 +126,16 @@ h3 span {
     max-width: none;
     text-align: center;
   }
+
+  .container_Bottom_data {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .Lastcard {
+    margin-bottom: 20px;
+  }
+}
+.teacher-section p{
+  margin-left: 70px;
 }

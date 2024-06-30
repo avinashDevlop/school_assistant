@@ -1,49 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./TeacherDetailsCSS.css";
-import imgg from "../../images/teacher4.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFacebook,
-  faInstagramSquare,
-  faWhatsapp,
-} from "@fortawesome/free-brands-svg-icons";
+import { faFacebook, faInstagramSquare, faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 import { faGlobe } from "@fortawesome/free-solid-svg-icons";
+import axios from '../../../../api';
+import imgg from "../../images/teacher4.png";
 
 const TeacherDashboard = () => {
-  const teacherInfo = {
-    photo: "imgg",
-    name: "John Doe",
-    address: "123 School St, Cityville",
-    contact: "123-456-7890",
-    email: "john.doe@example.com",
-    education: "Bachelor of Education, XYZ University",
-    skills: "Subject expertise, Classroom management",
-    about:
-      "Experienced teacher dedicated to fostering a positive learning environment...",
-    subjects: ["Mathematics", "Science"],
-  };
   const [selectedTeacher, setSelectedTeacher] = useState("");
+  const [teacherInfo, setTeacherInfo] = useState({});
+  const [teacherNames, setTeacherNames] = useState([]);
 
-  const teacherNames = [
-    "John Doe",
-    "Jane Doe",
-    "Joe Doe",
-    "Marry Smith",
-    "Bob Johnson",
-  ];
+  useEffect(() => {
+    const fetchTeacherNames = async () => {
+      try {
+        const response = await axios.get('Teachers.json');
+        const data = response.data;
+        const names = Object.keys(data);
+        setTeacherNames(names);
+        // Set the first teacher as the selected one by default
+        if (names.length > 0) {
+          setSelectedTeacher(names[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching teacher names:", error);
+      }
+    };
+
+    fetchTeacherNames();
+  }, []);
+
+  useEffect(() => {
+    const fetchTeacherDetails = async () => {
+      if (selectedTeacher) {
+        try {
+          const response = await axios.get(`Teachers/${selectedTeacher}.json`);
+          const data = response.data;
+          setTeacherInfo(data);
+        } catch (error) {
+          console.error("Error fetching teacher details:", error);
+        }
+      }
+    };
+
+    fetchTeacherDetails();
+  }, [selectedTeacher]);
 
   return (
     <>
       <h3>
-      Teachers/<span>Teacher Details</span>
+        Teachers/<span>Teacher Details</span>
       </h3>
       <div className="topOption">
-        <div className="dropdown">
-          <label htmlFor="teacherDropdown">Select Teacher:</label>
+        <div className="dropdown2"> 
+          <label htmlFor="teacherDropdown" style={{fontSize:'20px',color:'Highlight'}}>Select Teacher Resume and Details :</label>
           <select
             id="teacherDropdown"
             value={selectedTeacher}
             onChange={(e) => setSelectedTeacher(e.target.value)}
+            style={{height:'45px'}}
           >
             {teacherNames.map((teacher) => (
               <option key={teacher} value={teacher}>
@@ -53,42 +68,39 @@ const TeacherDashboard = () => {
           </select>
         </div>
       </div>
-      <div className="teacher-dashboard">
-        <div className="teacher-header">
-          <div>
-            <img src={imgg} alt="Teacher" className="teacher-photo" />
+      {teacherInfo && (
+        <div className="teacher-dashboard">
+          <div className="teacher-header">
+            <div>
+              <img src={teacherInfo.photo || imgg} alt="Teacher" className="teacher-photo" />
+            </div>
+            <div className="teacher-details">
+              <h2>{teacherInfo.fullName}</h2>
+              <p>Address: {teacherInfo.address}</p>
+              <p>Contact: {teacherInfo.phone}</p>
+              <p>Email: {teacherInfo.email}</p>
+            </div>
           </div>
-          <div className="teacher-details">
-            <h2>{teacherInfo.name}</h2>
-            <p>{teacherInfo.address}</p>
-            <p>Contact: {teacherInfo.contact}</p>
-            <p>Email: {teacherInfo.email}</p>
-          </div>
-        </div>
-        <div className="teacher-body">
-          <div className="teacher-section">
-            <h3>Education</h3>
-            <p>{teacherInfo.education}</p>
-          </div>
-          <div className="teacher-section">
-            <h3>Skills</h3>
-            <p>{teacherInfo.skills}</p>
-          </div>
-          <div className="teacher-section">
-            <h3>About Me</h3>
-            <p>{teacherInfo.about}</p>
-          </div>
-          <div className="teacher-section">
-            <h3>Subjects</h3>
-            <ul>
-              {teacherInfo.subjects.map((subject, index) => (
-                <li key={index}>{subject}</li>
-              ))}
-            </ul>
+          <div className="teacher-body">
+            <div className="teacher-section">
+              <h3>Education :</h3>
+              <p>{teacherInfo.university}</p>
+            </div>
+            <div className="teacher-section">
+              <h3>Skills :</h3>
+              <p>{teacherInfo.skills}</p>
+            </div>
+            <div className="teacher-section">
+              <h3>About Teacher :</h3>
+              <p>{teacherInfo.aboutTeacher}</p>
+            </div>
+            <div className="teacher-section">
+              <h3>Subjects :</h3>
+              <p>{teacherInfo.subjects}</p>
+            </div>
           </div>
         </div>
-      </div>
-      {/* social media */}
+      )}
       <div className="container_Bottom_data">
         <div className="Lastcard">
           <div className="facebook">
@@ -106,7 +118,7 @@ const TeacherDashboard = () => {
           <div className="WhatsApp">
             <FontAwesomeIcon icon={faWhatsapp} />
           </div>
-          <div className="details">Chart</div>
+          <div className="details">Chat</div>
         </div>
         <div className="Lastcard">
           <div className="Website">

@@ -1,9 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate } from 'react-router-dom';
 import "./AdmissionFormCSS.css";
 import api from "../../../../api";
+import { storage } from "../../../../firebaseConfig";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useReactToPrint } from "react-to-print";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import logo from "../../../../Header/logo.jpg";
 
 const AdmissionForm = () => {
-  const topRef = useRef(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const studentData = location.state?.studentData || null;
+  const currentYear = new Date().getFullYear();
+  const nextYear = currentYear + 1;
   const initialFormData = {
     surname: "",
     name: "",
@@ -30,6 +41,7 @@ const AdmissionForm = () => {
     photo: null,
     formNo: "",
     dateOfIssue: "",
+    academicYear: `${currentYear}-${nextYear}`,
     bloodGroup: "",
     identificationMarks: "",
     email: "",
@@ -38,10 +50,52 @@ const AdmissionForm = () => {
     gender: "",
     guardianName: "",
     guardianMobileNumber: "",
-    admissionNumber: "", // Added admissionNumber field
+    admissionNumber: "",
+    enclosures: {
+      tcRcStudyCertificate: false,
+      aadhar: false,
+      mothersBankPassbook: false,
+      rationCard: false,
+      birthCertificate: false,
+      casteCertificate: false,
+      progressReport: false,
+    },
+  };
+  const [formData, setFormData] = useState(studentData || initialFormData);
+  const [imagePreview, setImagePreview] = useState(studentData?.photo || null);
+  const [submittedData, setSubmittedData] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
+  const categoryOptions = [
+    "BC-A",
+    "BC-B",
+    "BC-C",
+    "BC-D",
+    "BC-E",
+    "EWS",
+    "OC",
+    "SC",
+    "ST"
+  ];
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      enclosures: {
+        ...prevData.enclosures,
+        [name]: checked,
+      },
+    }));
   };
 
-  const [formData, setFormData] = useState(initialFormData);
+  // Function to handle changes in identification marks textarea
+  const handleIdentificationMarksChange = (e) => {
+    const { value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      identificationMarks: value,
+    }));
+  };
 
   useEffect(() => {
     generateFormNumber();
@@ -58,59 +112,221 @@ const AdmissionForm = () => {
     }));
   };
 
+  const fetchAddressData = async (pincode) => {
+    try {
+      const response = await fetch(
+        `https://api.postalpincode.in/pincode/${pincode}`
+      );
+      const data = await response.json();
+
+      // Check if the request was successful
+      if (data && data[0] && data[0].Status === "Success") {
+        const postOffices = data[0].PostOffice;
+
+        // Assuming you want to access data from the first post office in the array
+        if (postOffices.length > 0) {
+          const firstPostOffice = postOffices[0];
+          const state = firstPostOffice.State;
+          const city = firstPostOffice.Name;
+
+          // Update formData with city and state
+          setFormData((prevData) => ({
+            ...prevData,
+            city: city,
+            state: state,
+          }));
+        } else {
+          console.log("No post office data found for this pincode.");
+          // Handle case where no post office data is found
+        }
+      } else {
+        console.log("No data found for this pincode.");
+        // Handle case where no data is found for the pincode
+      }
+    } catch (error) {
+      console.error("Error fetching address data: ", error);
+      // Handle error state in UI
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
 
+    // Handling pincode field
+    if (name === "pincode") {
+      // Limit pincode to 6 digits
+      if (value.length > 6) {
+        return;
+      }
+      // Fetch address data when pincode reaches 6 digits
+      if (value.length === 6) {
+        fetchAddressData(value);
+      }
+    }
+
+    // Function to format mobile number with a space after the fifth digit
+    const formatMobileNumber = (number) => {
+      const cleaned = number.replace(/\D/g, ""); // Remove non-digit characters
+      if (cleaned.length <= 5) {
+        return cleaned; // If 5 or fewer digits, return as is
+      }
+      const part1 = cleaned.slice(0, 5);
+      const part2 = cleaned.slice(5, 10);
+      return `${part1} ${part2}`; // Add space between 5th and 6th digits
+    };
+
+    // Check if the field is a mobile number field
+    const isMobileNumberField = [
+      "fathersMobileNumber",
+      "mothersMobileNumber",
+      "guardianMobileNumber",
+    ].includes(name);
+
+    // Validate and format the mobile number
+    let formattedValue = value;
+    if (isMobileNumberField) {
+      formattedValue = formatMobileNumber(value);
+      // Limit the mobile number field to 10 digits (excluding space)
+      if (formattedValue.replace(/\D/g, "").length > 10) {
+        return;
+      }
+    }
+
+    // Check if the field is an Aadhar number field
     if (name.endsWith("AadharCardNo") || name === "aadharCardNo") {
       const formattedAadharNo = value
-        .replace(/\D/g, "")
-        .replace(/(\d{4})(?=\d)/g, "$1-");
+        .replace(/\D/g, "") // Remove non-digit characters
+        .replace(/(\d{4})(?=\d)/g, "$1-"); // Add a hyphen after every 4 digits
       setFormData((prevData) => ({
         ...prevData,
         [name]: formattedAadharNo,
       }));
     } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: type === "file" ? files[0] : value,
-      }));
+      // Check if the field is a photo file input
+      if (name === "photo" && type === "file") {
+        const file = files[0];
+        setFormData((prevData) => ({
+          ...prevData,
+          photo: file,
+        }));
+        setImagePreview(URL.createObjectURL(file));
+      } else {
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]:
+            type === "file"
+              ? files[0]
+              : [
+                  "surname",
+                  "mothersSurname",
+                  "name",
+                  "mothersName",
+                  "fathersName",
+                  "guardianName",
+                ].includes(name)
+              ? formattedValue.toUpperCase()
+              : formattedValue,
+          ...(name === "surname" && { mothersSurname: value.toUpperCase() }), // Update mothersSurname when surname changes
+        }));
+      }
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setIsLoading(true);
+    
     try {
-      for (const key in formData) {
-        if (formData.hasOwnProperty(key)) {
-          if (formData[key] === "" && key !== "photo") {
-            window.alert(`${key} is required`);
-            return;
-          }
-        }
-      }
-
       const lowersurName = formData.surname.trim();
       const capitalizedFirstName = formData.name.trim();
       const lowerCaseName = `${lowersurName} ${capitalizedFirstName}`.trim();
-
-      const url = `admissionForms/${formData.selectedClass}/${formData.selectedSection}/${lowerCaseName}.json`;
-
-      await api
-        .put(url, formData)
-        .then((res) => {
-          console.log("Form submitted successfully!", res);
+  
+      let imageUrl = formData.photo;
+  
+      // Check if a new image file is selected
+      if (formData.photo && typeof formData.photo !== 'string') {
+        const image = formData.photo;
+        const storageRef = ref(storage, `StudentPhotos/${formData.selectedClass}/${formData.selectedSection}/${image.name}`);
+        
+        // Upload image to Firebase Storage
+        await uploadBytes(storageRef, image);
+        
+        // Get download URL for the uploaded image
+        imageUrl = await getDownloadURL(storageRef);
+      }
+      
+      // Update formData with the new image URL
+      const updatedFormData = { ...formData, photo: imageUrl };
+  
+      // Prepare API URL for submitting form data
+      const url = `admissionForms/${updatedFormData.selectedClass}/${updatedFormData.selectedSection}/${lowerCaseName}.json`;
+  
+      // Submit form data to API
+      await api.put(url, updatedFormData)
+        .then(() => {
+          setSubmittedData(updatedFormData);
           window.alert("Form submitted successfully!");
-          setFormData(initialFormData);
+          setIsModalOpen(true);
+          setFormData(initialFormData); // Reset form data after successful submission
+          document.getElementsByName("photo")[0].value = null;
           generateFormNumber();
-          topRef.current.scrollIntoView({ behavior: "smooth" });
         })
         .catch((err) => {
           console.error("Error submitting form: ", err);
         });
+  
     } catch (error) {
       console.error("Error submitting form:", error);
+    } finally {
+      setIsLoading(false);
     }
+  };
+  
+  const printRef = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+  });
+
+  const handleDownload = (selectedClass, academicYear) => async () => {
+    const printSection = document.querySelector('.print-section');
+  
+    if (!printSection) return;
+  
+    const canvas = await html2canvas(printSection);
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+  
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+  
+    const imgWidth = canvas.width;
+    const imgHeight = canvas.height;
+    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+  
+    const imgX = (pdfWidth - imgWidth * ratio) / 2;
+    const imgY = 10; // you can adjust this value to set the margin-top
+  
+    pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+    pdf.save(`${selectedClass}_${academicYear}_Admission_Form.pdf`);
+  };
+  
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    setFormData(initialFormData);
+    setSubmittedData(null);
+    generateFormNumber();
+    setImagePreview(null);
+    if (studentData) {
+      try {
+        const classParam = studentData.selectedClass;
+        const sectionParam = studentData.selectedSection;
+        const nameParam = `${studentData.surname} ${studentData.name}`
+        navigate('/Dashboard/StudentDetails', { state: { class: classParam, section: sectionParam, name:nameParam } });
+      } catch (error) {
+        console.error('Error updating form:', error);
+      }
+    } 
   };
 
   const sectionOptions = ["Section A", "Section B", "Section C"];
@@ -138,12 +354,24 @@ const AdmissionForm = () => {
     "Jainism",
     "Sikhism",
   ];
+  const motherTongueOptions = [
+    "English",
+    "Hindi",
+    "Marathi",
+    "Gujarati",
+    "Tamil",
+    "Telugu",
+    "Bengali",
+    "Kannada",
+    "Malayalam",
+    "Punjabi",
+  ];
   const widthundred = {
     width: "100%",
   };
   return (
     <>
-      <h3 ref={topRef}>
+      <h3 id="moveTop">
         Student/<span>Admission Form</span>
       </h3>
       <div className="admission-form">
@@ -160,13 +388,23 @@ const AdmissionForm = () => {
             />
           </div>
           <div className="form-group1">
-            <label>Date of Issue</label>
+            <label>Date of Admission</label>
             <input
               type="date"
               name="dateOfIssue"
               value={formData.dateOfIssue}
               onChange={handleChange}
               required
+            />
+          </div>
+          <div className="form-group1">
+            <label>Academic Year</label>
+            <input
+              type="text"
+              name="academicYear"
+              value={formData.academicYear}
+              onChange={handleChange}
+              placeholder="Enter academic year"
             />
           </div>
           <div className="form-group1">
@@ -212,6 +450,7 @@ const AdmissionForm = () => {
               onChange={handleChange}
               placeholder="Enter admission number"
               required
+              autoComplete="new-password"
             />
           </div>
           <div className="form-group1">
@@ -222,7 +461,9 @@ const AdmissionForm = () => {
               value={formData.surname}
               onChange={handleChange}
               placeholder="Enter surname"
+              className="uppercase"
               required
+              autoComplete="new-password"
             />
           </div>
           <div className="form-group1">
@@ -233,7 +474,9 @@ const AdmissionForm = () => {
               value={formData.name}
               onChange={handleChange}
               placeholder="Enter name"
+              className="uppercase"
               required
+              autoComplete="new-password"
             />
           </div>
           <div className="form-group1 flex">
@@ -268,7 +511,6 @@ const AdmissionForm = () => {
               name="dob"
               value={formData.dob}
               onChange={handleChange}
-              required
             />
           </div>
           <div className="form-group1">
@@ -280,7 +522,7 @@ const AdmissionForm = () => {
               onChange={handleChange}
               maxLength={14}
               placeholder="xxxx-xxxx-xxxx"
-              required
+              autoComplete="new-password"
             />
           </div>
           <div className="form-group1">
@@ -291,7 +533,8 @@ const AdmissionForm = () => {
               value={formData.fathersName}
               onChange={handleChange}
               placeholder="Enter father's name"
-              required
+              className="uppercase"
+              autoComplete="new-password"
             />
           </div>
           <div className="form-group1">
@@ -302,7 +545,6 @@ const AdmissionForm = () => {
               value={formData.fathersOccupation}
               onChange={handleChange}
               placeholder="Enter father's occupation"
-              required
             />
           </div>
           <div className="form-group1">
@@ -313,7 +555,7 @@ const AdmissionForm = () => {
               value={formData.fathersMobileNumber}
               onChange={handleChange}
               placeholder="Enter father's mobile number"
-              required
+              autoComplete="new-password"
             />
           </div>
           <div className="form-group1">
@@ -325,7 +567,7 @@ const AdmissionForm = () => {
               onChange={handleChange}
               maxLength={14}
               placeholder="xxxx-xxxx-xxxx"
-              required
+              autoComplete="new-password"
             />
           </div>
           <div className="form-group1">
@@ -336,7 +578,8 @@ const AdmissionForm = () => {
               value={formData.mothersSurname}
               onChange={handleChange}
               placeholder="Enter mother's surname"
-              required
+              className="uppercase"
+              autoComplete="new-password"
             />
           </div>
           <div className="form-group1">
@@ -347,7 +590,8 @@ const AdmissionForm = () => {
               value={formData.mothersName}
               onChange={handleChange}
               placeholder="Enter mother's name"
-              required
+              className="uppercase"
+              autoComplete="new-password"
             />
           </div>
           <div className="form-group1">
@@ -358,7 +602,6 @@ const AdmissionForm = () => {
               value={formData.mothersOccupation}
               onChange={handleChange}
               placeholder="Enter mother's occupation"
-              required
             />
           </div>
           <div className="form-group1">
@@ -369,7 +612,7 @@ const AdmissionForm = () => {
               value={formData.mothersMobileNumber}
               onChange={handleChange}
               placeholder="Enter mother's mobile number"
-              required
+              autoComplete="new-password"
             />
           </div>
           <div className="form-group1">
@@ -381,7 +624,7 @@ const AdmissionForm = () => {
               onChange={handleChange}
               maxLength={14}
               placeholder="xxxx-xxxx-xxxx"
-              required
+              autoComplete="new-password"
             />
           </div>
           <div className="form-group1">
@@ -392,7 +635,8 @@ const AdmissionForm = () => {
               value={formData.guardianName}
               onChange={handleChange}
               placeholder="Enter guardian name"
-              required
+              className="uppercase"
+              autoComplete="new-password"
             />
           </div>
           <div className="form-group1">
@@ -403,7 +647,7 @@ const AdmissionForm = () => {
               value={formData.guardianMobileNumber}
               onChange={handleChange}
               placeholder="Enter guardian mobile number"
-              required
+              autoComplete="new-password"
             />
           </div>
           <div className="form-group1">
@@ -414,31 +658,38 @@ const AdmissionForm = () => {
               value={formData.caste}
               onChange={handleChange}
               placeholder="Enter caste"
-              required
             />
           </div>
           <div className="form-group1">
             <label>Mother Tongue</label>
-            <input
-              type="text"
+            <select
               name="motherTongue"
+              className="form-dropdown"
               value={formData.motherTongue}
               onChange={handleChange}
-              placeholder="Enter mother tongue"
-              required
-            />
+            >
+              <option value="">Select Mother Tongue...</option>
+              {motherTongueOptions.map((tongue, index) => (
+                <option key={index} value={tongue}>
+                  {tongue}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="form-group1">
-            <label>Category</label>
-            <input
-              type="text"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              placeholder="Enter category"
-              required
-            />
-          </div>
+      <label>Category</label>
+      <select
+        name="category"
+        value={formData.category}
+        className="form-dropdown"
+        onChange={handleChange}
+      >
+        <option value="" disabled>Select category</option>
+        {categoryOptions.map((option, index) => (
+          <option key={index} value={option}>{option}</option>
+        ))}
+      </select>
+    </div>
           <div className="form-group1">
             <label>Religion</label>
             <select
@@ -446,7 +697,6 @@ const AdmissionForm = () => {
               className="form-dropdown"
               value={formData.religion}
               onChange={handleChange}
-              required
             >
               <option value="">Select Religion...</option>
               {religionOptions.map((religion, index) => (
@@ -456,17 +706,18 @@ const AdmissionForm = () => {
               ))}
             </select>
           </div>
-          <div className="form-group1">
-            <label>Last School Name</label>
-            <input
-              type="text"
-              name="lastSchoolName"
-              value={formData.lastSchoolName}
-              onChange={handleChange}
-              placeholder="Enter last school name"
-              required
-            />
-          </div>
+          {formData.selectedClass !== "Pre-K" && (
+            <div className="form-group1">
+              <label>Last School Name</label>
+              <input
+                type="text"
+                name="lastSchoolName"
+                value={formData.lastSchoolName}
+                onChange={handleChange}
+                placeholder="Enter last school name"
+              />
+            </div>
+          )}
           <div className="form-group1">
             <label>Residential Address</label>
             <input
@@ -475,29 +726,6 @@ const AdmissionForm = () => {
               value={formData.residentialAddress}
               onChange={handleChange}
               placeholder="Enter residential address"
-              required
-            />
-          </div>
-          <div className="form-group1">
-            <label>City</label>
-            <input
-              type="text"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-              placeholder="Enter city"
-              required
-            />
-          </div>
-          <div className="form-group1">
-            <label>State</label>
-            <input
-              type="text"
-              name="state"
-              value={formData.state}
-              onChange={handleChange}
-              placeholder="Enter state"
-              required
             />
           </div>
           <div className="form-group1">
@@ -508,7 +736,26 @@ const AdmissionForm = () => {
               value={formData.pincode}
               onChange={handleChange}
               placeholder="Enter pincode"
-              required
+            />
+          </div>
+          <div className="form-group1">
+            <label>City</label>
+            <input
+              type="text"
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+              placeholder="Enter city"
+            />
+          </div>
+          <div className="form-group1">
+            <label>State</label>
+            <input
+              type="text"
+              name="state"
+              value={formData.state}
+              onChange={handleChange}
+              placeholder="Enter state"
             />
           </div>
           <div className="form-group1">
@@ -519,18 +766,15 @@ const AdmissionForm = () => {
               value={formData.bloodGroup}
               onChange={handleChange}
               placeholder="Enter blood group"
-              required
             />
           </div>
           <div className="form-group1">
-            <label>Identification Marks</label>
-            <input
-              type="text"
-              name="identificationMarks"
+            <label>Identification Marks (Enter each mark on a new line)</label>
+            <textarea
+              rows="2"
               value={formData.identificationMarks}
-              onChange={handleChange}
+              onChange={handleIdentificationMarksChange}
               placeholder="Enter identification marks"
-              required
             />
           </div>
           <div className="form-group1">
@@ -541,12 +785,134 @@ const AdmissionForm = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter email"
-              required
+              autoComplete="new-password"
             />
           </div>
           <div className="form-group1">
             <label>Photo</label>
-            <input type="file" name="photo" onChange={handleChange} required />
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <input
+                type="file"
+                name="photo"
+                accept="image/*"
+                onChange={handleChange}
+              />
+              {imagePreview && (
+                <img
+                  src={imagePreview}
+                  alt=""
+                  style={{
+                    marginLeft: "10px",
+                    maxWidth: "100px",
+                    maxHeight: "100px",
+                    border: "2px solid #ad8dfc",
+                    borderRadius: "5px",
+                  }}
+                />
+              )}
+            </div>
+          </div>
+          <div className="form-group1">
+            <label>Enclosers:</label>
+            <div className="checkbox-group">
+              <div className="checkbox-items">
+                <div>
+                  <label>T.C. / R.C. / Study Certificate</label>
+                </div>
+                <div>
+                  <input
+                    type="checkbox"
+                    name="tcRcStudyCertificate"
+                    checked={formData.enclosures.tcRcStudyCertificate}
+                    onChange={handleCheckboxChange}
+                  />
+                </div>
+              </div>
+
+              <div className="checkbox-items">
+                <div>
+                  <label>Aadhar (Student, Mother, Father)</label>
+                </div>
+                <div>
+                  <input
+                    type="checkbox"
+                    name="aadhar"
+                    checked={formData.enclosures.aadhar}
+                    onChange={handleCheckboxChange}
+                  />
+                </div>
+              </div>
+
+              <div className="checkbox-items">
+                <div>
+                  <label>Mother's Bank Passbook</label>
+                </div>
+                <div>
+                  <input
+                    type="checkbox"
+                    name="mothersBankPassbook"
+                    checked={formData.enclosures.mothersBankPassbook}
+                    onChange={handleCheckboxChange}
+                  />
+                </div>
+              </div>
+
+              <div className="checkbox-items">
+                <div>
+                  <label>Ration Card</label>
+                </div>
+                <div>
+                  <input
+                    type="checkbox"
+                    name="rationCard"
+                    checked={formData.enclosures.rationCard}
+                    onChange={handleCheckboxChange}
+                  />
+                </div>
+              </div>
+
+              <div className="checkbox-items">
+                <div>
+                  <label>Birth Certificate</label>
+                </div>
+                <div>
+                  <input
+                    type="checkbox"
+                    name="birthCertificate"
+                    checked={formData.enclosures.birthCertificate}
+                    onChange={handleCheckboxChange}
+                  />
+                </div>
+              </div>
+
+              <div className="checkbox-items">
+                <div>
+                  <label>Caste Certificate</label>
+                </div>
+                <div>
+                  <input
+                    type="checkbox"
+                    name="casteCertificate"
+                    checked={formData.enclosures.casteCertificate}
+                    onChange={handleCheckboxChange}
+                  />
+                </div>
+              </div>
+
+              <div className="checkbox-items">
+                <div>
+                  <label>Progress Report (Previous)</label>
+                </div>
+                <div>
+                  <input
+                    type="checkbox"
+                    name="progressReport"
+                    checked={formData.enclosures.progressReport}
+                    onChange={handleCheckboxChange}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
           <div
             style={{
@@ -555,11 +921,229 @@ const AdmissionForm = () => {
               width: "550px",
             }}
           >
-            <button type="submit" style={{ width: "100px" }}>
-              Submit
-            </button>
+            <button type="submit" style={{ width: "110px" }} disabled={isLoading}>
+        {isLoading ? 'Submitting...' : 'Submit'}
+      </button>
           </div>
         </form>
+
+        {submittedData && (
+          <div
+            className={`modals ${isModalOpen ? "show" : ""}`}
+            style={{ display: isModalOpen ? "block" : "none" }}
+          >
+            <div className="modal-contents" style={{ overflow: "auto",cursor:'grab'}}>
+              <div ref={printRef} className="print-section"> 
+                <div className="printTop">
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <img src={logo} alt="School Logo" className="school-logo" />
+                  </div>
+                  <div>
+                    <div
+                      className="school-info2"
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                      }}
+                    >
+                      <p className="p1">
+                        St. JOHN'S ENGLISH MEDIUM HIGH SCHOOL
+                      </p>
+                      <p className="p2">
+                        Recognised by the Govt. of Andhra Pradesh
+                      </p>
+                      <p className="p3">
+                        Badvel Road, Mydukur - 516172, YSR Dist. A.P. INDIA
+                      </p>
+                      <p className="AFA">APPLICATION FOR ADMISSION</p>
+                    </div>
+                  </div>
+                  <div className="studentPhoto">
+                    <img
+                      src={imagePreview}
+                      alt="Student"
+                      className="student-photo"
+                      style={{
+                        width: "100px",
+                        height: "110px",
+                        border: "2px solid #87CEEB",
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="admission-details">
+                  <div className="formCorrect">
+                    <p>
+                      <strong>Form No:</strong> {submittedData.formNo}
+                    </p>
+                    <p>
+                      <strong>Date of Issue:</strong>{" "}
+                      {submittedData.dateOfIssue}
+                    </p>
+                    <p>
+                      <strong>Admission Number:</strong>{" "}
+                      {submittedData.admissionNumber}
+                    </p>
+                  </div>
+                  <p>
+                    <strong>Student Name:</strong>
+                    {submittedData.surname}&nbsp;&nbsp;{submittedData.name}
+                  </p>
+                  <p>
+                    <strong>Gender:</strong> {submittedData.gender}
+                  </p>
+                  <p>
+                    <strong>Date of Birth:</strong> {submittedData.dob}
+                  </p>
+                  <div className="formCorrect">
+                    <p>
+                      <strong>Class:</strong> {submittedData.selectedClass}
+                    </p>
+                    <p>
+                      <strong>Section:</strong> {submittedData.selectedSection}
+                    </p>
+                  </div>
+                  <p>
+                    <strong>Aadhar Card No:</strong>{" "}
+                    {submittedData.aadharCardNo}
+                  </p>
+                  <div className="formCorrect">
+                    <p>
+                      <strong>Fathers Name:</strong>
+                      {submittedData.surname}&nbsp;&nbsp;
+                      {submittedData.fathersName}
+                    </p>
+                    <p>
+                      <strong>Occupation:</strong>{" "}
+                      {submittedData.fathersOccupation}
+                    </p>
+                  </div>
+                  <div className="formCorrect">
+                    <p>
+                      <strong>Mobile Number:</strong>{" "}
+                      {submittedData.fathersMobileNumber}
+                    </p>
+                    <p>
+                      <strong>Aadhar Card No:</strong>{" "}
+                      {submittedData.fathersAadharCardNo}
+                    </p>
+                  </div>
+                  <div className="formCorrect">
+                    <p>
+                      <strong>Mothers Name:</strong>
+                      {submittedData.mothersSurname}&nbsp;&nbsp;
+                      {submittedData.mothersName}
+                    </p>
+                    <p>
+                      <strong>Occupation:</strong>{" "}
+                      {submittedData.mothersOccupation}
+                    </p>
+                  </div>
+                  <div className="formCorrect">
+                    <p>
+                      <strong>Mobile Number:</strong>{" "}
+                      {submittedData.mothersMobileNumber}
+                    </p>
+                    <p>
+                      <strong>Aadhar Card No:</strong>{" "}
+                      {submittedData.mothersAadharCardNo}
+                    </p>
+                  </div>
+                  <div className="formCorrect">
+                    <p>
+                      <strong>Guardian Name:</strong>{" "}
+                      {submittedData.guardianName}
+                    </p>
+                    <p>
+                      <strong>Mobile Number:</strong>{" "}
+                      {submittedData.guardianMobileNumber}
+                    </p>
+                  </div>
+                  <p>
+                    <strong>Caste:</strong> {submittedData.caste}
+                  </p>
+                  <p>
+                    <strong>Mother Tongue:</strong> {submittedData.motherTongue}
+                  </p>
+                  <p>
+                    <strong>Category:</strong> {submittedData.category}
+                  </p>
+                  <p>
+                    <strong>Religion:</strong> {submittedData.religion}
+                  </p>
+                  <p>
+                    <strong>Last School Name:</strong>{" "}
+                    {submittedData.lastSchoolName}
+                  </p>
+                  <p>
+                    <strong>Address:</strong> {submittedData.residentialAddress}
+                    ,{submittedData.city},{submittedData.state}-
+                    {submittedData.pincode}
+                  </p>
+                  <p>
+                    <strong>Blood Group:</strong> {submittedData.bloodGroup}
+                  </p>
+                  <p>
+                    <strong>Identification Marks:</strong>{" "}
+                    {submittedData.identificationMarks}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {submittedData.email}
+                  </p>
+                  <h4>Enclosures:</h4>
+                  <ul>
+                    <li>
+                      TC/RC/Study Certificate:{" "}
+                      {submittedData.enclosures.tcRcStudyCertificate
+                        ? "Yes"
+                        : "No"}
+                    </li>
+                    <li>
+                      Aadhar: {submittedData.enclosures.aadhar ? "Yes" : "No"}
+                    </li>
+                    <li>
+                      Mother's Bank Passbook:{" "}
+                      {submittedData.enclosures.mothersBankPassbook
+                        ? "Yes"
+                        : "No"}
+                    </li>
+                    <li>
+                      Ration Card:{" "}
+                      {submittedData.enclosures.rationCard ? "Yes" : "No"}
+                    </li>
+                    <li>
+                      Birth Certificate:{" "}
+                      {submittedData.enclosures.birthCertificate ? "Yes" : "No"}
+                    </li>
+                    <li>
+                      Caste Certificate:{" "}
+                      {submittedData.enclosures.casteCertificate ? "Yes" : "No"}
+                    </li>
+                    <li>
+                      Progress Report:{" "}
+                      {submittedData.enclosures.progressReport ? "Yes" : "No"}
+                    </li>
+                  </ul>
+                  <div className="sign">
+                    <li>SIGNATURE OF THE PARENT</li>
+                    <li>SIGNATURE OF THE STUDENT</li>
+                    <li>SIGNATURE OF THE H.M.</li>
+                  </div>
+                </div>
+              </div>
+              <div className="print-buttons">
+                <button onClick={handlePrint} className="print-btn">
+                  Print
+                </button>
+                <button onClick={handleDownload(submittedData.selectedClass,submittedData.academicYear)} className="download-btn">
+                  Download as PDF
+                </button>
+                <button onClick={handleCancel}>Close</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

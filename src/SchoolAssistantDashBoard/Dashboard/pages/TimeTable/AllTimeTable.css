@@ -1,20 +1,89 @@
-.head{
-   display: flex;
-   justify-content: space-around;
-   align-items: center;
+/* StudentTimeTable.css */
+.timetable-container {
+  max-width: 100%;
+  font-family: Arial, sans-serif;
 }
-.form-select{
-  height: 40px;
-  width: 60%;
-}
-.dropdown{
-  width: 40%;
+
+.timetable-controls {
   display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.control-group {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: row;
   align-items: center;
+  justify-content: space-around;
 }
-.Section{
-  background-color: white;
-  border: 0.1px solid rgb(231, 231, 255);
-  margin-left: 10px;
-  border-radius: 3px;
+
+.control-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
 }
+
+.form-select {
+  width: 50%;
+  height: 40px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  overflow-y: hidden;
+}
+
+.table-container {
+  position: relative;
+  width: 100%;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem;
+  text-align: center;
+  border: 1px solid #ddd;
+  min-width: 120px; /* Minimum width for each cell */
+}
+
+.table thead {
+  background-color: #f8f9fa;
+}
+
+.table th {
+  background-color: #3a9e97;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.sticky-col {
+  position: absolute;
+  left: 0;
+  top: auto;
+  width: 120px; /* Width of the first column */
+  background-color: #007bff;
+  color: white;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: #666;
+}
+

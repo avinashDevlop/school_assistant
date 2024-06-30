@@ -5,14 +5,14 @@ import "./AllStudentDetails.css";
 import Box from "@mui/material/Box";
 import Skeleton from "@mui/material/Skeleton";
 
-const Example = () => {
+const AllStudentDetails = () => {
   const [selectedClass, setSelectedClass] = useState("10th Class");
   const [selectedSection, setSelectedSection] = useState("");
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(false);
   const [studentData, setStudentData] = useState([]);
   const [classOptions, setClassOptions] = useState([]);
-  const [dataArray, setDataArray] = useState([]); // New state for dataArray
+  const [dataArray, setDataArray] = useState([]); 
 
   useEffect(() => {
     const fetchClassOptions = async () => {
@@ -139,7 +139,7 @@ const Example = () => {
       Name: name,
       Gender: details.gender,
       DOB: details.dob,
-      ContactNo: details.contactNumber,
+      ContactNo: details.fathersMobileNumber,
       AadharNo: details.aadharCardNo,
       FatherName: details.fathersName,
       MotherName: details.mothersName,
@@ -151,7 +151,7 @@ const Example = () => {
     <>
       <div className="detailStud">
         <div className="noStud">All Students Class Wise</div>
-        <div className="dropdown">
+        <div className="dropdown1">
           <div className="Class">
             <select
               value={selectedClass}
@@ -197,4 +197,4 @@ const Example = () => {
   );
 };
 
-export default Example;
+export default AllStudentDetails;

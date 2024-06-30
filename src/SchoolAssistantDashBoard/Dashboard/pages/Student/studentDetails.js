@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import { useNavigate, useLocation } from "react-router-dom";
+import api from '../../../../api'
 import "./studentDetailsCSS.css";
-import sisImage from "./sis.jpg";
+import sisImage from "./sis.png";
 import StudentReportCard from "../../graphs/reportCardGraph";
 import PaymentHistory from "../../Tables/Student/SPaymentHystory";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,7 +15,7 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 
 const StudentDetails = () => {
-  const [selectedClass, setSelectedClass] = useState("10th Class");
+  const [selectedClass, setSelectedClass] = useState("");
   const [selectedSection, setSelectedSection] = useState("");
   const [selectedName, setSelectedName] = useState("");
   const [studentDetails, setStudentDetails] = useState({});
@@ -21,6 +23,18 @@ const StudentDetails = () => {
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state) {
+      const { class: classParam, section: sectionParam, name: nameParam } = location.state;
+      setSelectedClass(classParam);
+      setSelectedSection(sectionParam);
+      setSelectedName(nameParam);
+    }
+  }, [location.state]);
 
   const classes = [
     "10th Class",
@@ -42,22 +56,26 @@ const StudentDetails = () => {
     setSelectedClass(e.target.value);
     setSelectedSection("");
     setSelectedName("");
+    setStudentDetails({});
+    setStudentNames([]);
+    setSections([]);
   };
 
   useEffect(() => {
     if (selectedClass) {
       setLoading(true);
-      axios
+      api
         .get(
-          `https://studentassistant-18fdd-default-rtdb.firebaseio.com/admissionForms/${selectedClass}.json`
+          `admissionForms/${selectedClass}.json`
         )
         .then((response) => {
           const data = response.data;
           if (data) {
             const sections = Object.keys(data);
             setSections(sections);
-            // Automatically select the first section
-            setSelectedSection(sections[0]);
+            if (!location.state) {
+              setSelectedSection(sections[0]);
+            }
           }
           setLoading(false);
         })
@@ -66,38 +84,38 @@ const StudentDetails = () => {
           setLoading(false);
         });
     }
-  }, [selectedClass]);
+  }, [selectedClass, location.state]);
 
   useEffect(() => {
     if (selectedClass && selectedSection) {
-      axios
+      api
         .get(
-          `https://studentassistant-18fdd-default-rtdb.firebaseio.com/admissionForms/${selectedClass}/${selectedSection}.json`
+          `admissionForms/${selectedClass}/${selectedSection}.json`
         )
         .then((response) => {
           const data = response.data;
           if (data) {
             const names = Object.keys(data);
             setStudentNames(names);
-            // Automatically select the first name
-            setSelectedName(names[0]);
+            if (!location.state) {
+              setSelectedName(names[0]);
+            }
           }
         })
         .catch((error) => {
           setError(error.message);
         });
     }
-  }, [selectedClass, selectedSection]);
+  }, [selectedClass, selectedSection, location.state]);
 
   useEffect(() => {
     if (selectedName) {
-      axios
+      api
         .get(
-          `https://studentassistant-18fdd-default-rtdb.firebaseio.com/admissionForms/${selectedClass}/${selectedSection}/${selectedName}.json`
+          `admissionForms/${selectedClass}/${selectedSection}/${selectedName}.json`
         )
         .then((response) => {
           const studentDetails = response.data;
-          console.log("Student details:", studentDetails); // Log the response data
           setStudentDetails(studentDetails);
           setLoading(false);
         })
@@ -107,17 +125,35 @@ const StudentDetails = () => {
     }
   }, [selectedName, selectedClass, selectedSection]);
 
-  useEffect(() => {
-    if (selectedClass && sections.length > 0) {
-      setSelectedSection(sections[0]);
+  const handleEditClick = () => {
+    if (selectedName) {
+    navigate("/Dashboard/AdmissionForm", { state: { studentData: studentDetails } });
+    }else{
+      alert('!! No student select to edit!!')
     }
-  }, [selectedClass, sections]);
+  };
 
-  useEffect(() => {
-    if (selectedClass && selectedSection && studentNames.length > 0) {
-      setSelectedName(studentNames[0]);
-    } 
-  }, [selectedClass, selectedSection, studentNames]);
+  const handleDeleteClick = () => {
+    if(selectedName){
+    if (window.confirm(`Are you sure you want to delete ${selectedName}?`)) {
+      api
+        .delete(
+          `admissionForms/${selectedClass}/${selectedSection}/${selectedName}.json`
+        )
+        .then(() => {
+          alert("Student deleted successfully");
+          // Refresh the student names and details after deletion
+          setStudentNames((prev) => prev.filter((name) => name !== selectedName));
+          setSelectedName("");
+          setStudentDetails({});
+        })
+        .catch((error) => {
+          setError(error.message);
+        });
+    }}else{
+      alert("!!Please select a student to delete!!")
+    }
+  };
 
   const imgStyle = {
     height: "150px",
@@ -132,8 +168,8 @@ const StudentDetails = () => {
       <h3>
         Student/<span>Student Details</span>
       </h3>
-      <div className="dashboard-content" style={{overflow:'hidden'}}>
-        <div className="container"> 
+      <div className="dashboard-content" style={{ overflow: "hidden" }}>
+        <div className="container1">
           <div className="detailStud margin">
             <label htmlFor="classDropdown">Class:</label>
             <select
@@ -182,31 +218,79 @@ const StudentDetails = () => {
             <div className="studInfo">
               <div className="allDetails">
                 <div className="info">
-                  <div>Name: {studentDetails?.surname}{" "}{studentDetails?.name}</div>
+                  <div>
+                    Name: {studentDetails?.surname} {studentDetails?.name}
+                  </div>
                   <div>Class: {studentDetails?.selectedClass}</div>
                   <div>Section: {studentDetails?.selectedSection}</div>
                   <div>Gender: {studentDetails?.gender}</div>
                   <div>Blood Group: {studentDetails?.bloodGroup}</div>
                   <div>Date of Birth: {studentDetails?.dob}</div>
-                  <div>Father Name: {studentDetails?.surname}{" "}{studentDetails?.fathersName}</div>
-                  <div>Mother Name: {studentDetails?.surname}{" "}{studentDetails?.mothersName}</div>
+                  <div>Father's Name: {studentDetails?.fathersName}</div>
+                  <div>
+                    Father's Occupation: {studentDetails?.fathersOccupation}
+                  </div>
+                  <div>Mother's Name: {studentDetails?.mothersName}</div>
+                  <div>Mother's Surname: {studentDetails?.mothersSurname}</div>
+                  <div>
+                    Mother's Occupation: {studentDetails?.mothersOccupation}
+                  </div>
+                  <div>Mother Tongue: {studentDetails?.motherTongue}</div>
                   <div>Caste: {studentDetails?.caste}</div>
                   <div>Category: {studentDetails?.category}</div>
                   <div>Religion: {studentDetails?.religion}</div>
-                  <div>Phone Number: {studentDetails?.contactNumber}</div>
                   <div>Aadhar Number: {studentDetails?.aadharCardNo}</div>
-                  <div>Email ID: {studentDetails?.email}</div>
                   <div>
-                    Address: {studentDetails?.residentialAddress},{" "}
-                    {studentDetails?.city}, {studentDetails?.state},{" "}
-                    {studentDetails?.pincode}
+                    Father's Aadhar Number:{" "}
+                    {studentDetails?.fathersAadharCardNo}
                   </div>
-                  
+                  <div>
+                    Mother's Aadhar Number:{" "}
+                    {studentDetails?.mothersAadharCardNo}
+                  </div>
+                  <div>Email ID: {studentDetails?.email}</div>
+                  <div>Phone Number: {studentDetails?.fathersMobileNumber}</div>
+                  <div>Guardian's Name: {studentDetails?.guardianName}</div>
+                  <div>
+                    Guardian's Mobile Number:{" "}
+                    {studentDetails?.guardianMobileNumber}
+                  </div>
+                  <div>
+                    Residential Address: {studentDetails?.residentialAddress}
+                  </div>
+                  <div>City: {studentDetails?.city}</div>
+                  <div>State: {studentDetails?.state}</div>
+                  <div>Pincode: {studentDetails?.pincode}</div>
+                  <div>Last School Name: {studentDetails?.lastSchoolName}</div>
+                  <div>
+                    Identification Marks: {studentDetails?.identificationMarks}
+
+
+                  </div>
+                  <div>
+                    Enclosures:
+                    {studentDetails?.enclosures?.aadhar && "Aadhar, "}
+                    {studentDetails?.enclosures?.birthCertificate &&
+                      "Birth Certificate, "}
+                    {studentDetails?.enclosures?.casteCertificate &&
+                      "Caste Certificate, "}
+                    {studentDetails?.enclosures?.mothersBankPassbook &&
+                      "Mother's Bank Passbook, "}
+                    {studentDetails?.enclosures?.progressReport &&
+                      "Progress Report"}
+                  </div>
                 </div>
                 <div className="about">
                   <div>
-                    <div className="profile">img</div>
-                    <div className="name">Avinash</div>
+                    <div className="profile">
+                      <img
+                        src={studentDetails?.photo}
+                        alt="student"
+                      />
+                    </div>
+                    <div className="name">
+                      {studentDetails?.surname} {studentDetails?.name}
+                    </div>
                   </div>
                   <div className="gradeAndAttend">
                     <div className="results">
@@ -218,11 +302,18 @@ const StudentDetails = () => {
                       <div>Grade</div>
                     </div>
                   </div>
+                  <div className="actionButtons2">
+                    <button className="editButton1" onClick={handleEditClick}>
+                      <FaEdit /> Edit
+                    </button>
+                    <button className="deleteButton2" onClick={handleDeleteClick}>
+                      <FaTrash /> Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-
           <div className="reportCard">
             <StudentReportCard />
           </div>

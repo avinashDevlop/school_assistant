@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import Header from './Header/Header.js';
 import './LoginForm.css';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { app } from "./firebaseConfig.js";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { FaEnvelope } from 'react-icons/fa';
+import { NavLink } from 'react-router-dom';
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  const formRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,9 +38,8 @@ const LoginForm = () => {
 
   const handleLinkClick = (e) => {
     e.preventDefault();
-    const form = document.getElementById('loginForm');
-    if (form) {
-      form.requestSubmit();
+    if (formRef.current) {
+      formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
     }
   };
 
@@ -45,12 +47,12 @@ const LoginForm = () => {
     <>
       <Header />
       <div className="d-flex justify-content-center align-items-center" style={{ paddingTop: '40px' }}>
-        <div id='abc' className="col-md-4 p-3 shadow-sm border rounded-5 border-primary login" style={{ width: '370px', height: '500px' }}>
+        <div id='abc' className="col-md-4 p-3 shadow-sm border rounded-5 border-primary login" style={{ width: '370px', height: '440px' }}>
           <h2 className="text-center mb-4 text-primary" style={{ height: '50px' }}>Login Form</h2>
-          <form id="loginForm" onSubmit={handleSubmit}>
+          <form id="loginForm" ref={formRef} onSubmit={handleSubmit}>
             <div className="mb-3">
               <label htmlFor="exampleInputEmail1" className="form-label">
-                Email or userName
+                Email
               </label>
               <input
                 type="email"
@@ -59,7 +61,7 @@ const LoginForm = () => {
                 placeholder='Enter your Email'
                 id="exampleInputEmail1"
                 aria-describedby="emailHelp"
-                style={{width:'325px'}}
+                style={{width:'325px',height:'45px'}}
                 required
               />
             </div>
@@ -73,26 +75,27 @@ const LoginForm = () => {
                 className="form-control border border-primary"
                 id="exampleInputPassword1"
                 name="password"
-                style={{width:'325px'}}
+                style={{width:'325px',height: '45px'}}
                 required
               />
             </div>
-            <p className="small">
-              <a href="#!" className="text-primary">
-                Forgot password?
-              </a>
-            </p>
             <div className="d-grid">
-              <Link to="#" onClick={handleLinkClick} className="login-btn1">
+              <NavLink to="#" onClick={handleLinkClick} className="login-btn1 btn btn-primary" style={{color:'white'}}>
                 Login
-              </Link>
-            </div>
+              </NavLink>
+            </div> 
           </form>
           <div className="mt-3">
-            <p className="mb-0 text-center" >
-              Don't have an account?{' '}
-              <a href="/SignUpForm" className="text-primary fw-bold">
-                Sign Up
+            <p className="mb-0 text-center">
+              I forgot my password?{' '}
+              <a
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=hexafire4@gmail.com&su=Subject&body=Body"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#0000ff", textDecoration: 'none' }}
+              >
+                <FaEnvelope style={{ color: "#0000ff", marginRight: "0.5rem" }} />
+                <span style={{ color: "#0000ff" }}>Contact Dev</span>
               </a>
             </p>
           </div>

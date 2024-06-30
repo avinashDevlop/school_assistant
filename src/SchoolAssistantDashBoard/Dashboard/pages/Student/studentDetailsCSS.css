@@ -3,9 +3,13 @@
     padding: 0px 10px;
     border-radius: 10px;
 }
+.container1{
+    background-color: #e2e8f8;
+    padding: 20px 0;
+}
 .img{
-    padding: 0px 30px;
-    padding-top: 20px;  
+    padding: 0px 29px;
+    padding-top: 2px;  
 }
 .allDetails{
     display: flex;
@@ -32,12 +36,23 @@
 .info div {
     padding: 10px;
   }
-.profile{
-    height: 150px;
+  .profile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 150px;
-    border-radius: 50%;
-    background-color: rgb(180, 221, 187);
-}
+    height: 150px;
+    overflow: hidden;
+    border: 4px solid rgb(241, 226, 255);
+    border-radius: 5%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile img {
+    width: 100%;
+    height: 100%;
+  }
+  
 .attendence,.grades {
     height: 80px;
     width:80px;
@@ -74,3 +89,31 @@
     background-color: #ffffff;
     border-top: 1px solid rgb(201, 201, 221);
 }
+  
+.actionButtons2 {
+    display: flex;
+    align-items: center;
+  }
+  
+  .editButton1, .deleteButton2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    margin-right: 8px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  .editButton1:hover, .deleteButton2:hover {
+    background-color: #0056b3;
+  }
+  
+  .editButton1 svg, .deleteButton2 svg {
+    margin-right: 8px; /* Adjust spacing between icon and text */
+    font-size: 18px; /* Adjust icon size */
+  }
+  

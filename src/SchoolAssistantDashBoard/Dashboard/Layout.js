@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { Outlet } from "react-router-dom";
-import NavBar from "./navgation/NavBarDashboard.js";
-import SideBar from "./navgation/SideNav.jsx";
-import "./navgation/SideNavCSS.css";
-import "./LayoutCSS.css";
-import SmallBrowserMessage from "../../Responsive/SmallBrowserMessage.js"; 
+import React, { useState, useEffect } from 'react';
+import { Outlet } from 'react-router-dom';
+import NavBar from './navgation/NavBarDashboard.js';
+import SideBar from './navgation/SideNav.jsx';
+import './navgation/SideNavCSS.css';
+import './LayoutCSS.css';
+import SmallBrowserMessage from '../../Responsive/SmallBrowserMessage.js';
+import OfflinePopup from '../../OfflinePopup';
+import { Offline } from 'react-detect-offline';
+
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [numOfStudents, setNumOfStudents] = useState(1500);
+  const [numOfTeachers, setNumOfTeachers] = useState(0);
+  const [numOfParents, setNumOfParents] = useState(0);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
-
-  const [numOfStudents, setNumOfStudents] = useState(1500);
-  const [numOfTeachers, setNumOfTeachers] = useState(0);
-  const [numOfParents, setNumOfParents] = useState(0);
 
   useEffect(() => {
     const studentIntervalId = setInterval(() => {
@@ -49,25 +51,28 @@ const Layout = () => {
   }, [numOfStudents, numOfTeachers, numOfParents]);
 
   useEffect(() => {
-    localStorage.setItem("numOfStudents", numOfStudents.toString());
-    localStorage.setItem("numOfTeachers", numOfTeachers.toString());
-    localStorage.setItem("numOfParents", numOfParents.toString());
+    localStorage.setItem('numOfStudents', numOfStudents.toString());
+    localStorage.setItem('numOfTeachers', numOfTeachers.toString());
+    localStorage.setItem('numOfParents', numOfParents.toString());
   }, [numOfStudents, numOfTeachers, numOfParents]);
-  
+
   return (
     <div className="Layout">
       <SmallBrowserMessage />
       <NavBar onToggleSidebar={toggleSidebar} />
       <div className="dashboard-container">
         <div>
-          <SideBar isOpen={isSidebarOpen}/>
-        </div> 
+          <SideBar isOpen={isSidebarOpen} />
+        </div>
         <div className="dashboard-content">
-          <Outlet /> 
+          <Outlet />
         </div>
       </div>
+      <Offline>
+        <OfflinePopup />
+      </Offline>
     </div>
   );
 };
 
-export default Layout;  
+export default Layout;

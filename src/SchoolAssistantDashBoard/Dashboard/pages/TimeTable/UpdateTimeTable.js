@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import axios from "axios";
 import "./UpdateTimeTables.css";
-import { Link } from 'react-router-dom';
 
 const UpdateTimeTable = () => {
   const [selectedClass, setSelectedClass] = useState("10th Class");
@@ -9,6 +8,17 @@ const UpdateTimeTable = () => {
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(false);
   const [timetable, setTimetable] = useState({});
+  const [periods, setPeriods] = useState([
+    'Period-1',
+    'Period-2',
+    'Period-3',
+    'Period-4',
+    'Period-5',
+    'Period-6',
+    'Period-7',
+    'Period-8',
+    'Period-9'
+  ]);
 
   const classOptions = [
     "10th Class",
@@ -35,27 +45,42 @@ const UpdateTimeTable = () => {
     "Saturday",
   ], []);
 
-  const periods = useMemo(() => [
-    'Period-1',
-    'Period-2',
-    'Period-3',
-    'Period-4',
-    'Period-5',
-    'Period-6',
-    'Period-7',
-    'Period-8',
-    'Period-9'
-  ], []);
-
   const handleClassChange = (e) => {
     setSelectedClass(e.target.value);
+    setSelectedSection(""); // Reset section when class changes
   };
 
   const handleSectionChange = (e) => {
     setSelectedSection(e.target.value);
   };
 
-  const fetchData = useCallback(async () => {
+  const initializeTimetable = useCallback(() => {
+    const initialTimetable = {};
+
+    // Initialize timetable for Monday with starting and ending times
+    initialTimetable["Monday"] = {};
+    periods.forEach((period) => {
+      initialTimetable["Monday"][period] = {
+        startTime: "",
+        endTime: "",
+        subjectName: "",
+      };
+    });
+
+    // Leave other days empty without starting and ending times
+    days.slice(1).forEach((day) => {
+      initialTimetable[day] = {};
+      periods.forEach((period) => {
+        initialTimetable[day][period] = {
+          subjectName: "",
+        };
+      });
+    });
+
+    setTimetable(initialTimetable);
+  }, [days, periods]);
+
+  const fetchSections = useCallback(async () => {
     try {
       setLoading(true);
       const response = await axios.get(
@@ -72,15 +97,44 @@ const UpdateTimeTable = () => {
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      console.error("Error fetching data:", error);
+      console.error("Error fetching sections:", error);
     }
   }, [selectedClass]);
 
+  const fetchTimetable = useCallback(async () => {
+    if (!selectedSection) return;
+
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `https://studentassistant-18fdd-default-rtdb.firebaseio.com/SchoolTimeTable/${selectedClass}/${selectedSection}.json`
+      );
+      const data = response.data;
+
+      if (data) {
+        setTimetable(data);
+      } else {
+        initializeTimetable();
+      }
+
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error("Error fetching timetable:", error);
+    }
+  }, [selectedClass, selectedSection, initializeTimetable]);
+
   useEffect(() => {
     if (selectedClass) {
-      fetchData();
+      fetchSections();
     }
-  }, [selectedClass, fetchData]);
+  }, [selectedClass, fetchSections]);
+
+  useEffect(() => {
+    if (selectedSection) {
+      fetchTimetable();
+    }
+  }, [selectedSection, fetchTimetable]);
 
   const handleTimeChange = (day, period, field, value) => {
     const updatedTimetable = { ...timetable };
@@ -141,35 +195,16 @@ const UpdateTimeTable = () => {
     }
   };
 
-  const initializeTimetable = useCallback(() => {
-    const initialTimetable = {};
+  const addPeriod = () => {
+    setPeriods([...periods, `Period-${periods.length + 1}`]);
+  };
 
-    // Initialize timetable for Monday with starting and ending times
-    initialTimetable["Monday"] = {};
-    periods.forEach((period) => {
-      initialTimetable["Monday"][period] = {
-        startTime: "",
-        endTime: "",
-        subjectName: "",
-      };
-    });
-
-    // Leave other days empty without starting and ending times
-    days.slice(1).forEach((day) => {
-      initialTimetable[day] = {};
-      periods.forEach((period) => {
-        initialTimetable[day][period] = {
-          subjectName: "",
-        };
-      });
-    });
-
-    setTimetable(initialTimetable);
-  }, [days, periods]);
-
-  useEffect(() => {
-    initializeTimetable();
-  }, [selectedClass, selectedSection, initializeTimetable]);
+  const deleteLastPeriod = () => {
+    if (periods.length > 1) {
+      const newPeriods = periods.slice(0, periods.length - 1);
+      setPeriods(newPeriods);
+    }
+  };
 
   return (
     <div>
@@ -179,7 +214,7 @@ const UpdateTimeTable = () => {
       <div className="dashboard-content">
         <div className="studGraph studGraph1">
           <div className="detailStud detailStud2">
-            <div className="noStud">
+            <div className="noStud" style={{fontSize:'21px'}}>
               Update Subject Name and Timings of the Periods
             </div>
             <div className="dropdowns">
@@ -217,9 +252,17 @@ const UpdateTimeTable = () => {
             <thead>
               <tr>
                 <th>Period</th>
-                {periods.map((period) => (
-                  <th key={period}>{period}</th>
+                {periods.map((period, index) => (
+                  <th key={period}>
+                    {period}
+                    {index === periods.length - 1 && periods.length > 1 && (
+                      <button onClick={deleteLastPeriod} style={{marginLeft:'10px'}}>X</button>
+                    )}
+                  </th>
                 ))}
+                <th>
+                  <button onClick={addPeriod}>Add Period</button>
+                </th>
               </tr>
               <tr>
                 <td>Time</td>
@@ -263,10 +306,10 @@ const UpdateTimeTable = () => {
             </tbody>
           </table>
         </div>
-        <div className="d-flex justify-content-end">
-          <Link className="form-btn1" onClick={sendDataToServer}>
+        <div className="d-flex justify-content-end" style={{paddingTop:'15px'}}>
+          <button className="form-btn1" onClick={sendDataToServer}> 
             Save Timetable
-          </Link>
+          </button>
         </div>
       </div>
     </div>

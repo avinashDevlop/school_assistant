@@ -183,9 +183,6 @@ function Header() {
                 <Link to="/LoginForm" className="form-btn1">
                   Login
                 </Link>
-                <Link to="/SignUpForm" className="form-btn1">
-                  SignUp
-                </Link>
               </div>
             </Navbar.Collapse>
           </div>

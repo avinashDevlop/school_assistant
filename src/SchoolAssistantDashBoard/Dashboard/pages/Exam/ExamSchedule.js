@@ -19,6 +19,8 @@ const ExamSchedule = () => {
     "3rd Class",
     "2nd Class",
     "1st Class",
+    "UKG",
+    "LKG",
     "Pre-K",
   ];
 
@@ -35,7 +37,6 @@ const ExamSchedule = () => {
         if (data) {
           const names = Object.keys(data);
           setTestNames(names);
-          // Select the first test by default if test names are available
           if (names.length > 0) {
             setSelectedTest(names[0]);
           }
@@ -86,7 +87,6 @@ const ExamSchedule = () => {
       if (testDates.length > 0) {
         const examDataArray = [];
 
-        // Loop through each test date
         for (const date of testDates) {
           try {
             const response = await fetch(
@@ -118,12 +118,27 @@ const ExamSchedule = () => {
   const handleClassChange = (e) => {
     const selectedClass = e.target.value;
     setSelectedClass(selectedClass);
-    setSelectedTest(""); // Reset selected test when class changes
+    setSelectedTest(""); 
   };
 
   const handleTestChange = (e) => {
     const selectedTest = e.target.value;
     setSelectedTest(selectedTest);
+  };
+
+  const formatTime = (timeString) => {
+    const [hour, minute] = timeString.split(":");
+    const date = new Date();
+    date.setHours(hour);
+    date.setMinutes(minute);
+
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const strMinutes = minutes < 10 ? "0" + minutes : minutes;
+    return `${hours}:${strMinutes} ${ampm}`;
   };
 
   return (
@@ -171,8 +186,8 @@ const ExamSchedule = () => {
             {exams.map((exam, index) => (
               <tr key={index}>
                 <td>{exam.date}</td>
-                <td>{exam.fromTime}</td>
-                <td>{exam.toTime}</td>
+                <td>{formatTime(exam.fromTime)}</td>
+                <td>{formatTime(exam.toTime)}</td>
                 <td>{exam.subject}</td>
                 <td>{exam.maxMarks}</td>
               </tr>

@@ -3,11 +3,10 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import { Link } from 'react-router-dom';
 import axios from "axios";
-import "./AddMarks.css"; 
+import "./AddMarks.css";
 
-const AddMarks = () => { 
+const AddMarks = () => {
   const [selectedClass, setSelectedClass] = useState("10th Class");
   const [selectedSection, setSelectedSection] = useState("");
   const [sectionOptions, setSectionOptions] = useState([]);
@@ -16,7 +15,8 @@ const AddMarks = () => {
   const [selectedTestName, setSelectedTestName] = useState("");
   const [firstDate, setFirstDate] = useState(null);
   const [lastDate, setLastDate] = useState(null);
-  const [disableInputs, setDisableInputs] = useState(true);
+  const [subjects, setSubjects] = useState([]);
+  const [examsAvailable, setExamsAvailable] = useState(false);
 
   const classOptions = [
     "10th Class",
@@ -34,6 +34,18 @@ const AddMarks = () => {
     "Pre-K",
   ];
 
+  const subjectOrder = [
+    "Telugu",
+    "Hindi",
+    "English",
+    "Mathematics",
+    "Science",
+    "Social",
+    "Computer",
+    "General Knowledge",
+    "Drawing",
+  ];
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -43,11 +55,12 @@ const AddMarks = () => {
         const data = response.data || {};
         if (Object.keys(data).length > 0) {
           const sections = Object.keys(data);
-          setSectionOptions(sections);
+          setSectionOptions(sections || []);
           setSelectedSection(sections[0] || "");
         }
       } catch (error) {
         console.error("Error fetching sections:", error);
+        setSectionOptions([]);
       }
     };
 
@@ -61,31 +74,27 @@ const AddMarks = () => {
           `https://studentassistant-18fdd-default-rtdb.firebaseio.com/admissionForms/${selectedClass}/${selectedSection}.json`
         );
         const data = response.data || {};
-        const students = Object.entries(data).map(([name, student]) => ({
-          id: name,
-          name: name,
+        const students = Object.entries(data).map(([id, student]) => ({
+          id,
+          name: student.name,
           gender: student.gender,
-          telugu: parseInt(student.telugu) || '', 
-          hindi: parseInt(student.hindi) || '', 
-          english: parseInt(student.english) || '', 
-          maths: parseInt(student.maths) || '', 
-          science: parseInt(student.science) || '', 
-          social: parseInt(student.social) || '', 
-          totalMarks: parseInt(student.totalMarks) || '', 
-          obtainMarks: parseInt(student.obtainMarks) || '', 
-          percentage: '', 
-          grade: ''
+          subjects: subjects.reduce((acc, subj) => ({ ...acc, [subj]: '' }), {}),
+          totalMarks: '',
+          obtainMarks: '',
+          percentage: '',
+          grade: '',
+          passFail: ''
         }));
         setStudentsData(students);
       } catch (error) {
         console.error("Error fetching student data:", error);
       }
     };
-    
+
     if (selectedClass && selectedSection) {
       fetchStudentData();
     }
-  }, [selectedClass, selectedSection]);
+  }, [selectedClass, selectedSection, subjects]);
 
   useEffect(() => {
     const fetchTestName = async () => {
@@ -98,9 +107,11 @@ const AddMarks = () => {
           const testnames = Object.keys(data);
           setTestName(testnames);
           setSelectedTestName(testnames[0] || "");
+          setExamsAvailable(true);
         } else {
           setTestName([]);
           setSelectedTestName("");
+          setExamsAvailable(false);
         }
       } catch (error) {
         console.error("Error fetching test names:", error);
@@ -111,7 +122,7 @@ const AddMarks = () => {
   }, [selectedClass]);
 
   useEffect(() => {
-    const fetchExamDates = async () => {
+    const fetchExamData = async () => {
       try {
         const response = await axios.get(
           `https://studentassistant-18fdd-default-rtdb.firebaseio.com/ExamSchedule/${selectedClass}/${selectedTestName}.json`
@@ -119,23 +130,24 @@ const AddMarks = () => {
         const data = response.data || {};
         if (Object.keys(data).length > 0) {
           const Dates = Object.keys(data);
+          const subjects = Dates.map(date => data[date].subject);
+          setSubjects(subjects);
           setFirstDate(Dates[0]);
-          const lastIndex = Dates.length - 1;
-          setLastDate(Dates[lastIndex]);
+          setLastDate(Dates[Dates.length - 1]);
         } else {
+          setSubjects([]);
           setFirstDate(null);
           setLastDate(null);
         }
-        setDisableInputs(!(selectedTestName && firstDate));
       } catch (error) {
-        console.error("Error fetching exam dates:", error);
+        console.error("Error fetching exam data:", error);
       }
     };
 
-    if (selectedTestName) {
-      fetchExamDates();
+    if (selectedClass && selectedTestName) {
+      fetchExamData();
     }
-  }, [selectedClass, selectedTestName, testName.length, firstDate]);
+  }, [selectedClass, selectedTestName]);
 
   const calculateGrade = (percentage) => {
     if (percentage >= 90) return "A+";
@@ -147,38 +159,46 @@ const AddMarks = () => {
     return "F";
   };
 
-  const handleMarksChange = (name, subject, value) => {
-    if (value === "" || (!isNaN(value) && parseInt(value) >= 0)) {
-      const numericValue = value === "" ? "" : parseInt(value); 
-      const index = studentsData.findIndex((student) => student.id === name);
-      if (index !== -1) {
-        const updatedStudentsData = [...studentsData];
-        updatedStudentsData[index][subject] = numericValue;
-
-        const obtainMarks =
-          parseInt(updatedStudentsData[index].telugu || 0) +
-          parseInt(updatedStudentsData[index].hindi || 0) +
-          parseInt(updatedStudentsData[index].english || 0) +
-          parseInt(updatedStudentsData[index].maths || 0) +
-          parseInt(updatedStudentsData[index].science || 0) +
-          parseInt(updatedStudentsData[index].social || 0);
-
-        updatedStudentsData[index].obtainMarks = obtainMarks;
-
-        const totalMarks = updatedStudentsData[index].totalMarks || 0;
-        const percentage = totalMarks ? ((obtainMarks / totalMarks) * 100).toFixed(2) : 0;
-        const grade = calculateGrade(percentage);
-
-        updatedStudentsData[index].percentage = percentage;
-        updatedStudentsData[index].grade = grade;
-
-        setStudentsData(updatedStudentsData);
-      }
-    } else {
-      console.error("Invalid marks input:", value);
+  const handleMarksChange = (id, field, value) => {
+    const numericValue = value === "" ? "" : parseInt(value, 10);
+  
+    if (value === "" || (!isNaN(value) && numericValue >= 0)) {
+      setStudentsData((prevData) => {
+        return prevData.map((student) => {
+          if (student.id === id) {
+            const updatedStudent = { ...student };
+  
+            if (subjects.includes(field)) {
+              updatedStudent.subjects[field] = numericValue;
+            } else if (field === "totalMarks") {
+              updatedStudent.totalMarks = numericValue;
+            }
+  
+            const obtainMarks = subjects.reduce(
+              (total, subj) => total + (parseInt(updatedStudent.subjects[subj]) || 0),
+              0
+            );
+            updatedStudent.obtainMarks = obtainMarks;
+  
+            if (field === "totalMarks" || obtainMarks > 0) {
+              updatedStudent.totalMarks = field === "totalMarks" ? numericValue : updatedStudent.totalMarks;
+              updatedStudent.percentage = ((obtainMarks / updatedStudent.totalMarks) * 100).toFixed(2);
+              updatedStudent.grade = calculateGrade(updatedStudent.percentage);
+  
+              // Calculate pass/fail based on dynamic threshold
+              const passThreshold = updatedStudent.totalMarks / subjects.length * 0.3;
+              updatedStudent.passFail = subjects.every((subj) => parseInt(updatedStudent.subjects[subj]) >= passThreshold) ? 'Pass' : 'Fail';
+            }
+  
+            return updatedStudent;
+          }
+          return student;
+        });
+      });
     }
   };
-
+  
+    
   const calculateTotalExamPercentage = () => {
     let totalMarks = 0;
     let totalObtainMarks = 0;
@@ -193,9 +213,13 @@ const AddMarks = () => {
 
   const handleSubmitMarks = async () => {
     try {
+      if (!selectedClass || !selectedSection || !selectedTestName) {
+        window.alert("Please select a class, section, and test name before submitting.");
+        return;
+      }
+
       const allFieldsFilled = studentsData.every(student => 
-        student.telugu !== "" && student.hindi !== "" && student.english !== "" &&
-        student.maths !== "" && student.science !== "" && student.social !== "" &&
+        subjects.every(subject => student.subjects[subject] !== "") &&
         student.totalMarks !== ""
       );
 
@@ -214,14 +238,12 @@ const AddMarks = () => {
         'C': 0,
         'F': 0,
       };
-  
+
       studentsData.forEach(student => {
         const grade = calculateGrade(student.percentage);
         gradeCounts[grade]++;
-        const passFail = student.telugu >= 35 && student.hindi >= 35 && student.english >= 35 && student.maths >= 35 && student.science >= 35 && student.social >= 35 ? 'Pass' : 'Fail';
-        student.passFail = passFail;
       });
-  
+
       const dataToSend = {
         conductedOn: {
           firstDate: firstDate,
@@ -231,19 +253,12 @@ const AddMarks = () => {
         TotalExamPercentage: totalExamPercentage,
         NoOfGrades: gradeCounts
       };
-  
+
       studentsData.forEach(student => {
         dataToSend.studentResults[student.id] = {
-         
-
- name: student.name,
+          name: student.name,
           gender: student.gender,
-          telugu: student.telugu,
-          hindi: student.hindi,
-          english: student.english,
-          maths: student.maths,
-          science: student.science,
-          social: student.social,
+          subjects: student.subjects,
           totalMarks: student.totalMarks,
           obtainMarks: student.obtainMarks,
           percentage: student.percentage,
@@ -251,29 +266,26 @@ const AddMarks = () => {
           passFail: student.passFail
         };
       });
-  
+
       await axios.put(
         `https://studentassistant-18fdd-default-rtdb.firebaseio.com/ExamMarks/${selectedClass}/${selectedSection}/${selectedTestName}.json`,
         dataToSend
       );
-   
+
       window.alert("Marks submitted successfully!");
 
       setStudentsData(studentsData.map(student => ({
         ...student,
-        telugu: '',
-        hindi: '',
-        english: '',
-        maths: '',
-        science: '',
-        social: '',
+        subjects: subjects.reduce((
+
+acc, subj) => ({ ...acc, [subj]: ''}), {}),
         totalMarks: '',
         obtainMarks: '',
         percentage: '',
         grade: '',
         passFail: ''
       })));
-      
+
     } catch (error) {
       console.error("Error submitting marks:", error);
     }
@@ -281,13 +293,17 @@ const AddMarks = () => {
 
   const handleClassChange = (event) => {
     setSelectedClass(event.target.value);
+    setSectionOptions([]);
   };
+  
 
   const handleSectionChange = (event) => {
     setSelectedSection(event.target.value);
   };
 
-  const handleTestChange = (event) => {
+ 
+
+ const handleTestChange = (event) => {
     setSelectedTestName(event.target.value);
   };
 
@@ -325,11 +341,17 @@ const AddMarks = () => {
                 value={selectedSection}
                 onChange={handleSectionChange}
               >
-                {sectionOptions.map((section, index) => (
-                  <MenuItem key={index} value={section}>
-                    {section}
+                {sectionOptions.length > 0 ? (
+                  sectionOptions.map((section, index) => (
+                    <MenuItem key={index} value={section}>
+                      {section}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem value="">
+                    <em>No sections available</em>
                   </MenuItem>
-                ))}
+                )}
               </Select>
             </FormControl>
           </div>
@@ -356,110 +378,61 @@ const AddMarks = () => {
         </div>
       </div>
       <div className="table-container">
-        <table>
+        <table className="marks-table">
           <thead>
-            <tr>
-              <th>SI</th>
+            <tr style={{backgroundColor:'#007bff'}}>
               <th>Name</th>
               <th>Gender</th>
-              <th>Telugu</th>
-              <th>Hindi</th>
-              <th>English</th>
-              <th>Maths</th>
-              <th>Science</th>
-              <th>Social</th>
+              {subjectOrder.filter(subject => subjects.includes(subject)).map((subject) => (
+                <th key={subject}>{subject}</th>
+              ))}
               <th>Total Marks</th>
               <th>Obtain Marks</th>
+              <th>Percentage</th>
+              <th>Grade</th>
+              <th>Pass/Fail</th>
             </tr>
           </thead>
           <tbody>
-            {studentsData.map((student, index) => (
+            {studentsData.map((student) => (
               <tr key={student.id}>
-                <td>{index + 1}</td>
                 <td>{student.name}</td>
                 <td>{student.gender}</td>
-                <td>
-                  <input
-                    type="number"
-                    value={student.telugu}
-                    onChange={(e) =>
-                      handleMarksChange(student.id, "telugu", e.target.value)
-                    }
-                    disabled={disableInputs} // Disable input conditionally
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={student.hindi}
-                    onChange={(e) =>
-                      handleMarksChange(student.id, "hindi", e.target.value)
-                    }
-                    disabled={disableInputs} // Disable input conditionally
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={student.english}
-                    onChange={(e) =>
-                      handleMarksChange(student.id, "english", e.target.value)
-                    }
-                    disabled={disableInputs} // Disable input conditionally
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={student.maths}
-                    onChange={(e) =>
-                      handleMarksChange(student.id, "maths", e.target.value)
-                    }
-                    disabled={disableInputs} // Disable input conditionally
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={student.science}
-                    onChange={(e) =>
-                      handleMarksChange(student.id, "science", e.target.value)
-                    }
-                    disabled={disableInputs} // Disable input conditionally
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={student.social}
-                    onChange={(e) =>
-                      handleMarksChange(student.id, "social", e.target.value)
-                    }
-                    disabled={disableInputs} // Disable input conditionally
-                  />
-                </td>
+                {subjectOrder.filter(subject => subjects.includes(subject)).map((subject) => (
+                  <td key={subject}>
+                    <input
+                      type="number"
+                      value={student.subjects[subject] || ''}
+                      onChange={(e) => handleMarksChange(student.id, subject, e.target.value)}
+                      disabled={!examsAvailable}
+                    />
+                  </td>
+                ))}
                 <td>
                   <input
                     type="number"
                     value={student.totalMarks}
-                    onChange={(e) =>
-                      handleMarksChange(student.id, "totalMarks", e.target.value)
-                    }
-                    disabled={disableInputs} // Disable input conditionally
+                    onChange={(e) => handleMarksChange(student.id, "totalMarks", e.target.value)}
+                    disabled={!examsAvailable}
                   />
                 </td>
                 <td>{student.obtainMarks}</td>
+                <td>{student.percentage}</td>
+                <td>{student.grade}</td>
+                <td>{student.passFail}</td>
               </tr>
             ))}
           </tbody>
         </table>
         <div className="d-flex justify-content-end">
-          {disableInputs ? (
-            <div className="form-btn1 disabled">Submit Marks</div>
-          ) : (
-            <Link className="form-btn1" onClick={handleSubmitMarks}>
+          {examsAvailable && studentsData.length > 0 ? (
+            <button className="form-btn1" onClick={handleSubmitMarks}>
               Submit Marks
-            </Link>
+            </button>
+          ) : (
+            <button className="form-btn1 disabled" disabled>
+              Submit Marks
+            </button>
           )}
         </div>
       </div>

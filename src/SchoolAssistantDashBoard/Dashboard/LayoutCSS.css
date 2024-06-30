@@ -1,6 +1,7 @@
 /* DashBoardCSS.css */
 .Layout{
   overflow: hidden;
+  height: 100vh;
 }
 .dashboard-container h3 {
   color: #303972;
@@ -16,7 +17,7 @@
 .dashboard-container {
   display: flex;
   flex-flow: row;
-  height: 89vh;
+  height: 89.5vh;
 }
 
 .dashboard-content {
