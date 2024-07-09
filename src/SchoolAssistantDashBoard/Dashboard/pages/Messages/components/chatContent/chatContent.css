@@ -34,7 +34,7 @@
   color:#ffffff;
 }
 
-.content__body {
+.content__body { 
   flex-grow: 1;
   max-height: calc(100vh - calc(100vh / 2));
   overflow-y: auto;

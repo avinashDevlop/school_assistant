@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from "react-router-dom";
 import "./AdmissionFormCSS.css";
 import api from "../../../../api";
 import { storage } from "../../../../firebaseConfig";
@@ -60,12 +60,18 @@ const AdmissionForm = () => {
       casteCertificate: false,
       progressReport: false,
     },
+    //new data
+    permanentEducationNumber: "",
+    rationCardNumber: "",
+    previousClassPercentage: "",
+    previousSchoolRecordSheetNumber: "",
+    scholarshipDetails: "",
   };
   const [formData, setFormData] = useState(studentData || initialFormData);
   const [imagePreview, setImagePreview] = useState(studentData?.photo || null);
   const [submittedData, setSubmittedData] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   const categoryOptions = [
     "BC-A",
     "BC-B",
@@ -75,7 +81,7 @@ const AdmissionForm = () => {
     "EWS",
     "OC",
     "SC",
-    "ST"
+    "ST",
   ];
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
@@ -235,34 +241,38 @@ const AdmissionForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       const lowersurName = formData.surname.trim();
       const capitalizedFirstName = formData.name.trim();
       const lowerCaseName = `${lowersurName} ${capitalizedFirstName}`.trim();
-  
+
       let imageUrl = formData.photo;
-  
+
       // Check if a new image file is selected
-      if (formData.photo && typeof formData.photo !== 'string') {
+      if (formData.photo && typeof formData.photo !== "string") {
         const image = formData.photo;
-        const storageRef = ref(storage, `StudentPhotos/${formData.selectedClass}/${formData.selectedSection}/${image.name}`);
-        
+        const storageRef = ref(
+          storage,
+          `StudentPhotos/${formData.selectedClass}/${formData.selectedSection}/${image.name}`
+        );
+
         // Upload image to Firebase Storage
         await uploadBytes(storageRef, image);
-        
+
         // Get download URL for the uploaded image
         imageUrl = await getDownloadURL(storageRef);
       }
-      
+
       // Update formData with the new image URL
       const updatedFormData = { ...formData, photo: imageUrl };
-  
+
       // Prepare API URL for submitting form data
       const url = `admissionForms/${updatedFormData.selectedClass}/${updatedFormData.selectedSection}/${lowerCaseName}.json`;
-  
+
       // Submit form data to API
-      await api.put(url, updatedFormData)
+      await api
+        .put(url, updatedFormData)
         .then(() => {
           setSubmittedData(updatedFormData);
           window.alert("Form submitted successfully!");
@@ -274,14 +284,13 @@ const AdmissionForm = () => {
         .catch((err) => {
           console.error("Error submitting form: ", err);
         });
-  
     } catch (error) {
       console.error("Error submitting form:", error);
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   const printRef = useRef();
 
   const handlePrint = useReactToPrint({
@@ -289,28 +298,35 @@ const AdmissionForm = () => {
   });
 
   const handleDownload = (selectedClass, academicYear) => async () => {
-    const printSection = document.querySelector('.print-section');
-  
+    const printSection = document.querySelector(".print-section");
+
     if (!printSection) return;
-  
+
     const canvas = await html2canvas(printSection);
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'mm', 'a4');
-  
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-  
+
     const imgWidth = canvas.width;
     const imgHeight = canvas.height;
     const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-  
+
     const imgX = (pdfWidth - imgWidth * ratio) / 2;
     const imgY = 10; // you can adjust this value to set the margin-top
-  
-    pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+
+    pdf.addImage(
+      imgData,
+      "PNG",
+      imgX,
+      imgY,
+      imgWidth * ratio,
+      imgHeight * ratio
+    );
     pdf.save(`${selectedClass}_${academicYear}_Admission_Form.pdf`);
   };
-  
+
   const handleCancel = () => {
     setIsModalOpen(false);
     setFormData(initialFormData);
@@ -321,12 +337,14 @@ const AdmissionForm = () => {
       try {
         const classParam = studentData.selectedClass;
         const sectionParam = studentData.selectedSection;
-        const nameParam = `${studentData.surname} ${studentData.name}`
-        navigate('/Dashboard/StudentDetails', { state: { class: classParam, section: sectionParam, name:nameParam } });
+        const nameParam = `${studentData.surname} ${studentData.name}`;
+        navigate("/Dashboard/StudentDetails", {
+          state: { class: classParam, section: sectionParam, name: nameParam },
+        });
       } catch (error) {
-        console.error('Error updating form:', error);
+        console.error("Error updating form:", error);
       }
-    } 
+    }
   };
 
   const sectionOptions = ["Section A", "Section B", "Section C"];
@@ -454,6 +472,17 @@ const AdmissionForm = () => {
             />
           </div>
           <div className="form-group1">
+            <label>Permanent Education Number (PEN)</label>
+            <input
+              type="text"
+              name="permanentEducationNumber"
+              value={formData.permanentEducationNumber}
+              placeholder="Enter Permanent Education Number"
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group1">
             <label>Surname</label>
             <input
               type="text"
@@ -523,6 +552,17 @@ const AdmissionForm = () => {
               maxLength={14}
               placeholder="xxxx-xxxx-xxxx"
               autoComplete="new-password"
+            />
+          </div>
+          <div className="form-group1">
+            <label>Ration Card Number</label>
+            <input
+              type="text"
+              name="rationCardNumber"
+              value={formData.rationCardNumber}
+              onChange={handleChange}
+              placeholder="Enter Ration Card Number"
+              required
             />
           </div>
           <div className="form-group1">
@@ -677,19 +717,23 @@ const AdmissionForm = () => {
             </select>
           </div>
           <div className="form-group1">
-      <label>Category</label>
-      <select
-        name="category"
-        value={formData.category}
-        className="form-dropdown"
-        onChange={handleChange}
-      >
-        <option value="" disabled>Select category</option>
-        {categoryOptions.map((option, index) => (
-          <option key={index} value={option}>{option}</option>
-        ))}
-      </select>
-    </div>
+            <label>Category</label>
+            <select
+              name="category"
+              value={formData.category}
+              className="form-dropdown"
+              onChange={handleChange}
+            >
+              <option value="" disabled>
+                Select category
+              </option>
+              {categoryOptions.map((option, index) => (
+                <option key={index} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="form-group1">
             <label>Religion</label>
             <select
@@ -706,18 +750,59 @@ const AdmissionForm = () => {
               ))}
             </select>
           </div>
+          <div className="form-group1">
+            <label>
+              Whether the Student was in Receipt of Any Scholarship
+            </label>
+            <input
+              type="text"
+              name="scholarshipDetails"
+              value={formData.scholarshipDetails}
+              onChange={handleChange}
+              placeholder="Enter Scholarship Details"
+              required
+            />
+          </div>
           {formData.selectedClass !== "Pre-K" && (
-            <div className="form-group1">
-              <label>Last School Name</label>
-              <input
-                type="text"
-                name="lastSchoolName"
-                value={formData.lastSchoolName}
-                onChange={handleChange}
-                placeholder="Enter last school name"
-              />
-            </div>
+            <>
+              <div className="form-group1">
+                <label>Last School Name</label>
+                <input
+                  type="text"
+                  name="lastSchoolName"
+                  value={formData.lastSchoolName}
+                  onChange={handleChange}
+                  placeholder="Enter last school name"
+                />
+              </div>
+
+              <div className="form-group1">
+                <label>Previous Class Percentage of Marks</label>
+                <input
+                  type="text"
+                  name="previousClassPercentage"
+                  value={formData.previousClassPercentage}
+                  onChange={handleChange}
+                  placeholder="Enter Previous Class Percentage"
+                  required
+                />
+              </div>
+              <div className="form-group1">
+                <label>
+                  Record Sheet/Transfer Certificate Number of Previous School
+                </label>
+                <input
+                  type="text"
+                  name="recordSheetOrTcNumber"
+                  value={formData.recordSheetOrTcNumber}
+                  onChange={handleChange}
+                  placeholder="Enter Record Sheet or TC Number"
+                  required
+                />
+              </div>
+            </>
           )}
+
           <div className="form-group1">
             <label>Residential Address</label>
             <input
@@ -769,7 +854,9 @@ const AdmissionForm = () => {
             />
           </div>
           <div className="form-group1">
-            <label>Identification Marks (Enter each mark on a new line)</label>
+            <label>
+              Personal Marks of Identification (Enter each mark on a new line)
+            </label>
             <textarea
               rows="2"
               value={formData.identificationMarks}
@@ -921,9 +1008,13 @@ const AdmissionForm = () => {
               width: "550px",
             }}
           >
-            <button type="submit" style={{ width: "110px" }} disabled={isLoading}>
-        {isLoading ? 'Submitting...' : 'Submit'}
-      </button>
+            <button
+              type="submit"
+              style={{ width: "110px" }}
+              disabled={isLoading}
+            >
+              {isLoading ? "Submitting..." : "Submit"}
+            </button>
           </div>
         </form>
 
@@ -932,8 +1023,11 @@ const AdmissionForm = () => {
             className={`modals ${isModalOpen ? "show" : ""}`}
             style={{ display: isModalOpen ? "block" : "none" }}
           >
-            <div className="modal-contents" style={{ overflow: "auto",cursor:'grab'}}>
-              <div ref={printRef} className="print-section"> 
+            <div
+              className="modal-contents"
+              style={{ overflow: "auto", cursor: "grab" }}
+            >
+              <div ref={printRef} className="print-section">
                 <div className="printTop">
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <img src={logo} alt="School Logo" className="school-logo" />
@@ -1136,7 +1230,13 @@ const AdmissionForm = () => {
                 <button onClick={handlePrint} className="print-btn">
                   Print
                 </button>
-                <button onClick={handleDownload(submittedData.selectedClass,submittedData.academicYear)} className="download-btn">
+                <button
+                  onClick={handleDownload(
+                    submittedData.selectedClass,
+                    submittedData.academicYear
+                  )}
+                  className="download-btn"
+                >
                   Download as PDF
                 </button>
                 <button onClick={handleCancel}>Close</button>

@@ -4,7 +4,7 @@ import Avatar from "../chatList/Avatar";
 import ChatItem from "./ChatItem";
 import { BsSend } from "react-icons/bs";
 import { LuRefreshCcw } from "react-icons/lu";
-import axios from 'axios';
+import axios from "axios";
 
 export default class ChatContent extends Component {
   messagesEndRef = createRef(null);
@@ -32,14 +32,18 @@ export default class ChatContent extends Component {
   }
 
   scrollToBottom = () => {
-    if (this.messagesEndRef.current) {
-      this.messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (this.chatItemsRef) {
+      this.chatItemsRef.scrollTop = this.chatItemsRef.scrollHeight;
     }
   };
 
   formatTimestamp = (date) => {
     const pad = (num) => (num < 10 ? `0${num}` : num);
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())},${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+      date.getDate()
+    )},${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
+      date.getSeconds()
+    )}`;
   };
 
   handleSendMessage = async () => {
@@ -50,11 +54,14 @@ export default class ChatContent extends Component {
     const formattedTimestamp = this.formatTimestamp(timestamp);
     const newMessage = {
       msg: this.state.msg.trim(),
-      timestamp: timestamp.toISOString() // Keep ISO format for sorting
+      timestamp: timestamp.toISOString(), // Keep ISO format for sorting
     };
 
     try {
-      await axios.put(`https://studentassistant-18fdd-default-rtdb.firebaseio.com/chats/${selectedChat.name}/${formattedTimestamp}.json`, newMessage);
+      await axios.put(
+        `https://studentassistant-18fdd-default-rtdb.firebaseio.com/chats/${selectedChat.name}/${formattedTimestamp}.json`,
+        newMessage
+      );
       this.setState(
         (prevState) => ({
           chat: [...prevState.chat, { ...newMessage, key: formattedTimestamp }],
@@ -72,14 +79,21 @@ export default class ChatContent extends Component {
       this.setState({ chat: [] });
       return;
     }
-  
+
     try {
-      const response = await axios.get(`https://studentassistant-18fdd-default-rtdb.firebaseio.com/chats/${chatName}.json`);
-      let chatData = response.data ? Object.entries(response.data).map(([key, value]) => ({ ...value, key })) : [];
-      
+      const response = await axios.get(
+        `https://studentassistant-18fdd-default-rtdb.firebaseio.com/chats/${chatName}.json`
+      );
+      let chatData = response.data
+        ? Object.entries(response.data).map(([key, value]) => ({
+            ...value,
+            key,
+          }))
+        : [];
+
       // Sort chat messages by timestamp
       chatData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-  
+
       this.setState({ chat: chatData }, this.scrollToBottom);
     } catch (error) {
       console.error("Error loading chat messages:", error);
@@ -98,7 +112,7 @@ export default class ChatContent extends Component {
   };
 
   handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey && this.state.msg.trim() !== "") {
+    if (e.key === "Enter" && !e.shiftKey && this.state.msg.trim() !== "") {
       e.preventDefault();
       this.handleSendMessage();
     }
@@ -124,17 +138,20 @@ export default class ChatContent extends Component {
           </div>
         </div>
         <div className="content__body">
-          <div className="chat__items">
-            {this.state.chat.map((itm, index) => (
-              <ChatItem
-                animationDelay={index + 2}
-                key={itm.key}
-                user={itm.type ? itm.type : "me"}
-                msg={itm.msg}
-                timestamp={itm.timestamp}
-              />
-            ))}
-            <div ref={this.messagesEndRef} />
+          <div className="chat__items" ref={(el) => (this.chatItemsRef = el)}>
+            {this.state.chat.length > 0 ? (
+              this.state.chat.map((itm, index) => (
+                <ChatItem
+                  animationDelay={index + 2}
+                  key={itm.key}
+                  user={itm.type ? itm.type : "me"}
+                  msg={itm.msg}
+                  timestamp={itm.timestamp}
+                />
+              ))
+            ) : (
+              <p>No messages yet.</p>
+            )}
           </div>
         </div>
         <div className="content__footer">

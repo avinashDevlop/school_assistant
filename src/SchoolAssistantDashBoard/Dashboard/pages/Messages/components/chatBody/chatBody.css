@@ -11,10 +11,3 @@
   height: 80vh; 
   overflow: hidden;
 }
-
-@media (max-width: 768px) {
-  .main__chatbody {
-    flex-direction: column;
-    height: 80vh;
-  }
-}
