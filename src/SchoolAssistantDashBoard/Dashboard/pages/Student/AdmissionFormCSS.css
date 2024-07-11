@@ -261,6 +261,9 @@ input[type="date"] {
   max-width: 210mm; /* A4 width */
   margin: 0 auto;
   box-sizing: border-box;
+  display: flex; 
+  justify-content: space-between;
+  flex-direction: column;
 }
 
 .admission-details p {
@@ -303,6 +306,9 @@ input[type="date"] {
 .formCorrect p{
   width: 50%;
 }
+.formCorrect li{
+  width: 50%;
+}
 .sign {
   padding-top: 20px;
   display: flex;
@@ -314,4 +320,4 @@ input[type="date"] {
   font-size: 12px; /* Adjust font size as needed */
   margin-bottom: 10px; /* Adjust margin between list items */
 }
- 
+  

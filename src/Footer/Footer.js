@@ -144,7 +144,7 @@ const Footer = () => {
           </FooterLink>
         </FooterLogo>
         <DeveloperInfo>
-          <FooterLink href="">
+          <FooterLink href="https://hexafire4.com/" target="_blank">
             <DevelopedBy>
               Developed by: <HexaFire>Hexa <span style={{color:'#f27d0c'}}>fire</span> 4</HexaFire>
             </DevelopedBy>

@@ -479,7 +479,6 @@ const AdmissionForm = () => {
               value={formData.permanentEducationNumber}
               placeholder="Enter Permanent Education Number"
               onChange={handleChange}
-              required
             />
           </div>
           <div className="form-group1">
@@ -562,7 +561,6 @@ const AdmissionForm = () => {
               value={formData.rationCardNumber}
               onChange={handleChange}
               placeholder="Enter Ration Card Number"
-              required
             />
           </div>
           <div className="form-group1">
@@ -751,16 +749,13 @@ const AdmissionForm = () => {
             </select>
           </div>
           <div className="form-group1">
-            <label>
-              Whether the Student was in Receipt of Any Scholarship
-            </label>
+            <label>Whether the Student was in Receipt of Any Scholarship</label>
             <input
               type="text"
               name="scholarshipDetails"
               value={formData.scholarshipDetails}
               onChange={handleChange}
               placeholder="Enter Scholarship Details"
-              required
             />
           </div>
           {formData.selectedClass !== "Pre-K" && (
@@ -784,7 +779,6 @@ const AdmissionForm = () => {
                   value={formData.previousClassPercentage}
                   onChange={handleChange}
                   placeholder="Enter Previous Class Percentage"
-                  required
                 />
               </div>
               <div className="form-group1">
@@ -797,7 +791,6 @@ const AdmissionForm = () => {
                   value={formData.recordSheetOrTcNumber}
                   onChange={handleChange}
                   placeholder="Enter Record Sheet or TC Number"
-                  required
                 />
               </div>
             </>
@@ -1067,6 +1060,7 @@ const AdmissionForm = () => {
                   </div>
                 </div>
                 <div className="admission-details">
+                  <div>
                   <div className="formCorrect">
                     <p>
                       <strong>Form No:</strong> {submittedData.formNo}
@@ -1081,15 +1075,24 @@ const AdmissionForm = () => {
                     </p>
                   </div>
                   <p>
+                      <strong>Permanent Education Number:</strong>{" "}
+                      {submittedData.permanentEducationNumber}
+                    </p>
+                    <div className="formCorrect">
+                  <p>
                     <strong>Student Name:</strong>
                     {submittedData.surname}&nbsp;&nbsp;{submittedData.name}
                   </p>
                   <p>
                     <strong>Gender:</strong> {submittedData.gender}
-                  </p>
+                  </p></div>
+                  <div className="formCorrect">
                   <p>
                     <strong>Date of Birth:</strong> {submittedData.dob}
                   </p>
+                  <p>
+                    <strong>Blood Group:</strong> {submittedData.bloodGroup}
+                  </p></div>
                   <div className="formCorrect">
                     <p>
                       <strong>Class:</strong> {submittedData.selectedClass}
@@ -1098,10 +1101,16 @@ const AdmissionForm = () => {
                       <strong>Section:</strong> {submittedData.selectedSection}
                     </p>
                   </div>
+                  <div className="formCorrect">
                   <p>
                     <strong>Aadhar Card No:</strong>{" "}
                     {submittedData.aadharCardNo}
                   </p>
+                  <p>
+                      <strong>Ration Card No:</strong>{" "}
+                      {submittedData.rationCardNumber}
+                    </p>
+                    </div>
                   <div className="formCorrect">
                     <p>
                       <strong>Fathers Name:</strong>
@@ -1154,29 +1163,44 @@ const AdmissionForm = () => {
                       {submittedData.guardianMobileNumber}
                     </p>
                   </div>
+                  <div className="formCorrect">
                   <p>
                     <strong>Caste:</strong> {submittedData.caste}
                   </p>
                   <p>
-                    <strong>Mother Tongue:</strong> {submittedData.motherTongue}
-                  </p>
-                  <p>
                     <strong>Category:</strong> {submittedData.category}
                   </p>
+                  </div>
+                  <div className="formCorrect">
                   <p>
                     <strong>Religion:</strong> {submittedData.religion}
+                  </p>
+                  <p>
+                    <strong>Mother Tongue:</strong> {submittedData.motherTongue}
+                  </p>
+                  </div>
+                  <p>
+                    <strong>Scholarship Details:</strong>{" "}
+                    {submittedData.scholarshipDetails}
                   </p>
                   <p>
                     <strong>Last School Name:</strong>{" "}
                     {submittedData.lastSchoolName}
                   </p>
+                  <div className="formCorrect">
+                  <p>
+                    <strong>Previous Class Percentage:</strong>{" "}
+                    {submittedData.previousClassPercentage}
+                  </p>
+                  <p>
+                    <strong>Previous School Record Sheet Number:</strong>{" "}
+                    {submittedData.previousSchoolRecordSheetNumber}
+                  </p>
+                  </div>
                   <p>
                     <strong>Address:</strong> {submittedData.residentialAddress}
                     ,{submittedData.city},{submittedData.state}-
                     {submittedData.pincode}
-                  </p>
-                  <p>
-                    <strong>Blood Group:</strong> {submittedData.bloodGroup}
                   </p>
                   <p>
                     <strong>Identification Marks:</strong>{" "}
@@ -1187,6 +1211,7 @@ const AdmissionForm = () => {
                   </p>
                   <h4>Enclosures:</h4>
                   <ul>
+                  <div className="formCorrect"> 
                     <li>
                       TC/RC/Study Certificate:{" "}
                       {submittedData.enclosures.tcRcStudyCertificate
@@ -1196,6 +1221,8 @@ const AdmissionForm = () => {
                     <li>
                       Aadhar: {submittedData.enclosures.aadhar ? "Yes" : "No"}
                     </li>
+                    </div>
+                    <div className="formCorrect">
                     <li>
                       Mother's Bank Passbook:{" "}
                       {submittedData.enclosures.mothersBankPassbook
@@ -1205,7 +1232,8 @@ const AdmissionForm = () => {
                     <li>
                       Ration Card:{" "}
                       {submittedData.enclosures.rationCard ? "Yes" : "No"}
-                    </li>
+                    </li></div>
+                    <div className="formCorrect">
                     <li>
                       Birth Certificate:{" "}
                       {submittedData.enclosures.birthCertificate ? "Yes" : "No"}
@@ -1214,11 +1242,13 @@ const AdmissionForm = () => {
                       Caste Certificate:{" "}
                       {submittedData.enclosures.casteCertificate ? "Yes" : "No"}
                     </li>
+                    </div>
                     <li>
                       Progress Report:{" "}
                       {submittedData.enclosures.progressReport ? "Yes" : "No"}
                     </li>
                   </ul>
+                  </div>
                   <div className="sign">
                     <li>SIGNATURE OF THE PARENT</li>
                     <li>SIGNATURE OF THE STUDENT</li>
