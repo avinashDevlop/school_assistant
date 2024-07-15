@@ -2,10 +2,15 @@ import React from "react";
 import { Link } from 'react-router-dom';
 import { Nav, Navbar } from "react-bootstrap";
 import logo from './logo.jpg'; 
+import OfflinePopup from '../OfflinePopup';
+import { Offline } from 'react-detect-offline';
 
 function Header() {
   return (
     <div className="nav-container">
+      <Offline>
+        <OfflinePopup />
+      </Offline>
       <style>
         {`
           .nav-container {

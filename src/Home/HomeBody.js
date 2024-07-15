@@ -4,6 +4,8 @@ import blogimg1 from './blog/schoolbig.jpg';
 import blogimg2 from './blog/awardTaking.jpg';
 import blogimg3 from './blog/planting.jpg';
 import "./HomeBodyCSS.css";
+import OfflinePopup from '../OfflinePopup';
+import { Offline } from 'react-detect-offline';
 
 const HomeBody = () => {
   const commonImageStyle = {
@@ -27,6 +29,9 @@ const HomeBody = () => {
   const imageStyle = isPhone ? phoneImageStyle : laptopImageStyle;
   return (
     <div>
+      <Offline>
+        <OfflinePopup />
+      </Offline>
       <Carousel>
         <Carousel.Item>
           <img

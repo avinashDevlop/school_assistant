@@ -142,7 +142,7 @@ const AllStudentDetails = () => {
       ContactNo: details.fathersMobileNumber,
       AadharNo: details.aadharCardNo,
       FatherName: details.fathersName,
-      MotherName: details.mothersName,
+      MotherName: details.mothersSurname && details.mothersName ? `${details.mothersSurname} ${details.mothersName}` : "",
       FormNo: details.formNo,
     }));
   }, [studentData]);
