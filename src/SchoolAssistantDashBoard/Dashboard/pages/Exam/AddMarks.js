@@ -3,7 +3,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import axios from "axios";
+import api from "../../../../api";
 import "./AddMarks.css";
 
 const AddMarks = () => {
@@ -13,6 +13,7 @@ const AddMarks = () => {
   const [studentsData, setStudentsData] = useState([]);
   const [testName, setTestName] = useState([]);
   const [selectedTestName, setSelectedTestName] = useState("");
+  const [maxMarks, setmaxMarks] = useState(0);
   const [firstDate, setFirstDate] = useState(null);
   const [lastDate, setLastDate] = useState(null);
   const [subjects, setSubjects] = useState([]);
@@ -49,9 +50,7 @@ const AddMarks = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `https://studentassistant-18fdd-default-rtdb.firebaseio.com/admissionForms/${selectedClass}.json`
-        );
+        const response = await api.get(`admissionForms/${selectedClass}.json`);
         const data = response.data || {};
         if (Object.keys(data).length > 0) {
           const sections = Object.keys(data);
@@ -70,8 +69,8 @@ const AddMarks = () => {
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
-        const response = await axios.get(
-          `https://studentassistant-18fdd-default-rtdb.firebaseio.com/admissionForms/${selectedClass}/${selectedSection}.json`
+        const response = await api.get(
+          `admissionForms/${selectedClass}/${selectedSection}.json`
         );
         const data = response.data || {};
         const students = Object.entries(data).map(([id, student]) => ({
@@ -99,15 +98,30 @@ const AddMarks = () => {
   useEffect(() => {
     const fetchTestName = async () => {
       try {
-        const response = await axios.get(
-          `https://studentassistant-18fdd-default-rtdb.firebaseio.com/ExamSchedule/${selectedClass}.json`
-        );
+        const allowedTestNames = [
+          "Class Test",
+          "FORMATIVE ASSESSMENT - I",
+          "FORMATIVE ASSESSMENT - II",
+          "SUMMATIVE ASSESSMENT - I",
+          "FORMATIVE ASSESSMENT - III",
+          "FORMATIVE ASSESSMENT - IV",
+          "SUMMATIVE ASSESSMENT - II",
+          "SUMMATIVE ASSESSMENT - III",
+        ];
+        
+        const response = await api.get(`ExamSchedule/${selectedClass}.json`);
         const data = response.data || {};
+  
         if (Object.keys(data).length > 0) {
           const testnames = Object.keys(data);
-          setTestName(testnames);
-          setSelectedTestName(testnames[0] || "");
-          setExamsAvailable(true);
+          // Filter testnames to include only allowedTestNames
+          const filteredTestNames = testnames.filter(testname =>
+            allowedTestNames.includes(testname)
+          );
+          
+          setTestName(filteredTestNames);
+          setSelectedTestName(filteredTestNames[0] || "");
+          setExamsAvailable(filteredTestNames.length > 0);
         } else {
           setTestName([]);
           setSelectedTestName("");
@@ -117,27 +131,30 @@ const AddMarks = () => {
         console.error("Error fetching test names:", error);
       }
     };
-
+  
     fetchTestName();
   }, [selectedClass]);
 
   useEffect(() => {
     const fetchExamData = async () => {
       try {
-        const response = await axios.get(
-          `https://studentassistant-18fdd-default-rtdb.firebaseio.com/ExamSchedule/${selectedClass}/${selectedTestName}.json`
+        const response = await api.get(
+          `ExamSchedule/${selectedClass}/${selectedTestName}.json`
         );
         const data = response.data || {};
         if (Object.keys(data).length > 0) {
           const Dates = Object.keys(data);
           const subjects = Dates.map(date => data[date].subject);
+          const totalMaxMarks = Dates.map(date => Number(data[date].maxMarks) || 0).reduce((acc, curr) => acc + curr, 0);
           setSubjects(subjects);
+          setmaxMarks(totalMaxMarks);
           setFirstDate(Dates[0]);
           setLastDate(Dates[Dates.length - 1]);
         } else {
           setSubjects([]);
           setFirstDate(null);
           setLastDate(null);
+          setmaxMarks(0);
         }
       } catch (error) {
         console.error("Error fetching exam data:", error);
@@ -159,36 +176,42 @@ const AddMarks = () => {
     return "F";
   };
 
-  const handleMarksChange = (id, field, value) => {
+  const handleMarksChange = (id, field, value, totalMaxMarks) => {  // Add totalMaxMarks as an argument
     const numericValue = value === "" ? "" : parseInt(value, 10);
   
+    // Only update if value is valid (empty or non-negative integer)
     if (value === "" || (!isNaN(value) && numericValue >= 0)) {
       setStudentsData((prevData) => {
         return prevData.map((student) => {
           if (student.id === id) {
             const updatedStudent = { ...student };
   
+            // Update subjects based on the field
             if (subjects.includes(field)) {
               updatedStudent.subjects[field] = numericValue;
-            } else if (field === "totalMarks") {
-              updatedStudent.totalMarks = numericValue;
             }
   
+            // Calculate obtained marks by summing all subject marks
             const obtainMarks = subjects.reduce(
               (total, subj) => total + (parseInt(updatedStudent.subjects[subj]) || 0),
               0
             );
             updatedStudent.obtainMarks = obtainMarks;
   
-            if (field === "totalMarks" || obtainMarks > 0) {
-              updatedStudent.totalMarks = field === "totalMarks" ? numericValue : updatedStudent.totalMarks;
+            // Set totalMarks to totalMaxMarks
+            updatedStudent.totalMarks = maxMarks;
+  
+            // Calculate percentage if totalMaxMarks is greater than zero
+            if (updatedStudent.totalMarks > 0) {
               updatedStudent.percentage = ((obtainMarks / updatedStudent.totalMarks) * 100).toFixed(2);
               updatedStudent.grade = calculateGrade(updatedStudent.percentage);
-  
-              // Calculate pass/fail based on dynamic threshold
-              const passThreshold = updatedStudent.totalMarks / subjects.length * 0.3;
-              updatedStudent.passFail = subjects.every((subj) => parseInt(updatedStudent.subjects[subj]) >= passThreshold) ? 'Pass' : 'Fail';
             }
+  
+            // Calculate pass/fail based on subject-wise threshold
+            const passThreshold = (updatedStudent.totalMarks / subjects.length) * 0.3;
+            updatedStudent.passFail = subjects.every((subj) => 
+              parseInt(updatedStudent.subjects[subj]) >= passThreshold
+            ) ? 'Pass' : 'Fail';
   
             return updatedStudent;
           }
@@ -267,8 +290,8 @@ const AddMarks = () => {
         };
       });
 
-      await axios.put(
-        `https://studentassistant-18fdd-default-rtdb.firebaseio.com/ExamMarks/${selectedClass}/${selectedSection}/${selectedTestName}.json`,
+      await api.put(
+        `ExamMarks/${selectedClass}/${selectedSection}/${selectedTestName}.json`,
         dataToSend
       );
 
@@ -386,8 +409,8 @@ acc, subj) => ({ ...acc, [subj]: ''}), {}),
               {subjectOrder.filter(subject => subjects.includes(subject)).map((subject) => (
                 <th key={subject}>{subject}</th>
               ))}
-              <th>Total Marks</th>
               <th>Obtain Marks</th>
+              <th>Total Marks</th>
               <th>Percentage</th>
               <th>Grade</th>
               <th>Pass/Fail</th>
@@ -408,15 +431,8 @@ acc, subj) => ({ ...acc, [subj]: ''}), {}),
                     />
                   </td>
                 ))}
-                <td>
-                  <input
-                    type="number"
-                    value={student.totalMarks}
-                    onChange={(e) => handleMarksChange(student.id, "totalMarks", e.target.value)}
-                    disabled={!examsAvailable}
-                  />
-                </td>
                 <td>{student.obtainMarks}</td>
+                <td>{maxMarks}</td>
                 <td>{student.percentage}</td>
                 <td>{student.grade}</td>
                 <td>{student.passFail}</td>

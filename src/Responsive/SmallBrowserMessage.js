@@ -18,7 +18,7 @@ const SmallBrowserMessage = () => {
   }, []);
 
   return (
-    <div className={`small-browser-message ${windowWidth < 1100 ? 'visible' : 'hidden'}`}>
+    <div className={`small-browser-message ${windowWidth < 500 ? 'visible' : 'hidden'}`}>
       <div className="message-container">
       <BsArrowsFullscreen className="fullscreen-icon" />
         <div className="message">Your browser window is too small. Please resize to at least 1100px wide.</div>

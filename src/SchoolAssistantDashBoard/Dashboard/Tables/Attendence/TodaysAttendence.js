@@ -105,7 +105,6 @@ useEffect(() => {
       const data = response.data || {};
       if (Object.keys(data).length > 0) {
         const sections = Object.keys(data);
-        console.log("Sections:", sections); // Log sections to verify data
         setSectionOptions(sections);
         setSelectedSection(sections[0] || "");
       }
@@ -172,7 +171,6 @@ useEffect(() => {
     const fetchStudentData = async () => {
       try {
         setLoadingStudents(true);
-
         
         if (selectedClass && selectedSection) {
           const response = await api.get(

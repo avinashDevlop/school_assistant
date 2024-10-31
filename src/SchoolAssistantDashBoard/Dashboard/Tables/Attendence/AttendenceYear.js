@@ -8,6 +8,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 const AllStudent = () => {
   const [selectedClass, setSelectedClass] = useState("10th Class");
+  const [selectedPreviousClass, setselectedPreviousClass] =
+    useState("@10th Class");
   const [selectedSection, setSelectedSection] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,16 +19,26 @@ const AllStudent = () => {
   const [dataArray, setDataArray] = useState([]);
   const [studentData, setStudentData] = useState([]);
   const [attendanceDataResponse, setAttendanceDataResponse] = useState({});
+  const [newClassDropdown, setNewClassDropdown] = useState("");
 
   useEffect(() => {
     const fetchMonthWiseStuAttendance = async () => {
       if (!selectedClass || !selectedSection || !selectedMonth) return;
       try {
         setLoading(true);
-        const response = await api.get(
-          `Attendance/StudAttendance/${selectedClass}/${selectedSection}/${selectedMonth}.json`
-        );
 
+        // Check if selectedClass matches the 'value' property of any object in dataArray
+        const classExists = dataArray.some(
+          (item) => item.value.trim() === selectedClass.trim()
+        );
+        let endpoint;
+        if (classExists) {
+          endpoint = `Attendance/previousYearStudents/${selectedClass}/${selectedPreviousClass}/${selectedSection}/${selectedMonth}.json`;
+        } else {
+          endpoint = `Attendance/StudAttendance/${selectedClass}/${selectedSection}/${selectedMonth}.json`;
+        }
+
+        const response = await api.get(endpoint);
         setAttendanceDataResponse(response.data || {});
         setLoading(false);
       } catch (error) {
@@ -34,8 +46,9 @@ const AllStudent = () => {
         console.error("Error fetching attendance data:", error);
       }
     };
+
     fetchMonthWiseStuAttendance();
-  }, [selectedMonth, selectedClass, selectedSection]);
+  }, [selectedClass, selectedSection, selectedMonth, dataArray, selectedPreviousClass]);
 
   useEffect(() => {
     const fetchClassOptions = async () => {
@@ -115,9 +128,18 @@ const AllStudent = () => {
       if (!selectedClass || !selectedSection) return;
       try {
         setLoading(true);
-        const response = await api.get(
-          `Attendance/StudAttendance/${selectedClass}/${selectedSection}.json`
+
+        // Check if selectedClass matches the 'value' property of any object in dataArray (with trimming for whitespace)
+        const classExists = dataArray.some(
+          (item) => item.value.trim() === selectedClass.trim()
         );
+
+        const endpoint = classExists
+          ? `Attendance/previousYearStudents/${selectedClass}/${selectedPreviousClass}/${selectedSection}.json`
+          : `Attendance/StudAttendance/${selectedClass}/${selectedSection}.json`;
+
+
+        const response = await api.get(endpoint);
         const data = response.data || {};
 
         const months = Object.keys(data);
@@ -133,7 +155,7 @@ const AllStudent = () => {
     };
 
     fetchMonthOptions();
-  }, [selectedClass, selectedSection]);
+  }, [selectedClass, selectedSection, dataArray, selectedPreviousClass]);
 
   useEffect(() => {
     const fetchStudentData = async () => {
@@ -156,10 +178,6 @@ const AllStudent = () => {
     fetchStudentData();
   }, [selectedClass, selectedSection, dataArray]);
 
-  const handleClassChange = (e) => {
-    setSelectedClass(e.target.value);
-  };
-
   const handleSectionChange = (e) => {
     setSelectedSection(e.target.value);
   };
@@ -174,7 +192,9 @@ const AllStudent = () => {
 
   const columns = useMemo(() => {
     const year = new Date().getFullYear();
-    const monthIndex = new Date(Date.parse(`${selectedMonth} 1, ${year}`)).getMonth();
+    const monthIndex = new Date(
+      Date.parse(`${selectedMonth} 1, ${year}`)
+    ).getMonth();
     const daysInMonth = getDaysInMonth(year, monthIndex);
 
     const dayColumns = Array.from({ length: daysInMonth }, (_, index) => {
@@ -209,7 +229,9 @@ const AllStudent = () => {
 
   const formattedStudentData = useMemo(() => {
     const year = new Date().getFullYear();
-    const monthIndex = new Date(Date.parse(`${selectedMonth} 1, ${year}`)).getMonth();
+    const monthIndex = new Date(
+      Date.parse(`${selectedMonth} 1, ${year}`)
+    ).getMonth();
     const daysInMonth = getDaysInMonth(year, monthIndex);
 
     return Object.entries(studentData).map(([name, _], index) => {
@@ -218,8 +240,10 @@ const AllStudent = () => {
       let absentStudents = [];
 
       for (let i = 1; i <= daysInMonth; i++) {
-        presentStudents[i] = attendanceDataResponse[`${selectedMonth}_${i}`]?.present || [];
-        absentStudents[i] = attendanceDataResponse[`${selectedMonth}_${i}`]?.absent || [];
+        presentStudents[i] =
+          attendanceDataResponse[`${selectedMonth}_${i}`]?.present || [];
+        absentStudents[i] =
+          attendanceDataResponse[`${selectedMonth}_${i}`]?.absent || [];
       }
 
       const attendanceRow = [name];
@@ -236,6 +260,42 @@ const AllStudent = () => {
     });
   }, [attendanceDataResponse, selectedMonth, studentData]);
 
+  const newBatchOptions = [
+    "@10th Class",
+    "@9th Class",
+    "@8th Class",
+    "@7th Class",
+    "@6th Class",
+    "@5th Class",
+    "@4th Class",
+    "@3rd Class",
+    "@2nd Class",
+    "@1st Class",
+    "@UKG",
+    "@LKG",
+    "@Pre-K",
+  ];
+
+  const handleClassChange = (e) => {
+    const selectedClass = e.target.value;
+    setSelectedClass(selectedClass);
+
+    // Check if the selectedClass exists in the fetched options (dataArray)
+    const isFetchedOption = dataArray.some(
+      (item) => item.value === selectedClass
+    );
+
+    if (isFetchedOption) {
+      setNewClassDropdown("show"); // Show new dropdown if selected class is a fetched option
+    } else {
+      setNewClassDropdown(""); // Hide dropdown if selected class is not a fetched option
+    }
+  };
+
+  const handlePreviousClassChange = (e) => {
+    const selectedPreviousClass = e.target.value;
+    setselectedPreviousClass(selectedPreviousClass);
+  };
   return (
     <div className="tablecontainer year">
       <div className="studGraph">
@@ -252,6 +312,20 @@ const AllStudent = () => {
               ))}
             </select>
           </div>
+          {newClassDropdown && (
+            <div className="newDropdown">
+              <select
+                value={selectedPreviousClass}
+                onChange={handlePreviousClassChange}
+              >
+                {newBatchOptions.map((option, index) => (
+                  <option key={index} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="Section">
             <select value={selectedSection} onChange={handleSectionChange}>
               {sectionOptions.map((section, index) => (
@@ -262,9 +336,7 @@ const AllStudent = () => {
             </select>
           </div>
           <div className="Month">
-            <select value={selectedMonth
-
-} onChange={handleMonthChange}>
+            <select value={selectedMonth} onChange={handleMonthChange}>
               {monthOptions.map((month, index) => (
                 <option key={index} value={month}>
                   {month}
@@ -273,6 +345,7 @@ const AllStudent = () => {
             </select>
           </div>
         </div>
+
         {loading ? (
           <CircularProgress />
         ) : (

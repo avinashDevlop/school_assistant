@@ -51,6 +51,7 @@ const AdmissionForm = () => {
     guardianName: "",
     guardianMobileNumber: "",
     admissionNumber: "",
+    recordSheetOrTcNumber: "",
     enclosures: {
       tcRcStudyCertificate: false,
       aadhar: false,

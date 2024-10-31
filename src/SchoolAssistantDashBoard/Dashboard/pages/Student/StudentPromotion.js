@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import api from "../../../../api.js"
+import api from "../../../../api.js";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "../../../../firebaseConfig.js";
 import "./StudentPromotionFormCSS.css";
@@ -48,9 +48,7 @@ const StudentPromotionForm = () => {
     if (name === "currentClass" && value !== "") {
       try {
         setLoading(true);
-        const response = await api.get(
-          `admissionForms/${value}.json`
-        );
+        const response = await api.get(`admissionForms/${value}.json`);
         const sections = response.data ? Object.keys(response.data) : [];
         setSectionOptions(sections);
       } catch (error) {
@@ -78,7 +76,7 @@ const StudentPromotionForm = () => {
         }
       } catch (error) {
         console.error("Error fetching student information:", error);
-      }finally{
+      } finally {
         setLoading(false); // Set loading to false after fetching student names
       }
     }
@@ -146,8 +144,10 @@ const StudentPromotionForm = () => {
       alert("Student promotion successful.");
     } catch (error) {
       console.error("Error promoting student:", error);
-      alert("student data is not present in some class. Please try again later.");
-    }finally {
+      alert(
+        "student data is not present in some class. Please try again later."
+      );
+    } finally {
       setLoading(false); // Set loading to false after fetching sections
     }
   };
@@ -158,226 +158,550 @@ const StudentPromotionForm = () => {
 
   const handleLogin = async () => {
     if (!Email || !password) {
-        alert("Please enter email and password.");
-        return;
+      alert("Please enter email and password.");
+      return;
     }
 
     try {
       setLoading(true);
-       const auth = getAuth(app);
-        await signInWithEmailAndPassword(auth, Email, password);
-        const user = auth.currentUser;
-        setShowModal(false);
-        if (user) {
-            console.log("Login successfully", user);
-            alert("Login successful!");
-            
-            try {
-                const currentYear = new Date().getFullYear();
-                const classUpdate = [
-                    "previousYearStudents",
-                    "10th Class",
-                    "9th Class",
-                    "8th Class",
-                    "7th Class",
-                    "6th Class",
-                    "5th Class",
-                    "4th Class",
-                    "3rd Class",
-                    "2nd Class",
-                    "1st Class",
-                    "UKG",
-                    "LKG",
-                    "Pre-K",
-                ];
+      const auth = getAuth(app);
+      await signInWithEmailAndPassword(auth, Email, password);
+      const user = auth.currentUser;
 
-                for (let i = 0; i < classUpdate.length - 1; i++) {
-                    let studentSectionA = {};
-                    let studentSectionB = {};
-                    let studentSectionC = {};
+      setShowModal(false);
 
-                    try {
-                        // Check if Section A exists for the class
-                        const sectionAResponse = await api.get(
-                            `admissionForms/${
-                            classUpdate[i + 1]
-                            }/Section%20A.json`
-                        );
+      if (user) {
+        console.log("Login successfully", user);
+        alert("Login successful!");
 
-                        // If Section A exists, fetch its data
-                        if (sectionAResponse.status === 200) {
-                            const responseA = sectionAResponse.data;
-                            console.log('Data for Section A:', responseA);
-                            studentSectionA = responseA;
-                        } else {
-                            console.log(`Section A not found for ${classUpdate[i+1]}`);
-                        }
+        try {
+          const currentYear = new Date().getFullYear();
+          const classUpdate = [
+            "previousYearStudents",
+            "10th Class",
+            "9th Class",
+            "8th Class",
+            "7th Class",
+            "6th Class",
+            "5th Class",
+            "4th Class",
+            "3rd Class",
+            "2nd Class",
+            "1st Class",
+            "UKG",
+            "LKG",
+            "Pre-K",
+          ];
 
-                        // Check if Section B exists for the class
-                        const sectionBResponse = await api.get(
-                            `admissionForms/${
-                            classUpdate[i + 1]
-                            }/Section%20B.json`
-                        );
+          const sections = ["Section A", "Section B", "Section C"];
 
-                        // If Section B exists, fetch its data
-                        if (sectionBResponse.status === 200) {
-                            const responseB = sectionBResponse.data;
-                            console.log('Data for Section B:', responseB);
-                            studentSectionB = responseB;
-                        } else {
-                            console.log(`Section B not found for ${classUpdate[i+1]}`);
-                        }
+          // Helper function to fetch data for all sections of a class
+          const fetchClassSections = async (className) => {
+            const fetchSection = (section) =>
+              api
+                .get(`admissionForms/${className}/${section}.json`)
+                .then((res) => res.data || {})
+                .catch(() => ({}));
 
-                        // Check if Section C exists for the class
-                        const sectionCResponse = await api.get(
-                            `admissionForms/${
-                            classUpdate[i + 1]
-                            }/Section%20C.json`
-                        );
+            const [sectionA, sectionB, sectionC] = await Promise.all(
+              sections.map(fetchSection)
+            );
 
-                        // If Section C exists, fetch its data
-                        if (sectionCResponse.status === 200) {
-                            const responseC = sectionCResponse.data;
-                            console.log('Data for Section C:', responseC);
-                            studentSectionC = responseC;
-                        } else {
-                            console.log(`Section C not found for ${classUpdate[i+1]}`);
-                        }
-                    } catch (error) {
-                        console.error(`Error fetching data for ${classUpdate[i+1]}:`, error);
-                    }
-                   //delete
-                    const sections = ["Section A", "Section B", "Section C"];
-              
-                      for (const section of sections) {
-                          // Fetch all student names from the current section in the class
-                          const response = await api.get(
-                              `admissionForms/${classUpdate[i+1]}/${section}.json`
-                          );
-              
-                          // Check if response.data is not undefined or null before using Object.keys()
-                          if (response.data) {
-                              const studentNames = Object.keys(response.data);
-              
-                              // Iterate over each student and delete them from the current section
-                              for (const studentName of studentNames) {
-                                  await api.delete(
-                                      `admissionForms/${classUpdate[i+1]}/${section}/${studentName}.json`
-                                  );
-                              }
-                          }
-                      }
+            return { sectionA, sectionB, sectionC };
+          };
 
-                    if (classUpdate[i] === "previousYearStudents") {
-                        if (studentSectionA && typeof studentSectionA === 'object' && Object.keys(studentSectionA).length === 0) {
-                            console.log(`No Section A in class ${classUpdate[i]}`);
-                        } else {
-                            await api
-                                .put(
-                                    `admissionForms/${classUpdate[i]}/@${currentYear}Batch/Section%20A.json`,
-                                    studentSectionA
-                                )
-                                .catch((error) => {
-                                    console.error(
-                                        `Error updating Section A for ${classUpdate[i]}:`,
-                                        error
-                                    );
-                                });
-                        }
-                        if (studentSectionB && typeof studentSectionB === 'object' && Object.keys(studentSectionB).length === 0) {
-                            console.log(`No Section B in class ${classUpdate[i]}`);
-                        } else {
-                            await api
-                                .put(
-                                    `admissionForms/${classUpdate[i]}/@${currentYear}Batch/Section%20B.json`,
-                                    studentSectionB
-                                )
-                                .catch((error) => {
-                                    console.error(
-                                        `Error updating Section B for ${classUpdate[i]}:`,
-                                        error
-                                    );
-                                });
-                        }
-                        if (studentSectionC && typeof studentSectionC === 'object' && Object.keys(studentSectionC).length === 0) {
-                            console.log(`No Section C in class ${classUpdate[i]}`);
-                        } else {
-                            await api
-                                .put(
-                                    `admissionForms/${classUpdate[i]}/@${currentYear}Batch/Section%20C.json`,
-                                    studentSectionC
-                                )
-                                .catch((error) => {
-                                    console.error(
-                                        `Error updating Section C for ${classUpdate[i]}:`,
-                                        error
-                                    );
-                                });
-                        }
-                    } else {
-                        if (studentSectionA && typeof studentSectionA === 'object' && Object.keys(studentSectionA).length === 0) {
-                            console.log(`No Section A in class ${classUpdate[i]}`);
-                        } else {
-                            await api
-                                .put(
-                                    `admissionForms/${classUpdate[i]}/Section%20A.json`,
-                                    studentSectionA
-                                )
-                                .catch((error) => {
-                                    console.log(
-                                        `Error updating Section A for ${classUpdate[i]}:`
-                                    );
-                                });
-                        }
-                        if (studentSectionB && typeof studentSectionB === 'object' && Object.keys(studentSectionB).length === 0) {
-                            console.log(`No Section B in class ${classUpdate[i]}`);
-                        } else {
-                            await api
-                                .put(
-                                    `admissionForms/${classUpdate[i]}/Section%20B.json`,
-                                    studentSectionB
-                                )
-                                .catch((error) => {
-                                    console.log(
-                                        `Error updating Section B for ${classUpdate[i]}:`
-                                    );
-                                });
-                        }
-                        if (studentSectionC && typeof studentSectionC === 'object' && Object.keys(studentSectionC).length === 0) {
-                            console.log(`No Section C in class ${classUpdate[i]}`);
-                        } else {
-                            await api
-                                .put(
-                                    `admissionForms/${classUpdate[i]}/Section%20C.json`,
-                                    studentSectionC
-                                )
-                                .catch((error) => {
-                                    console.log(
-                                        `Error updating Section C for ${classUpdate[i]}:`
-                                    );
-                                });
-                        }
-                    }
-                } 
-                alert("All students promoted successfully.");
-            } catch (error) {
-                setLoading(false);
-                console.error("Error promoting all students:", error);
-                alert("Error promoting all students. Please try again later.");
+          // Helper function to update class sections
+          const updateSections = async (
+            className,
+            sectionData,
+            batch = false
+          ) => {
+            const batchPrefix = batch ? `@${currentYear}Batch/` : "";
+
+            const promises = sections.map((section, i) => {
+              const data = sectionData[i];
+              if (Object.keys(data).length === 0) {
+                console.log(`No ${section} in class ${className}`);
+                return Promise.resolve();
+              }
+              return api
+                .put(
+                  `admissionForms/${className}/${batchPrefix}${section}.json`,
+                  data
+                )
+                .catch((error) => {
+                  console.error(
+                    `Error updating ${section} for ${className}:`,
+                    error
+                  );
+                });
+            });
+
+            await Promise.all(promises);
+          };
+
+          // Loop through classes and process sections
+          for (let i = 0; i < classUpdate.length - 1; i++) {
+            const currentClass = classUpdate[i + 1];
+            const previousClass = classUpdate[i];
+
+            // Fetch all section data
+            const { sectionA, sectionB, sectionC } = await fetchClassSections(
+              currentClass
+            );
+
+            // Delete old data from the current class
+            for (const section of sections) {
+              const students = await api.get(
+                `admissionForms/${currentClass}/${section}.json`
+              );
+              if (students.data) {
+                const deletePromises = Object.keys(students.data).map(
+                  (student) =>
+                    api.delete(
+                      `admissionForms/${currentClass}/${section}/${student}.json`
+                    )
+                );
+                await Promise.all(deletePromises);
+              }
             }
-        } else {
-            console.log("User not authenticated");
-            alert("User not authenticated");
+
+            // Promote students to the next class or batch
+            if (previousClass === "previousYearStudents") {
+              await updateSections(
+                previousClass,
+                [sectionA, sectionB, sectionC],
+                true
+              );
+            } else {
+              await updateSections(previousClass, [
+                sectionA,
+                sectionB,
+                sectionC,
+              ]);
+            }
+          }
+
+          //promoting the student attendence.....
+          async function promoteStudents() {
+            try {
+              const classes = [
+                "Pre-K",
+                "LKG",
+                "UKG",
+                "1st Class",
+                "2nd Class",
+                "3rd Class",
+                "4th Class",
+                "5th Class",
+                "6th Class",
+                "7th Class",
+                "8th Class",
+                "9th Class",
+                "10th Class",
+              ];
+
+              const sections = ["Section A", "Section B", "Section C"];
+
+              // Loop through each class to promote students
+              for (let i = 0; i < classes.length - 1; i++) {
+                let currentClass = classes[i];
+                let nextClass = classes[i + 1];
+
+                // Fetch current class data
+                let currentClassResponse = await api.get(
+                  `/Attendance/StudAttendance/${currentClass}.json`
+                );
+                let currentClassData = currentClassResponse.data;
+
+                // Ensure currentClassData is defined before proceeding
+                if (currentClassData) {
+                  // Filter only sections A, B, and C
+                  let filteredData = Object.fromEntries(
+                    Object.entries(currentClassData).filter(([section]) =>
+                      sections.includes(section)
+                    )
+                  );
+
+                  // Promote students to the next class if there's data to promote
+                  if (Object.keys(filteredData).length > 0) {
+                    await api.put(
+                      `/Attendance/StudAttendance/${nextClass}/@${currentClass}.json`,
+                      filteredData
+                    );
+                  }
+
+                  // Promote students from previous classes
+                  for (let j = 0; j < i; j++) {
+                    let incrementClass = classes[j];
+                    let previousClassResponse = await api.get(
+                      `/Attendance/StudAttendance/${currentClass}/@${incrementClass}.json`
+                    );
+                    let previousClassData = previousClassResponse.data;
+
+                    if (previousClassData) {
+                      await api.put(
+                        `/Attendance/StudAttendance/${nextClass}/@${incrementClass}.json`,
+                        previousClassData
+                      );
+                    }
+                  }
+
+                  // Delete the filtered sections from the current class
+                  for (const section of sections) {
+                    if (currentClassData[section]) {
+                      await api.delete(
+                        `/Attendance/StudAttendance/${currentClass}/${section}.json`
+                      );
+                    }
+                  }
+                }
+              }
+
+              // Special case for 10th Class promotion
+              let tenthClassResponse = await api.get(
+                `/Attendance/StudAttendance/10th Class.json`
+              );
+              let tenthClassData = tenthClassResponse.data;
+
+              if (tenthClassData) {
+                // Filter only sections A, B, and C
+                let tenthfilteredData = Object.fromEntries(
+                  Object.entries(tenthClassData).filter(([section]) =>
+                    sections.includes(section)
+                  )
+                );
+
+                if (tenthfilteredData) {
+                  let currentYear = new Date().getFullYear();
+
+                  // Archive 10th class data under previousYearStudents
+                  await api.put(
+                    `/Attendance/previousYearStudents/@${currentYear}Batch/@10th Class.json`,
+                    tenthfilteredData
+                  );
+
+                  for (const section of sections) {
+                    if (tenthfilteredData[section]) {
+                      await api.delete(
+                        `/Attendance/StudAttendance/10th Class/${section}.json`
+                      );
+                    }
+                  }
+                }
+              }
+
+              //for all the @classes in 10th class
+              for (let k = 0; k < 12; k++) {
+                let incrementclass = classes[k];
+                let previousClassResponse = await api.get(
+                  `/Attendance/StudAttendance/10th Class/@${incrementclass}.json`
+                );
+                let previousClassData = previousClassResponse.data;
+
+                if (previousClassData) {
+                  await api.put(
+                    `/Attendance/previousYearStudents/@${currentYear}Batch/@${incrementclass}.json`,
+                    previousClassData
+                  );
+                }
+              }
+
+              console.log("Student promotion completed.");
+            } catch (error) {
+              console.error("Error during promotion:", error);
+            }
+          }
+          // Call the function to promote students
+          promoteStudents();
+
+          //promoting the exam schedule..
+          async function storeExamSchedules() {
+            try {
+              const classes = [
+                "Pre-K",
+                "LKG",
+                "UKG",
+                "1st Class",
+                "2nd Class",
+                "3rd Class",
+                "4th Class",
+                "5th Class",
+                "6th Class",
+                "7th Class",
+                "8th Class",
+                "9th Class",
+                "10th Class",
+              ];
+
+              const testNames = [
+                "Class Test",
+                "FORMATIVE ASSESSMENT - I",
+                "FORMATIVE ASSESSMENT - II",
+                "SUMMATIVE ASSESSMENT - I",
+                "FORMATIVE ASSESSMENT - III",
+                "FORMATIVE ASSESSMENT - IV",
+                "SUMMATIVE ASSESSMENT - II",
+                "SUMMATIVE ASSESSMENT - III",
+              ];
+
+              // Loop through each class to promote students
+              for (let i = 0; i < classes.length - 1; i++) {
+                let currentClass = classes[i];
+                let nextClass = classes[i + 1];
+
+                // Fetch current class data
+                let currentClassResponse = await api.get(
+                  `/ExamSchedule/${currentClass}.json`
+                );
+                let currentClassData = currentClassResponse.data;
+
+                let filteredData = {};
+                if (currentClassData) {
+                  testNames.forEach((test) => {
+                    if (currentClassData[test]) {
+                      filteredData[test] = currentClassData[test];
+                    }
+                  });
+                }
+
+                if (filteredData) {
+                  await api.put(
+                    `/ExamSchedule/${nextClass}/@${currentClass}.json`,
+                    filteredData
+                  );
+                }
+
+                // Promote students from previous classes
+                for (let j = 0; j < i; j++) {
+                  let incrementClass = classes[j];
+                  let previousClassResponse = await api.get(
+                    `/ExamSchedule/${currentClass}/@${incrementClass}.json`
+                  );
+                  let previousClassData = previousClassResponse.data;
+
+                  if (previousClassData) {
+                    await api.put(
+                      `/ExamSchedule/${nextClass}/@${incrementClass}.json`,
+                      previousClassData
+                    );
+                  }
+                }
+                // Delete the filtered sections from the current class
+
+                for (const testName of testNames) {
+                  if (currentClassData[testName]) {
+                    try {
+                      await api.delete(`/ExamSchedule/${currentClass}/${testName}.json`);
+                      console.log(`Deleted: ${testName}`);
+                    } catch (error) {
+                      console.error(`Error deleting ${testName}:`, error);
+                    }
+                  }
+                }
+                
+              }
+
+              // Special case for 10th Class promotion
+              let tenthClassResponse = await api.get(
+                `/ExamSchedule/10th Class.json`
+              );
+              let tenthClassData = tenthClassResponse.data;
+              // Filter only tests present in 10th class for pervious year students
+              let tenthfilteredData = {};
+              testNames.forEach((test) => {
+                if (tenthClassData[test]) {
+                  tenthfilteredData[test] = tenthClassData[test];
+                }
+              });
+
+              if (tenthfilteredData) {
+                let currentYear = new Date().getFullYear();
+
+                // Archive 10th class data under previousYearStudents
+                await api.put(
+                  `/ExamSchedule/previousYearStudents/@${currentYear}Batch/@10th Class.json`,
+                  tenthfilteredData
+                );
+
+                for (const testName of testNames) {
+                  if (tenthfilteredData[testName]) {
+                    await api.delete(
+                      `/ExamSchedule/10th Class/${testName}.json`
+                    );
+                  }
+                }
+              }
+
+              //for all the @classes in 10th class
+              for (let k = 0; k < 12; k++) {
+                let incrementclass = classes[k];
+                let previousClassResponse = await api.get(
+                  `/ExamSchedule/10th Class/@${incrementclass}.json`
+                );
+                let previousClassData = previousClassResponse.data;
+
+                if (previousClassData) {
+                  await api.put(
+                    `/ExamSchedule/previousYearStudents/@${currentYear}Batch/@${incrementclass}.json`,
+                    previousClassData
+                  );
+                }
+              }
+              console.log("Student exam schedules are stored .");
+            } catch (error) {
+              console.error("Error during store the examSchedule:", error);
+            }
+          }
+          storeExamSchedules();
+
+          //store the exam marks for feature view
+          async function storeExamMarks() {
+            try {
+              const classes = [
+                "Pre-K",
+                "LKG",
+                "UKG",
+                "1st Class",
+                "2nd Class",
+                "3rd Class",
+                "4th Class",
+                "5th Class",
+                "6th Class",
+                "7th Class",
+                "8th Class",
+                "9th Class",
+                "10th Class",
+              ];
+
+              const sections = ["Section A", "Section B", "Section C"];
+
+              // Loop through each class to promote students
+              for (let i = 0; i < classes.length - 1; i++) {
+                let currentClass = classes[i];
+                let nextClass = classes[i + 1];
+                // Fetch current class data
+                let currentClassResponse = await api.get(
+                  `/ExamMarks/${currentClass}.json` 
+                );
+                let currentClassData = currentClassResponse.data;
+
+                // Ensure currentClassData is defined before proceeding
+                if (currentClassData) {
+                  // Filter only sections A, B, and C
+                  let filteredData = Object.fromEntries(
+                    Object.entries(currentClassData).filter(([section]) =>
+                      sections.includes(section)
+                    )
+                  );
+
+                  // Promote students to the next class if there's data to promote
+                  if (Object.keys(filteredData).length > 0) {
+                    await api.put(
+                      `/ExamMarks/${nextClass}/@${currentClass}.json`,
+                      filteredData
+                    );
+                  }
+
+                  // Promote students from previous classes
+                  for (let j = 0; j < i; j++) {
+                    let incrementClass = classes[j];
+                    let previousClassResponse = await api.get(
+                      `/ExamMarks/${currentClass}/@${incrementClass}.json`
+                    );
+                    let previousClassData = previousClassResponse.data;
+
+                    if (previousClassData) {
+                      await api.put(
+                        `/ExamMarks/${nextClass}/@${incrementClass}.json`,
+                        previousClassData
+                      );
+                    }
+                  }
+
+                  // Delete the filtered sections from the current class
+                  for (const section of sections) {
+                    if (currentClassData[section]) {
+                      await api.delete(
+                        `/ExamMarks/${currentClass}/${section}.json`
+                      );
+                    }
+                  }
+                }
+              }
+
+              // Special case for 10th Class promotion
+              let tenthClassResponse = await api.get(
+                `/ExamMarks/10th Class.json`
+              );
+              let tenthClassData = tenthClassResponse.data;
+
+              if (tenthClassData) {
+                // Filter only sections A, B, and C
+                let tenthfilteredData = Object.fromEntries(
+                  Object.entries(tenthClassData).filter(([section]) =>
+                    sections.includes(section)
+                  )
+                );
+
+                if (tenthfilteredData) {
+                  let currentYear = new Date().getFullYear();
+
+                  // Archive 10th class data under previousYearStudents
+                  await api.put(
+                    `/ExamMarks/previousYearStudents/@${currentYear}Batch/@10th Class.json`,
+                    tenthfilteredData
+                  );
+
+                  for (const section of sections) {
+                    if (tenthfilteredData[section]) {
+                      await api.delete(
+                        `/ExamMarks/10th Class/${section}.json`
+                      );
+                    }
+                  }
+                }
+              }
+
+              //for all the @classes in 10th class
+              for (let k = 0; k < 12; k++) {
+                let incrementclass = classes[k];
+                let previousClassResponse = await api.get(
+                  `/ExamMarks/10th Class/@${incrementclass}.json`
+                );
+                let previousClassData = previousClassResponse.data;
+
+                if (previousClassData) {
+                  await api.put(
+                    `/ExamMarks/previousYearStudents/@${currentYear}Batch/@${incrementclass}.json`,
+                    previousClassData
+                  );
+                }
+              }
+
+              console.log("Student promotion completed.");
+            } catch (error) {
+              console.error("Error during promotion:", error);
+            }
+          }
+          storeExamMarks()
+
+          alert("All students promoted successfully.");
+        } catch (error) {
+          console.error("Error promoting all students:", error);
+          alert("Error promoting all students. Please try again later.");
         }
+      } else {
+        console.log("User not authenticated");
+        alert("User not authenticated");
+      }
     } catch (error) {
-        setLoading(false);
-        console.error("Login failed:", error.message);
-        alert("Login failed. Please try again.");
-    } finally{
+      console.error("Login failed:", error.message);
+      alert("Login failed. Please try again.");
+    } finally {
       setLoading(false);
     }
-};
+  };
 
   return (
     <>
@@ -386,7 +710,7 @@ const StudentPromotionForm = () => {
       </h3>
       <div className="promotion-form">
         <h2>Student Promotion Form</h2>
-        <form onSubmit={handleSubmit} style={{width:'100%'}}>  
+        <form onSubmit={handleSubmit} style={{ width: "100%" }}>
           <label>Current Class:</label>
           <select
             name="currentClass"
@@ -475,9 +799,7 @@ const StudentPromotionForm = () => {
               </option>
             ))}
           </select>
-          <button type="submit">
-      {loading ? "Submitting..." : "Submit"}
-    </button>
+          <button type="submit">{loading ? "Submitting..." : "Submit"}</button>
         </form>
         <span className="or">or</span>
         <input

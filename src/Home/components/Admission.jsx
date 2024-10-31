@@ -89,7 +89,7 @@ function Admission() {
           <MDBCard>
             <MDBCardBody className="px-4">
               <h3 className="fw-bold mb-4 pb-2 pb-md-0 mb-md-5">
-                Registration Form
+                Registration Form For Student Admission
               </h3>
               {submitted ? (
                 <div className="alert alert-success" role="alert">
