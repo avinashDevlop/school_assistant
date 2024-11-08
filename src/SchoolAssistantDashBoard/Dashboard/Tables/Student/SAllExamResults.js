@@ -244,7 +244,6 @@ const AllStudExamResults = () => {
 
             const percentage = result.percentage;
             const grade = getGrade(percentage);
-
             return {
               SINo: index + 1,
               Name: name,
@@ -537,9 +536,7 @@ const AllStudExamResults = () => {
                             submittedData.progressCard.subjects[subject] ||
                             "N/A";
                           const totalMarksPerSubject =
-                            submittedData.TotalMarks /
-                            Object.keys(submittedData.progressCard.subjects)
-                              .length;
+                          submittedData.progressCard.subjectMaxMarks[subject] || "N/A";
                           const grade = getGrade(
                             (marks / totalMarksPerSubject) * 100
                           );

@@ -867,6 +867,7 @@ const AdmissionForm = () => {
               onChange={handleChange}
               placeholder="Enter email"
               autoComplete="new-password"
+              required
             />
           </div>
           <div className="form-group1">

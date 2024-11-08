@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -18,6 +18,7 @@ const AddMarks = () => {
   const [lastDate, setLastDate] = useState(null);
   const [subjects, setSubjects] = useState([]);
   const [examsAvailable, setExamsAvailable] = useState(false);
+  const [subMaxMarks, setSubMaxMarks] = useState({});
 
   const classOptions = [
     "10th Class",
@@ -66,34 +67,64 @@ const AddMarks = () => {
     fetchData();
   }, [selectedClass]);
 
-  useEffect(() => {
-    const fetchStudentData = async () => {
-      try {
-        const response = await api.get(
-          `admissionForms/${selectedClass}/${selectedSection}.json`
-        );
-        const data = response.data || {};
-        const students = Object.entries(data).map(([id, student]) => ({
-          id,
-          name: student.name,
-          gender: student.gender,
-          subjects: subjects.reduce((acc, subj) => ({ ...acc, [subj]: '' }), {}),
-          totalMarks: '',
-          obtainMarks: '',
-          percentage: '',
-          grade: '',
-          passFail: ''
-        }));
-        setStudentsData(students);
-      } catch (error) {
-        console.error("Error fetching student data:", error);
-      }
-    };
 
-    if (selectedClass && selectedSection) {
+  const fetchStudentData = useCallback(async () => {
+    try {
+      const response = await api.get(
+        `admissionForms/${selectedClass}/${selectedSection}.json`
+      );
+      const data = response.data || {};
+  
+      const students = await Promise.all(
+        Object.entries(data).map(async ([id, student]) => {
+          const marksResponse = await api.get(
+            `ExamMarks/${selectedClass}/${selectedSection}/${selectedTestName}/studentResults/${id}.json`
+          );
+          const marksData = marksResponse.data?.subjects || {};
+  
+          const studentSubjects = subjects.reduce((acc, subj) => ({
+            ...acc,
+            [subj]: marksData[subj] || ""
+          }), {});
+  
+          const obtainMarks = subjects.reduce(
+            (total, subj) => total + (parseInt(studentSubjects[subj]) || 0),
+            0
+          );
+  
+          const percentage = maxMarks > 0 ? ((obtainMarks / maxMarks) * 100).toFixed(2) : "";
+          const grade = calculateGrade(percentage);
+          const passFail = subjects.every((subj) =>
+            parseInt(studentSubjects[subj] || 0) >= (maxMarks / subjects.length) * 0.3
+          ) ? "Pass" : "Fail";
+  
+          return {
+            id,
+            name: student.name,
+            gender: student.gender,
+            subjects: studentSubjects,
+            totalMarks: maxMarks,
+            obtainMarks: obtainMarks,
+            percentage: percentage,
+            grade: grade,
+            passFail: passFail
+          };
+        })
+      );
+  
+      setStudentsData(students);
+    } catch (error) {
+      console.error("Error fetching student data:", error);
+    }
+  }, [selectedClass, selectedSection, selectedTestName, subjects, maxMarks]);
+  
+  // Use `fetchStudentData` in useEffect directly.
+  useEffect(() => {
+    if (selectedClass && selectedSection && selectedTestName) {
       fetchStudentData();
     }
-  }, [selectedClass, selectedSection, subjects]);
+  }, [selectedClass, selectedSection, selectedTestName, fetchStudentData]);
+    
 
   useEffect(() => {
     const fetchTestName = async () => {
@@ -145,7 +176,14 @@ const AddMarks = () => {
         if (Object.keys(data).length > 0) {
           const Dates = Object.keys(data);
           const subjects = Dates.map(date => data[date].subject);
-          const totalMaxMarks = Dates.map(date => Number(data[date].maxMarks) || 0).reduce((acc, curr) => acc + curr, 0);
+          const subMaxMarksData = {};
+          Dates.forEach(date => {
+            const subject = data[date].subject;
+            const maxMarks = Number(data[date].maxMarks) || 0;
+            subMaxMarksData[subject] = maxMarks;
+          });
+          const totalMaxMarks = Object.values(subMaxMarksData).reduce((acc, curr) => acc + curr, 0);
+          setSubMaxMarks(subMaxMarksData);
           setSubjects(subjects);
           setmaxMarks(totalMaxMarks);
           setFirstDate(Dates[0]);
@@ -155,6 +193,7 @@ const AddMarks = () => {
           setFirstDate(null);
           setLastDate(null);
           setmaxMarks(0);
+          setSubMaxMarks({});
         }
       } catch (error) {
         console.error("Error fetching exam data:", error);
@@ -282,6 +321,7 @@ const AddMarks = () => {
           name: student.name,
           gender: student.gender,
           subjects: student.subjects,
+          subjectMaxMarks: subMaxMarks,
           totalMarks: student.totalMarks,
           obtainMarks: student.obtainMarks,
           percentage: student.percentage,
@@ -296,19 +336,17 @@ const AddMarks = () => {
       );
 
       window.alert("Marks submitted successfully!");
-
+      
       setStudentsData(studentsData.map(student => ({
         ...student,
-        subjects: subjects.reduce((
-
-acc, subj) => ({ ...acc, [subj]: ''}), {}),
+        subjects: subjects.reduce((acc, subj) => ({ ...acc, [subj]: ''}), {}),
         totalMarks: '',
         obtainMarks: '',
         percentage: '',
         grade: '',
         passFail: ''
       })));
-
+      await fetchStudentData();
     } catch (error) {
       console.error("Error submitting marks:", error);
     }
@@ -319,12 +357,9 @@ acc, subj) => ({ ...acc, [subj]: ''}), {}),
     setSectionOptions([]);
   };
   
-
   const handleSectionChange = (event) => {
     setSelectedSection(event.target.value);
   };
-
- 
 
  const handleTestChange = (event) => {
     setSelectedTestName(event.target.value);
