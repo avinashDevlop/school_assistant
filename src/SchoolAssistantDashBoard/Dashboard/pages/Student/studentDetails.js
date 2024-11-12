@@ -15,7 +15,7 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 
 const StudentDetails = () => {
-  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedClass, setSelectedClass] = useState("10th Class");
   const [selectedSection, setSelectedSection] = useState("");
   const [selectedName, setSelectedName] = useState("");
   const [studentDetails, setStudentDetails] = useState({});
