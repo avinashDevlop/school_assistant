@@ -154,8 +154,8 @@ const AddTeacherAndEducationForm = () => {
             flex-direction: column;
             align-items: center;
             padding: 20px;
-            width: 100%;
-            padding: 2% 3% 0 10%;
+            width: 80%;
+            margin: 0 auto;
             background-color: #e4e4ff;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -164,24 +164,23 @@ const AddTeacherAndEducationForm = () => {
           .add-teacher-form,
           .education-form {
             margin-bottom: 20px;
-            margin:30px 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-gap: 20px;
-            width: 90%;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content: flex-start;
           }
 
           label {
             display: block;
             margin-bottom: 10px;
+            width:55%;
           }
 
           input,
           textarea {
+            display: block;
             width: 100%;
             padding: 8px;
-            margin-top: 4px;
-            margin-bottom: 10px;
             box-sizing: border-box;
             border: 1px solid #ccc;
             border-radius: 5px;

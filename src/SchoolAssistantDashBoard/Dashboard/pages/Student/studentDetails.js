@@ -31,8 +31,8 @@ const StudentDetails = () => {
     if (location.state) {
       const { class: classParam, section: sectionParam, name: nameParam } = location.state;
       setSelectedClass(classParam);
-      setSelectedSection(sectionParam);
-      setSelectedName(nameParam);
+      setSelectedSection(sectionParam|| "");
+      setSelectedName(nameParam|| "");
     }
   }, [location.state]);
 
@@ -73,7 +73,7 @@ const StudentDetails = () => {
           if (data) {
             const sections = Object.keys(data);
             setSections(sections);
-            if (!location.state) {
+            if (!location.state || !location.state.section) {
               setSelectedSection(sections[0]);
             }
           }
@@ -97,7 +97,7 @@ const StudentDetails = () => {
           if (data) {
             const names = Object.keys(data);
             setStudentNames(names);
-            if (!location.state) {
+            if (!location.state || !location.state.name) {
               setSelectedName(names[0]);
             }
           }
