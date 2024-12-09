@@ -1,5 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './AuthContext';
+import PrivateRoute from './PrivateRoute';
 import Home from './Home/Home.js';
 import Gallery from './Home/components/Gallery.jsx';
 import WebsiteAdmission from './Home/components/Admission.jsx';
@@ -35,6 +37,7 @@ import Finance from './SchoolAssistantDashBoard/Dashboard/pages/Finance/Finance.
 import StudResults from './SchoolAssistantDashBoard/Dashboard/pages/Exam/StudResults.jsx';
 const App = () => {
   return (
+    <AuthProvider>
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
@@ -44,7 +47,7 @@ const App = () => {
         <Route path="/AboutUs" element={<AboutUs />} />
         <Route path="/LoginForm" element={<Login />} />
         
-        <Route path="/Dashboard" element={<Layout />}>
+        <Route path="/Dashboard" element={<PrivateRoute><Layout /></PrivateRoute>}>
           <Route index element={<AdminDashboard />} />
           <Route path="AdminDashboard" element={<AdminDashboard />} />
           <Route path="TeacherDashboard" element={<TeacherDashboard />} />
@@ -76,6 +79,7 @@ const App = () => {
         <Route path="*" element={<div>Not Found</div>} />
       </Routes>
     </Router>
+    </AuthProvider>
   );
 };
 
