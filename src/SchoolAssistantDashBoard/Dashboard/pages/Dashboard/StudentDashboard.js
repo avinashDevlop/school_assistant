@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import StudentAttendence from "../../graphs/AttendanceSatus.js";
 import SExamStatus from "../../graphs/SExamStatus.js";
-import { IoMdArrowDropleft } from "react-icons/io";
-import { IoMdArrowDropright } from "react-icons/io";
 import "./StudentDashboardCSS.css";
 import TopStudTableClassWise from "../../Tables/STopStudentClassWise.js";
 import UnpaidStud from "../../Tables/SUnpaidFees.js";
@@ -15,40 +13,8 @@ import {
 import { faGlobe } from "@fortawesome/free-solid-svg-icons";
 const StudentDashboard = () => {
   // class
-  const [selectedClass, setSelectedClass] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
   const [selectedExamClass, setSelectedExamClass] = useState("");
   const [selectedTest, setSelectedTest] = useState("");
-  //  Define class options from 10th class to pre-K
-  const classOptions = [
-    "10th Class",
-    "9th Class",
-    "8th Class",
-    "7th Class",
-    "6th Class",
-    "5th Class",
-    "4th Class",
-    "3rd Class",
-    "2nd Class",
-    "1st Class",
-    "Pre-K",
-  ];
-  const monthOptions = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  const yearOptions = ["2024", "2023", "2022"];
 
   const examClassOptions = [
     "10th Class Students",
@@ -71,16 +37,6 @@ const StudentDashboard = () => {
     // Add more test names as needed
   ];
 
-  const handleClassChange = (e) => {
-    setSelectedClass(e.target.value);
-  };
-
-  const handleMonthChange = (e) => {
-    setSelectedMonth(e.target.value);
-  };
-  const handleYearChange = (e) => {
-    setSelectedYear(e.target.value);
-  };
   const handleTestChange = (e) => {
     setSelectedTest(e.target.value);
   };
@@ -94,44 +50,6 @@ const StudentDashboard = () => {
       </h3>
       <div>
         <div className="studGraph studGraphtop">
-          <div className="detailStud">
-            <div className="noStud">Attendance status</div>
-             <div className="Class">
-              <select value={selectedClass} onChange={handleClassChange}>
-                {classOptions.map((className, index) => (
-                  <option key={index} value={className}>
-                    {className}
-                  </option>
-                ))}
-              </select>
-             </div>
-             <div className="Month">
-              <select value={selectedMonth} onChange={handleMonthChange}>
-                {monthOptions.map((month, index) => (
-                  <option key={index} value={month}>
-                    {month}
-                  </option>
-                ))}
-              </select>
-             </div>
-             <div className="Year">
-              <select value={selectedYear} onChange={handleYearChange}>
-                {yearOptions.map((year, index) => (
-                  <option key={index} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="threeDots">
-              <span>
-                <IoMdArrowDropleft />
-              </span>
-              <span>
-                <IoMdArrowDropright />
-              </span>
-            </div>
-          </div>
           <StudentAttendence />
         </div>
         {/* graph */}

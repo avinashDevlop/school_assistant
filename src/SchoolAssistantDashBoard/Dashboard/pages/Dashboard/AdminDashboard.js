@@ -1,26 +1,87 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { getDatabase, ref, get } from "firebase/database"; // Firebase imports
 import { PiStudentDuotone } from "react-icons/pi";
 import { LiaChalkboardTeacherSolid } from "react-icons/lia";
 import { GiMoneyStack } from "react-icons/gi";
-import { BsCalendar3 } from "react-icons/bs";
+import { BsCalendar3, BsThreeDotsVertical } from "react-icons/bs";
 import StudentAttendence from "../../graphs/TotalStudentAttendence.js";
 import TotalStudentExamGrades from "../../graphs/TotalStudentExamGrades.js";
 import TopStudTable from "../../Tables/topStudent.js";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFacebook,
-  faInstagramSquare,
-  faWhatsapp,
-} from "@fortawesome/free-brands-svg-icons";
-import { faGlobe } from "@fortawesome/free-solid-svg-icons";
 import "./AdminDashboardCSS.css";
+
 const AdminDashboard = () => {
+  const [studentCount, setStudentCount] = useState(0); // State for total students
+  const [teacherCount, setTeacherCount] = useState(0); // State for total teachers
+
+  // Function to count total students from Firebase
+  const countStudents = async () => {
+    const db = getDatabase();
+    const dbRef = ref(db, "admissionForms"); // Path in Firebase
+
+    try {
+      const snapshot = await get(dbRef);
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        let totalStudents = 0;
+
+        // Loop through classes and sections to count students
+        Object.keys(data).forEach((classKey) => {
+          const sections = data[classKey];
+          Object.keys(sections).forEach((sectionKey) => {
+            const students = sections[sectionKey];
+            totalStudents += Object.keys(students).length;
+          });
+        });
+
+        return totalStudents;
+      } else {
+        console.log("No data found in Firebase");
+        return 0;
+      }
+    } catch (error) {
+      console.error("Error fetching data from Firebase:", error);
+      return 0;
+    }
+  };
+
+  // Function to count total teachers from Firebase
+  const countTeachers = async () => {
+    const db = getDatabase();
+    const dbRef = ref(db, "accounts/Teachers"); // Path in Firebase
+
+    try {
+      const snapshot = await get(dbRef);
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const totalTeachers = Object.keys(data).length; // Count teacher entries
+        return totalTeachers;
+      } else {
+        console.log("No teachers found in Firebase");
+        return 0;
+      }
+    } catch (error) {
+      console.error("Error fetching teachers from Firebase:", error);
+      return 0;
+    }
+  };
+
+  // Fetch total students and teachers on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      const studentCount = await countStudents();
+      setStudentCount(studentCount); // Update state with student count
+
+      const teacherCount = await countTeachers();
+      setTeacherCount(teacherCount); // Update state with teacher count
+    };
+    fetchData();
+  }, []);
+
   return (
     <div>
       <h3>
-          Dashboard/<span>Admin</span>
-        </h3>
+        Dashboard/<span>Admin</span>
+      </h3>
       <div className="dashboard-content">
         <div className="container_top">
           <div className="container_top_data">
@@ -31,9 +92,9 @@ const AdminDashboard = () => {
                 </span>
               </div>
               <div className="details">
-                <div className="dataName">Student</div>
+                <div className="dataName">Students</div>
                 <div>
-                  <span className="green">211</span>/233
+                  <span className="green">{studentCount}</span>
                 </div>
               </div>
             </div>
@@ -44,9 +105,9 @@ const AdminDashboard = () => {
                 </span>
               </div>
               <div className="details">
-                <div className="dataName">Teacher</div>
+                <div className="dataName">Teachers</div>
                 <div>
-                  <span className="green">21</span>/33
+                  <span className="green">{teacherCount}</span>
                 </div>
               </div>
             </div>
@@ -59,7 +120,7 @@ const AdminDashboard = () => {
               <div className="details">
                 <div className="dataName">Fees</div>
                 <div>
-                  <span className="green">201</span>/233
+                  <span className="green">0</span>/{studentCount}
                 </div>
               </div>
             </div>
@@ -72,19 +133,13 @@ const AdminDashboard = () => {
               <div className="details">
                 <div className="dataName">Events</div>
                 <div>
-                  <span>23</span>
+                  <span>0</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div className="studGraph">
-          <div className="detailStud">
-            <div className="noStud">Number of Students class wise</div>
-            <div className="threeDots">
-              <BsThreeDotsVertical />
-            </div>
-          </div>
           <StudentAttendence />
         </div>
         <div className="studGraph">
@@ -100,8 +155,7 @@ const AdminDashboard = () => {
               test-2
             </div>
             <div className="RightOne">
-              <span className="Onename">Conducted on :</span> 10 May, 10:00AM -
-              11:30AM
+              <span className="Onename">Conducted on :</span> 10 May, 10:00AM - 11:30AM
             </div>
           </div>
           <div className="pieGrade">
@@ -109,10 +163,10 @@ const AdminDashboard = () => {
           </div>
           <div className="detailExam">
             <div className="leftOne">
-               Students attended the test <span className="Onename">: 300</span>
+              Students attended the test <span className="Onename">: 300</span>
             </div>
             <div className="RightOne">
-               Students didn’t attend the test <span className="Onename">: 20</span>  
+              Students didn’t attend the test <span className="Onename">: 20</span>
             </div>
           </div>
         </div>
@@ -127,33 +181,6 @@ const AdminDashboard = () => {
             <div className="tableStudentMarks">
               <TopStudTable />
             </div>
-          </div>
-        </div>
-        {/* social media */}
-        <div className="container_Bottom_data">
-          <div className="Lastcard">
-            <div className="facebook">
-              <FontAwesomeIcon icon={faFacebook} />
-            </div>
-            <div className="details">Visit</div>
-          </div>
-          <div className="Lastcard">
-            <div className="instragram">
-              <FontAwesomeIcon icon={faInstagramSquare} />
-            </div>
-            <div className="details">Visit</div>
-          </div>
-          <div className="Lastcard">
-            <div className="WhatsApp">
-              <FontAwesomeIcon icon={faWhatsapp} />
-            </div>
-            <div className="details">Chart</div>
-          </div>
-          <div className="Lastcard">
-            <div className="Website">
-              <FontAwesomeIcon icon={faGlobe} />
-            </div>
-            <div className="details">Visit</div>
           </div>
         </div>
       </div>

@@ -23,7 +23,6 @@ const LoginForm = () => {
       const user = auth.currentUser;
 
       if (user) {
-        console.log('Login successfully', user);
         window.alert('Login successful!');
         navigate("/Dashboard");
       } else {

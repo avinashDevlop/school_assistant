@@ -11,15 +11,29 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import Slide from '@mui/material/Slide';
 import PersonAdd from '@mui/icons-material/PersonAdd';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
 import './navBarCSS.css';
 
+// Transition effect for the dialog
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 const TopHeader = ({ onToggleSidebar }) => {
   const [dateTime, setDateTime] = useState(getCurrentDateTime());
   const [anchorEl, setAnchorEl] = useState(null);
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const open = Boolean(anchorEl);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -40,23 +54,32 @@ const TopHeader = ({ onToggleSidebar }) => {
     return { time: formattedTime, date: ` ${formattedDate}` };
   }
 
-  const handleClick = (event) => {
+  const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  const navigate = useNavigate();
 
-  const handleLogout = () => {
-    handleClose();
-    navigate('/');
-  };
-  const handleClose = () => {
+  const handleMenuClose = () => {
     setAnchorEl(null);
   };
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
   const handleToggleSidebar = () => {
     onToggleSidebar();
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleLogout = () => {
+    setLogoutDialogOpen(true);
+  };
+
+  const confirmLogout = () => {
+    setLogoutDialogOpen(false);
+    navigate('/LoginForm');
+  };
+
+  const cancelLogout = () => {
+    setLogoutDialogOpen(false);
   };
 
   return (
@@ -69,22 +92,20 @@ const TopHeader = ({ onToggleSidebar }) => {
           </div>
         </div>
 
-        <div className="center">
-          St. JOHN'S ENGLISH MEDIUM SCHOOL, Mydukur
-        </div>
+        <div className="center">St. JOHN'S ENGLISH MEDIUM SCHOOL, Mydukur</div>
 
         <div className="right">
           <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-            <Tooltip title="Account settings">
+            <Tooltip title="Account">
               <IconButton
-                onClick={handleClick}
+                onClick={handleMenuOpen}
                 size="large"
-                sx={{ ml: 2 }} 
+                sx={{ ml: 2 }}
                 aria-controls={open ? 'account-menu' : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? 'true' : undefined}
-                style={{color:'white',paddingRight:'20px'}}
-              > 
+                style={{ color: 'white', paddingRight: '20px' }}
+              >
                 <FaUserCircle />
               </IconButton>
             </Tooltip>
@@ -94,8 +115,8 @@ const TopHeader = ({ onToggleSidebar }) => {
             anchorEl={anchorEl}
             id="account-menu"
             open={open}
-            onClose={handleClose}
-            onClick={handleClose}
+            onClose={handleMenuClose}
+            onClick={handleMenuClose}
             PaperProps={{
               elevation: 0,
               sx: {
@@ -113,7 +134,7 @@ const TopHeader = ({ onToggleSidebar }) => {
                   display: 'block',
                   position: 'absolute',
                   top: 0,
-                  right: 14,
+                  right: 31,
                   width: 10,
                   height: 10,
                   bgcolor: 'background.paper',
@@ -125,20 +146,20 @@ const TopHeader = ({ onToggleSidebar }) => {
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           >
-            <MenuItem onClick={handleClose}>
+            <MenuItem>
               <Avatar /> Profile
             </MenuItem>
-            <MenuItem onClick={handleClose}>
+            <MenuItem>
               <Avatar /> My account
             </MenuItem>
             <Divider />
-            <MenuItem onClick={handleClose}>
+            <MenuItem>
               <ListItemIcon>
                 <PersonAdd fontSize="small" />
               </ListItemIcon>
               Add another account
             </MenuItem>
-            <MenuItem onClick={handleClose}>
+            <MenuItem>
               <ListItemIcon>
                 <Settings fontSize="small" />
               </ListItemIcon>
@@ -163,6 +184,31 @@ const TopHeader = ({ onToggleSidebar }) => {
           </div>
         </div>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog
+        open={logoutDialogOpen}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={cancelLogout}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title" style={{ textAlign: 'center' }}>
+          Logout Confirmation
+        </DialogTitle>
+        <DialogContent style={{ textAlign: 'center', padding: '20px' }}>
+          Are you sure you want to logout?
+        </DialogContent>
+        <DialogActions style={{ justifyContent: 'center' }}>
+          <Button onClick={cancelLogout} color="secondary" variant="contained">
+            Cancel
+          </Button>
+          <Button onClick={confirmLogout} color="primary" variant="contained">
+            Logout
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
